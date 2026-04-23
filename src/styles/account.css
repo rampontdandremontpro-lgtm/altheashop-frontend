@@ -53,6 +53,124 @@
   gap: 24px;
 }
 
+.account-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.account-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.account-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.account-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.account-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  background: #fff;
+}
+
+.account-card p {
+  margin: 4px 0;
+  color: var(--muted);
+}
+
+.account-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.account-card-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.account-form-grid input,
+.account-form-grid select,
+.account-form-grid textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+}
+
+.account-form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+}
+
+.default-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  grid-column: 1 / -1;
+}
+
+.default-toggle input {
+  width: auto;
+  margin: 0;
+}
+
+.default-toggle span {
+  line-height: 1.4;
+}
+
+.inline-error {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+.badge-default {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .settings-list {
   display: flex;
   flex-direction: column;
@@ -85,10 +203,24 @@
   margin-top: 0;
 }
 
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
 @media (max-width: 900px) {
   .account-grid,
   .account-layout,
   .account-grid-content {
     grid-template-columns: 1fr;
+  }
+
+  .account-summary-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

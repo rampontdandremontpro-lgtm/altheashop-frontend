@@ -6,12 +6,15 @@ import { formatPrice } from "../utils/formatPrice";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 
+const FALLBACK_IMAGE =
+  "https://placehold.co/800x500/e5e7eb/6b7280?text=Image+indisponible";
+
 function ProductPage() {
   const { slug } = useParams();
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
-  const [mainImage, setMainImage] = useState("");
+  const [mainImage, setMainImage] = useState(FALLBACK_IMAGE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -23,7 +26,7 @@ function ProductPage() {
 
         const data = await getProductBySlug(slug);
         setProduct(data);
-        setMainImage(data.images?.[0]?.imageUrl || "");
+        setMainImage(data.images?.[0]?.imageUrl || FALLBACK_IMAGE);
       } catch (err) {
         setError("Produit introuvable.");
       } finally {
@@ -38,7 +41,6 @@ function ProductPage() {
   if (error) return <ErrorMessage message={error} />;
   if (!product) return null;
 
-  const fallback = "https://placehold.co/800x500?text=Produit";
   const images = product.images || [];
 
   return (
@@ -46,9 +48,12 @@ function ProductPage() {
       <section className="product-detail">
         <div className="box">
           <img
-            src={mainImage || fallback}
+            src={mainImage}
             alt={product.name}
             className="product-main-image"
+            onError={(e) => {
+              e.currentTarget.src = FALLBACK_IMAGE;
+            }}
           />
 
           {images.length > 0 && (
@@ -57,12 +62,15 @@ function ProductPage() {
                 <button
                   key={img.id}
                   className="thumb-button"
-                  onClick={() => setMainImage(img.imageUrl)}
+                  onClick={() => setMainImage(img.imageUrl || FALLBACK_IMAGE)}
                 >
                   <img
-                    src={img.imageUrl}
-                    alt={product.name}
+                    src={img.imageUrl || FALLBACK_IMAGE}
+                    alt={img.altText || product.name}
                     className="thumb-image"
+                    onError={(e) => {
+                      e.currentTarget.src = FALLBACK_IMAGE;
+                    }}
                   />
                 </button>
               ))}

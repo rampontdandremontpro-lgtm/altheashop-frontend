@@ -2,6 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+function normalizePhone(value) {
+  return value.replace(/\D/g, "").slice(0, 10);
+}
+
+function isValidPhone(phone) {
+  return /^\d{10}$/.test(phone);
+}
+
 function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -20,9 +28,17 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    let nextValue = value;
+
+    if (name === "phone") {
+      nextValue = normalizePhone(value);
+    }
+
     setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: nextValue,
     }));
   };
 
@@ -34,10 +50,18 @@ function RegisterPage() {
       !form.firstName ||
       !form.lastName ||
       !form.email ||
+      !form.phone ||
       !form.password ||
       !form.confirmPassword
     ) {
       setError("Merci de remplir tous les champs obligatoires.");
+      return;
+    }
+
+    if (!isValidPhone(form.phone)) {
+      setError(
+        "Le numéro de téléphone doit contenir exactement 10 chiffres."
+      );
       return;
     }
 
@@ -105,6 +129,8 @@ function RegisterPage() {
               placeholder="Téléphone"
               value={form.phone}
               onChange={handleChange}
+              inputMode="numeric"
+              maxLength={10}
             />
 
             <select name="role" value={form.role} onChange={handleChange}>

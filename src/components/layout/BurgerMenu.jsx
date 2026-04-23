@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import SearchBar from "./SearchBar";
 
 function BurgerMenu({
   isOpen,
@@ -14,6 +15,10 @@ function BurgerMenu({
 
   return (
     <div className="mobile-menu">
+      <div className="mobile-menu-search">
+        <SearchBar onSearchDone={onClose} />
+      </div>
+
       <nav className="mobile-menu-nav">
         <NavLink to="/" onClick={onClose}>
           Accueil
@@ -21,6 +26,10 @@ function BurgerMenu({
 
         <NavLink to="/catalog" onClick={onClose}>
           Catalogue
+        </NavLink>
+
+        <NavLink to="/search" onClick={onClose}>
+          Recherche
         </NavLink>
 
         <NavLink to="/cart" onClick={onClose}>
@@ -77,10 +86,6 @@ function BurgerMenu({
           <>
             <NavLink to="/login" onClick={onClose}>
               Connexion
-            </NavLink>
-
-            <NavLink to="/register" onClick={onClose}>
-              Inscription
             </NavLink>
           </>
         )}

@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import BurgerMenu from "./BurgerMenu";
+import SearchBar from "./SearchBar";
 
 function Header() {
   const { totalItems } = useCart();
@@ -20,6 +21,10 @@ function Header() {
         <Link to="/" className="brand">
           Althea Shop
         </Link>
+
+        <div className="header-search-wrapper desktop-only">
+          <SearchBar />
+        </div>
 
         <nav className="nav nav-desktop">
           <NavLink to="/">Accueil</NavLink>
@@ -40,7 +45,6 @@ function Header() {
           ) : (
             <>
               <NavLink to="/login">Connexion</NavLink>
-              <NavLink to="/register">Inscription</NavLink>
             </>
           )}
         </nav>

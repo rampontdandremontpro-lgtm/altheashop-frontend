@@ -5,6 +5,7 @@ import "./styles/globals.css";
 import "./styles/layout.css";
 import "./styles/home.css";
 import "./styles/catalog.css";
+import "./styles/search.css";
 import "./styles/cart.css";
 import "./styles/auth.css";
 import "./styles/account.css";

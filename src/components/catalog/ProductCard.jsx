@@ -1,17 +1,26 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../utils/formatPrice";
 
+const FALLBACK_IMAGE =
+  "https://placehold.co/600x400/e5e7eb/6b7280?text=Image+indisponible";
+
 function ProductCard({ product }) {
   const { addToCart } = useCart();
-
-  const imageUrl =
-    product.images?.[0]?.imageUrl || "https://placehold.co/600x400?text=Produit";
+  const [imageSrc, setImageSrc] = useState(
+    product.images?.[0]?.imageUrl || FALLBACK_IMAGE
+  );
 
   return (
     <article className="card">
       <Link to={`/product/${product.slug}`} className="card-image-wrapper">
-        <img src={imageUrl} alt={product.name} className="card-image" />
+        <img
+          src={imageSrc}
+          alt={product.name}
+          className="card-image"
+          onError={() => setImageSrc(FALLBACK_IMAGE)}
+        />
       </Link>
 
       <div className="card-body">

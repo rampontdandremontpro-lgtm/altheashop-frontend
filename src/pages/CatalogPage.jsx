@@ -22,7 +22,7 @@ function CatalogPage() {
   const [filters, setFilters] = useState({
     q: "",
     category: "",
-    sort: "relevance",
+    sort: "priority",
     inStock: false,
     minPriceCents: "",
     maxPriceCents: "",
@@ -30,6 +30,7 @@ function CatalogPage() {
 
   const [page, setPage] = useState(1);
 
+  // 🔹 Charger catégories
   useEffect(() => {
     async function fetchCategoriesData() {
       try {
@@ -43,6 +44,7 @@ function CatalogPage() {
     fetchCategoriesData();
   }, []);
 
+  // 🔹 Charger produits
   useEffect(() => {
     async function fetchProductsData() {
       try {
@@ -58,13 +60,17 @@ function CatalogPage() {
         if (filters.q.trim()) params.q = filters.q.trim();
         if (filters.category) params.category = filters.category;
         if (filters.inStock) params.inStock = true;
-        if (filters.minPriceCents) params.minPriceCents = Number(filters.minPriceCents);
-        if (filters.maxPriceCents) params.maxPriceCents = Number(filters.maxPriceCents);
+        if (filters.minPriceCents) {
+          params.minPriceCents = Number(filters.minPriceCents);
+        }
+        if (filters.maxPriceCents) {
+          params.maxPriceCents = Number(filters.maxPriceCents);
+        }
 
         const data = await getProducts(params);
         setProductsData(data);
       } catch (err) {
-        setError("Impossible de charger le catalogue.");
+        setError("Impossible de charger les produits.");
       } finally {
         setLoading(false);
       }
@@ -73,6 +79,7 @@ function CatalogPage() {
     fetchProductsData();
   }, [page, filters]);
 
+  // 🔹 Changement filtre (AUTO)
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -80,18 +87,16 @@ function CatalogPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    setPage(1); // reset pagination automatiquement
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setPage(1);
-  };
-
+  // 🔹 Reset
   const handleReset = () => {
     setFilters({
       q: "",
       category: "",
-      sort: "relevance",
+      sort: "priority",
       inStock: false,
       minPriceCents: "",
       maxPriceCents: "",
@@ -111,7 +116,7 @@ function CatalogPage() {
           </div>
         </div>
 
-        <form className="filters filters-advanced" onSubmit={handleSubmit}>
+        <div className="filters filters-advanced">
           <input
             type="text"
             name="q"
@@ -134,7 +139,6 @@ function CatalogPage() {
           </select>
 
           <select name="sort" value={filters.sort} onChange={handleChange}>
-            <option value="relevance">Pertinence</option>
             <option value="priority">Priorité</option>
             <option value="price_asc">Prix croissant</option>
             <option value="price_desc">Prix décroissant</option>
@@ -170,10 +174,6 @@ function CatalogPage() {
             En stock
           </label>
 
-          <button type="submit" className="btn btn-primary">
-            Appliquer
-          </button>
-
           <button
             type="button"
             className="btn btn-secondary"
@@ -181,10 +181,10 @@ function CatalogPage() {
           >
             Réinitialiser
           </button>
-        </form>
+        </div>
       </section>
 
-      {loading && <Loader text="Chargement du catalogue..." />}
+      {loading && <Loader text="Chargement des produits..." />}
       {error && <ErrorMessage message={error} />}
 
       {!loading && !error && (
@@ -199,7 +199,7 @@ function CatalogPage() {
             ) : (
               <EmptyState
                 title="Aucun produit trouvé"
-                message="Essaie de modifier les filtres ou la recherche."
+                message="Essaie de modifier les filtres."
               />
             )}
           </section>

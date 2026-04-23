@@ -11,6 +11,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import AccountPage from "../pages/AccountPage";
+import AccountEditPage from "../pages/AccountEditPage";
 import OrdersPage from "../pages/OrdersPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import CheckoutSuccessPage from "../pages/CheckoutSuccessPage";
@@ -19,6 +20,7 @@ import AboutPage from "../pages/AboutPage";
 import LegalPage from "../pages/LegalPage";
 import TermsPage from "../pages/TermsPage";
 import SettingsPage from "../pages/SettingsPage";
+import SearchPage from "../pages/SearchPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminProductsPage from "../pages/admin/AdminProductsPage";
@@ -31,6 +33,7 @@ function AppRouter() {
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="catalog" element={<CatalogPage />} />
+        <Route path="search" element={<SearchPage />} />
         <Route path="categories/:slug" element={<CategoriesPage />} />
         <Route path="product/:slug" element={<ProductPage />} />
         <Route path="cart" element={<CartPage />} />
@@ -49,6 +52,15 @@ function AppRouter() {
           element={
             <PrivateRoute>
               <AccountPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="account/edit"
+          element={
+            <PrivateRoute>
+              <AccountEditPage />
             </PrivateRoute>
           }
         />

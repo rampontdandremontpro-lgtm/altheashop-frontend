@@ -9,7 +9,7 @@ function AccountSidebar() {
         <NavLink to="/account">Mon profil</NavLink>
         <NavLink to="/orders">Mes commandes</NavLink>
         <NavLink to="/settings">Paramètres</NavLink>
-        <NavLink to="/checkout">Checkout</NavLink>
+        <NavLink to="/cart">Panier</NavLink>
       </nav>
     </aside>
   );

@@ -1,47 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import AccountSidebar from "../components/account/AccountSidebar";
 
 function AccountPage() {
-  const { user, updateProfile, logout } = useAuth();
-
-  const [form, setForm] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    phone: user?.phone || "",
-  });
-
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccess("");
-    setError("");
-
-    try {
-      setLoading(true);
-      await updateProfile(form);
-      setSuccess("Profil mis à jour.");
-    } catch (err) {
-      setError(err.message || "Impossible de mettre à jour le profil.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-  };
+  const { user } = useAuth();
 
   return (
     <div className="page-stack">
@@ -51,72 +13,42 @@ function AccountPage() {
             <h1>Mon compte</h1>
             <p>Bienvenue {user?.firstName}.</p>
           </div>
-
-          <div className="account-actions">
-            <Link to="/orders" className="btn btn-secondary">
-              Mes commandes
-            </Link>
-            <Link to="/settings" className="btn btn-secondary">
-              Paramètres
-            </Link>
-            <button className="btn btn-secondary" onClick={handleLogout}>
-              Déconnexion
-            </button>
-          </div>
         </div>
 
         <div className="account-layout">
           <AccountSidebar />
 
-          <div className="account-grid-content">
+          <div>
             <div className="box">
               <h2>Informations personnelles</h2>
 
-              {error && <div className="box error-box">{error}</div>}
-              {success && <div className="box success-box">{success}</div>}
+              <div className="account-summary-list">
+                <div className="account-summary-row">
+                  <span>Prénom</span>
+                  <strong>{user?.firstName || "-"}</strong>
+                </div>
 
-              <form className="auth-form" onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="Prénom"
-                  value={form.firstName}
-                  onChange={handleChange}
-                />
+                <div className="account-summary-row">
+                  <span>Nom</span>
+                  <strong>{user?.lastName || "-"}</strong>
+                </div>
 
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Nom"
-                  value={form.lastName}
-                  onChange={handleChange}
-                />
+                <div className="account-summary-row">
+                  <span>Email</span>
+                  <strong>{user?.email || "-"}</strong>
+                </div>
 
-                <input type="email" value={user?.email || ""} disabled />
+                <div className="account-summary-row">
+                  <span>Téléphone</span>
+                  <strong>{user?.phone || "-"}</strong>
+                </div>
+              </div>
 
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Téléphone"
-                  value={form.phone}
-                  onChange={handleChange}
-                />
-
-                <button className="btn btn-primary" type="submit" disabled={loading}>
-                  {loading ? "Enregistrement..." : "Enregistrer"}
-                </button>
-              </form>
-            </div>
-
-            <div className="box">
-              <h2>Résumé du compte</h2>
-              <ul className="clean-list">
-                <li>profil utilisateur</li>
-                <li>historique commandes</li>
-                <li>préférences</li>
-                <li>future gestion des adresses</li>
-                <li>future gestion des paiements</li>
-              </ul>
+              <div className="detail-box">
+                <Link to="/account/edit" className="btn btn-primary">
+                  Modifier
+                </Link>
+              </div>
             </div>
           </div>
         </div>

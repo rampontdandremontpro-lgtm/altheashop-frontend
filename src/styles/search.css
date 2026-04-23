@@ -1,0 +1,17 @@
+.search-filters-only {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.search-filters-only .checkbox-inline {
+  justify-content: flex-start;
+}
+
+.search-filters-only button {
+  min-width: 160px;
+}
+
+@media (max-width: 640px) {
+  .search-filters-only {
+    grid-template-columns: 1fr;
+  }
+}
