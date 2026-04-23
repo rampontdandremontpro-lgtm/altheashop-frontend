@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -10,22 +10,28 @@ function isValidPhone(phone) {
   return /^\d{10}$/.test(phone);
 }
 
+const EMPTY_FORM = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+  role: "user",
+};
+
 function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    role: "user",
-  });
-
+  const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setForm(EMPTY_FORM);
+    setError("");
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,6 +88,7 @@ function RegisterPage() {
         role: form.role,
       });
 
+      setForm(EMPTY_FORM);
       navigate("/account");
     } catch (err) {
       setError(err.message || "Impossible de créer le compte.");
@@ -98,13 +105,18 @@ function RegisterPage() {
 
           {error && <div className="box error-box">{error}</div>}
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form
+            className="auth-form"
+            onSubmit={handleSubmit}
+            autoComplete="off"
+          >
             <input
               type="text"
               name="firstName"
               placeholder="Prénom"
               value={form.firstName}
               onChange={handleChange}
+              autoComplete="off"
             />
 
             <input
@@ -113,6 +125,7 @@ function RegisterPage() {
               placeholder="Nom"
               value={form.lastName}
               onChange={handleChange}
+              autoComplete="off"
             />
 
             <input
@@ -121,6 +134,7 @@ function RegisterPage() {
               placeholder="Email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="off"
             />
 
             <input
@@ -131,9 +145,15 @@ function RegisterPage() {
               onChange={handleChange}
               inputMode="numeric"
               maxLength={10}
+              autoComplete="off"
             />
 
-            <select name="role" value={form.role} onChange={handleChange}>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              autoComplete="off"
+            >
               <option value="user">Utilisateur</option>
               <option value="admin">Administrateur</option>
             </select>
@@ -144,6 +164,7 @@ function RegisterPage() {
               placeholder="Mot de passe"
               value={form.password}
               onChange={handleChange}
+              autoComplete="new-password"
             />
 
             <input
@@ -152,6 +173,7 @@ function RegisterPage() {
               placeholder="Confirmer le mot de passe"
               value={form.confirmPassword}
               onChange={handleChange}
+              autoComplete="new-password"
             />
 
             <button className="btn btn-primary" type="submit" disabled={loading}>

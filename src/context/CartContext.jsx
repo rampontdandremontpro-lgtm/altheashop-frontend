@@ -37,7 +37,11 @@ export function CartProvider({ children }) {
           name: product.name,
           priceCents: product.priceCents,
           stock: product.stock,
-          imageUrl: product.images?.[0]?.imageUrl || "",
+          imageUrl:
+            product.imageUrl ||
+            product.images?.[0]?.url ||
+            product.images?.[0]?.imageUrl ||
+            "",
           quantity: 1,
         },
       ];

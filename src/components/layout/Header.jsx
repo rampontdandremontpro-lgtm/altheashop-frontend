@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import BurgerMenu from "./BurgerMenu";
 import SearchBar from "./SearchBar";
 
 function Header() {
+  const navigate = useNavigate();
   const { totalItems } = useCart();
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ function Header() {
   const handleLogout = async () => {
     await logout();
     setMenuOpen(false);
+    navigate("/");
   };
 
   return (

@@ -1,19 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const EMPTY_FORM = {
+  email: "",
+  password: "",
+};
 
 function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setForm(EMPTY_FORM);
+    setError("");
+  }, []);
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -24,20 +29,23 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
-    setSuccess("");
 
     if (!form.email || !form.password) {
-      setError("Merci de remplir tous les champs.");
+      setError("Merci de remplir votre email et votre mot de passe.");
       return;
     }
 
     try {
       setLoading(true);
-      await login(form);
-      setSuccess("Connexion réussie.");
-      navigate("/account");
+
+      await login({
+        email: form.email,
+        password: form.password,
+      });
+
+      setForm(EMPTY_FORM);
+      navigate("/");
     } catch (err) {
       setError(err.message || "Impossible de se connecter.");
     } finally {
@@ -52,15 +60,19 @@ function LoginPage() {
           <h1>Connexion</h1>
 
           {error && <div className="box error-box">{error}</div>}
-          {success && <div className="box success-box">{success}</div>}
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form
+            className="auth-form"
+            onSubmit={handleSubmit}
+            autoComplete="off"
+          >
             <input
               type="email"
               name="email"
               placeholder="Email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="off"
             />
 
             <input
@@ -69,6 +81,7 @@ function LoginPage() {
               placeholder="Mot de passe"
               value={form.password}
               onChange={handleChange}
+              autoComplete="new-password"
             />
 
             <button className="btn btn-primary" type="submit" disabled={loading}>

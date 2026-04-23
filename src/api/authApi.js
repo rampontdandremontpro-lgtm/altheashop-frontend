@@ -1,151 +1,100 @@
-const USERS_KEY = "althea_users";
-const SESSION_KEY = "althea_session";
+import api from "./axios";
 
-function getUsers() {
-  const raw = localStorage.getItem(USERS_KEY);
-  return raw ? JSON.parse(raw) : [];
+const TOKEN_KEY = "althea_token";
+const USER_KEY = "althea_user";
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
 }
 
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+export function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
 }
 
-function saveSession(user) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+export function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
 }
 
-function getSession() {
-  const raw = localStorage.getItem(SESSION_KEY);
+function saveUser(user) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+function clearUser() {
+  localStorage.removeItem(USER_KEY);
+}
+
+export function getStoredUser() {
+  const raw = localStorage.getItem(USER_KEY);
   return raw ? JSON.parse(raw) : null;
 }
 
-function removeSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
 export async function register(payload) {
-  const users = getUsers();
-
-  const existing = users.find(
-    (user) => user.email.toLowerCase() === payload.email.toLowerCase()
-  );
-
-  if (existing) {
-    throw new Error("Un compte existe déjà avec cet email.");
-  }
-
-  const newUser = {
-    id: Date.now(),
+  const response = await api.post("/auth/register", {
     firstName: payload.firstName,
     lastName: payload.lastName,
     email: payload.email,
+    phone: payload.phone,
     password: payload.password,
-    phone: payload.phone || "",
-    role: payload.role || "user",
-    createdAt: new Date().toISOString(),
-    orders: [],
-    addresses: [],
-  };
+  });
 
-  users.push(newUser);
-  saveUsers(users);
+  const { accessToken, user } = response.data;
 
-  const sessionUser = {
-    id: newUser.id,
-    firstName: newUser.firstName,
-    lastName: newUser.lastName,
-    email: newUser.email,
-    phone: newUser.phone,
-    role: newUser.role,
-  };
+  setToken(accessToken);
+  saveUser(user);
 
-  saveSession(sessionUser);
-
-  return sessionUser;
+  return user;
 }
 
 export async function login(payload) {
-  const users = getUsers();
+  const response = await api.post("/auth/login", {
+    email: payload.email,
+    password: payload.password,
+  });
 
-  const user = users.find(
-    (item) =>
-      item.email.toLowerCase() === payload.email.toLowerCase() &&
-      item.password === payload.password
-  );
+  const { accessToken, user } = response.data;
 
-  if (!user) {
-    throw new Error("Email ou mot de passe incorrect.");
-  }
+  setToken(accessToken);
+  saveUser(user);
 
-  const sessionUser = {
-    id: user.id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    phone: user.phone || "",
-    role: user.role || "user",
-  };
-
-  saveSession(sessionUser);
-
-  return sessionUser;
+  return user;
 }
 
 export async function logout() {
-  removeSession();
+  clearToken();
+  clearUser();
   return true;
 }
 
 export async function getMe() {
-  return getSession();
+  const token = getToken();
+
+  if (!token) {
+    return null;
+  }
+
+  const response = await api.get("/auth/me");
+  const user = response.data;
+
+  saveUser(user);
+  return user;
 }
 
 export async function forgotPassword(email) {
-  const users = getUsers();
-
-  const user = users.find(
-    (item) => item.email.toLowerCase() === email.toLowerCase()
-  );
-
-  if (!user) {
-    throw new Error("Aucun compte trouvé avec cet email.");
-  }
-
   return {
     message:
-      "Demande prise en compte. Quand le backend sera prêt, un email pourra être envoyé.",
+      "La réinitialisation du mot de passe n'est pas encore disponible côté backend.",
   };
 }
 
 export async function updateProfile(payload) {
-  const users = getUsers();
-  const session = getSession();
-
-  if (!session) {
-    throw new Error("Utilisateur non connecté.");
-  }
-
-  const updatedUsers = users.map((user) => {
-    if (user.id !== session.id) return user;
-
-    return {
-      ...user,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      phone: payload.phone,
-    };
-  });
-
-  saveUsers(updatedUsers);
-
-  const updatedSession = {
-    ...session,
+  const response = await api.patch("/users/me", {
     firstName: payload.firstName,
     lastName: payload.lastName,
     phone: payload.phone,
-  };
+  });
 
-  saveSession(updatedSession);
+  const user = response.data;
+  saveUser(user);
 
-  return updatedSession;
+  return user;
 }

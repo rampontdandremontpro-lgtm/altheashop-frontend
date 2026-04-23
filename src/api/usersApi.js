@@ -1,124 +1,59 @@
-const USERS_KEY = "althea_users";
-const SESSION_KEY = "althea_session";
+import api from "./axios";
+import { getStoredUser } from "./authApi";
 
-function getUsers() {
-  const raw = localStorage.getItem(USERS_KEY);
-  return raw ? JSON.parse(raw) : [];
-}
+const PAYMENT_METHODS_PREFIX = "althea_payment_methods_";
 
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+function getCurrentUserId() {
+  const user = getStoredUser();
 
-function getSession() {
-  const raw = localStorage.getItem(SESSION_KEY);
-  return raw ? JSON.parse(raw) : null;
-}
-
-function saveSession(session) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-}
-
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-function requireSession() {
-  const session = getSession();
-
-  if (!session) {
+  if (!user?.id) {
     throw new Error("Utilisateur non connecté.");
   }
 
-  return session;
+  return user.id;
 }
 
-function findCurrentUser() {
-  const session = requireSession();
-  const users = getUsers();
-  const user = users.find((item) => item.id === session.id);
+function getPaymentStorageKey() {
+  return `${PAYMENT_METHODS_PREFIX}${getCurrentUserId()}`;
+}
 
-  if (!user) {
-    throw new Error("Utilisateur introuvable.");
-  }
+function getPaymentMethodsStorage() {
+  const raw = localStorage.getItem(getPaymentStorageKey());
+  return raw ? JSON.parse(raw) : [];
+}
 
-  return { session, users, user };
+function savePaymentMethodsStorage(methods) {
+  localStorage.setItem(getPaymentStorageKey(), JSON.stringify(methods));
 }
 
 export async function getProfile() {
-  const { user } = findCurrentUser();
-
-  return {
-    id: user.id,
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    email: user.email || "",
-    phone: user.phone || "",
-    role: user.role || "user",
-    createdAt: user.createdAt || null,
-  };
+  const response = await api.get("/users/me");
+  return response.data;
 }
 
 export async function updateProfile(payload) {
-  const { session, users } = findCurrentUser();
-
-  const normalizedEmail = String(payload.email || "").trim().toLowerCase();
-
-  const emailAlreadyUsed = users.some(
-    (user) => user.id !== session.id && user.email.toLowerCase() === normalizedEmail
-  );
-
-  if (emailAlreadyUsed) {
-    throw new Error("Cet email est déjà utilisé par un autre compte.");
-  }
-
-  const updatedUsers = users.map((user) => {
-    if (user.id !== session.id) return user;
-
-    return {
-      ...user,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      email: normalizedEmail,
-      phone: payload.phone,
-    };
-  });
-
-  saveUsers(updatedUsers);
-
-  const updatedSession = {
-    ...session,
+  const response = await api.patch("/users/me", {
     firstName: payload.firstName,
     lastName: payload.lastName,
-    email: normalizedEmail,
     phone: payload.phone,
-  };
+  });
 
-  saveSession(updatedSession);
-
-  return updatedSession;
+  return response.data;
 }
 
 export async function deleteCurrentUserAccount() {
-  const { session, users } = findCurrentUser();
-
-  const updatedUsers = users.filter((user) => user.id !== session.id);
-  saveUsers(updatedUsers);
-  clearSession();
-
-  return true;
+  throw new Error(
+    "La suppression du compte n'est pas encore disponible côté backend."
+  );
 }
 
 export async function getAddresses() {
-  const { user } = findCurrentUser();
-  return user.addresses || [];
+  const response = await api.get("/users/me/addresses");
+  return response.data;
 }
 
 export async function createAddress(payload) {
-  const { session, users, user } = findCurrentUser();
-
-  const newAddress = {
-    id: Date.now(),
+  const response = await api.post("/users/me/addresses", {
     firstName: payload.firstName,
     lastName: payload.lastName,
     addressLine1: payload.addressLine1,
@@ -128,90 +63,42 @@ export async function createAddress(payload) {
     postalCode: payload.postalCode,
     country: payload.country,
     phone: payload.phone || "",
-    isDefault: Boolean(payload.isDefault),
-  };
+  });
 
-  let nextAddresses = [...(user.addresses || [])];
-
-  if (newAddress.isDefault || nextAddresses.length === 0) {
-    nextAddresses = nextAddresses.map((address) => ({
-      ...address,
-      isDefault: false,
-    }));
-    newAddress.isDefault = true;
-  }
-
-  nextAddresses.push(newAddress);
-
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, addresses: nextAddresses } : item
-  );
-
-  saveUsers(updatedUsers);
-  return newAddress;
+  return response.data;
 }
 
 export async function updateAddress(id, payload) {
-  const { session, users, user } = findCurrentUser();
+  const response = await api.patch(`/users/me/addresses/${id}`, {
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    addressLine1: payload.addressLine1,
+    addressLine2: payload.addressLine2 || "",
+    city: payload.city,
+    region: payload.region || "",
+    postalCode: payload.postalCode,
+    country: payload.country,
+    phone: payload.phone || "",
+  });
 
-  let nextAddresses = (user.addresses || []).map((address) =>
-    address.id === id
-      ? {
-          ...address,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          addressLine1: payload.addressLine1,
-          addressLine2: payload.addressLine2 || "",
-          city: payload.city,
-          region: payload.region || "",
-          postalCode: payload.postalCode,
-          country: payload.country,
-          phone: payload.phone || "",
-          isDefault: Boolean(payload.isDefault),
-        }
-      : address
-  );
-
-  if (payload.isDefault) {
-    nextAddresses = nextAddresses.map((address) => ({
-      ...address,
-      isDefault: address.id === id,
-    }));
-  }
-
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, addresses: nextAddresses } : item
-  );
-
-  saveUsers(updatedUsers);
-
-  return nextAddresses.find((address) => address.id === id);
+  return response.data;
 }
 
 export async function deleteAddress(id) {
-  const { session, users, user } = findCurrentUser();
-
-  let nextAddresses = (user.addresses || []).filter((address) => address.id !== id);
-
-  if (nextAddresses.length > 0 && !nextAddresses.some((address) => address.isDefault)) {
-    nextAddresses[0].isDefault = true;
-  }
-
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, addresses: nextAddresses } : item
-  );
-
-  saveUsers(updatedUsers);
-  return true;
+  const response = await api.delete(`/users/me/addresses/${id}`);
+  return response.data;
 }
 
+/**
+ * Les moyens de paiement restent locaux pour l'instant :
+ * le backend ne propose pas encore de routes dédiées.
+ */
 export async function getPaymentMethods() {
-  const { user } = findCurrentUser();
-  return user.paymentMethods || [];
+  return getPaymentMethodsStorage();
 }
 
 export async function createPaymentMethod(payload) {
-  const { session, users, user } = findCurrentUser();
+  const methods = getPaymentMethodsStorage();
 
   const digits = String(payload.cardNumber).replace(/\s+/g, "");
   const last4 = digits.slice(-4);
@@ -225,7 +112,7 @@ export async function createPaymentMethod(payload) {
     isDefault: Boolean(payload.isDefault),
   };
 
-  let nextMethods = [...(user.paymentMethods || [])];
+  let nextMethods = [...methods];
 
   if (newMethod.isDefault || nextMethods.length === 0) {
     nextMethods = nextMethods.map((method) => ({
@@ -236,22 +123,18 @@ export async function createPaymentMethod(payload) {
   }
 
   nextMethods.push(newMethod);
+  savePaymentMethodsStorage(nextMethods);
 
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, paymentMethods: nextMethods } : item
-  );
-
-  saveUsers(updatedUsers);
   return newMethod;
 }
 
 export async function updatePaymentMethod(id, payload) {
-  const { session, users, user } = findCurrentUser();
+  const methods = getPaymentMethodsStorage();
 
   const digits = String(payload.cardNumber).replace(/\s+/g, "");
   const last4 = digits.slice(-4);
 
-  let nextMethods = (user.paymentMethods || []).map((method) =>
+  let nextMethods = methods.map((method) =>
     method.id === id
       ? {
           ...method,
@@ -271,44 +154,28 @@ export async function updatePaymentMethod(id, payload) {
     }));
   }
 
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, paymentMethods: nextMethods } : item
-  );
-
-  saveUsers(updatedUsers);
+  savePaymentMethodsStorage(nextMethods);
 
   return nextMethods.find((method) => method.id === id);
 }
 
 export async function deletePaymentMethod(id) {
-  const { session, users, user } = findCurrentUser();
-
-  let nextMethods = (user.paymentMethods || []).filter((method) => method.id !== id);
+  let nextMethods = getPaymentMethodsStorage().filter((method) => method.id !== id);
 
   if (nextMethods.length > 0 && !nextMethods.some((method) => method.isDefault)) {
     nextMethods[0].isDefault = true;
   }
 
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, paymentMethods: nextMethods } : item
-  );
-
-  saveUsers(updatedUsers);
+  savePaymentMethodsStorage(nextMethods);
   return true;
 }
 
 export async function setDefaultPaymentMethod(id) {
-  const { session, users, user } = findCurrentUser();
-
-  const nextMethods = (user.paymentMethods || []).map((method) => ({
+  const nextMethods = getPaymentMethodsStorage().map((method) => ({
     ...method,
     isDefault: method.id === id,
   }));
 
-  const updatedUsers = users.map((item) =>
-    item.id === session.id ? { ...item, paymentMethods: nextMethods } : item
-  );
-
-  saveUsers(updatedUsers);
+  savePaymentMethodsStorage(nextMethods);
   return true;
 }
