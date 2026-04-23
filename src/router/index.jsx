@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PrivateRoute from "../components/auth/PrivateRoute";
+import AdminRoute from "../components/admin/AdminRoute";
 import HomePage from "../pages/HomePage";
 import CatalogPage from "../pages/CatalogPage";
 import CategoriesPage from "../pages/CategoriesPage";
@@ -12,9 +13,17 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import AccountPage from "../pages/AccountPage";
 import OrdersPage from "../pages/OrdersPage";
 import CheckoutPage from "../pages/CheckoutPage";
+import CheckoutSuccessPage from "../pages/CheckoutSuccessPage";
+import ContactPage from "../pages/ContactPage";
+import AboutPage from "../pages/AboutPage";
+import LegalPage from "../pages/LegalPage";
+import TermsPage from "../pages/TermsPage";
+import SettingsPage from "../pages/SettingsPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminProductsPage from "../pages/admin/AdminProductsPage";
+import AdminProductCreatePage from "../pages/admin/AdminProductCreatePage";
+import AdminProductEditPage from "../pages/admin/AdminProductEditPage";
 
 function AppRouter() {
   return (
@@ -25,10 +34,15 @@ function AppRouter() {
         <Route path="categories/:slug" element={<CategoriesPage />} />
         <Route path="product/:slug" element={<ProductPage />} />
         <Route path="cart" element={<CartPage />} />
+        <Route path="checkout" element={<CheckoutPage />} />
+        <Route path="checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="legal" element={<LegalPage />} />
+        <Route path="terms" element={<TermsPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="checkout" element={<CheckoutPage />} />
 
         <Route
           path="account"
@@ -49,20 +63,47 @@ function AppRouter() {
         />
 
         <Route
-          path="admin"
+          path="settings"
           element={
             <PrivateRoute>
-              <AdminDashboardPage />
+              <SettingsPage />
             </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="admin"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
           }
         />
 
         <Route
           path="admin/products"
           element={
-            <PrivateRoute>
+            <AdminRoute>
               <AdminProductsPage />
-            </PrivateRoute>
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="admin/products/new"
+          element={
+            <AdminRoute>
+              <AdminProductCreatePage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="admin/products/:id/edit"
+          element={
+            <AdminRoute>
+              <AdminProductEditPage />
+            </AdminRoute>
           }
         />
 

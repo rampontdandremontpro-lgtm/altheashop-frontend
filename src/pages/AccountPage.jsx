@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AccountSidebar from "../components/account/AccountSidebar";
 
 function AccountPage() {
   const { user, updateProfile, logout } = useAuth();
@@ -45,7 +46,7 @@ function AccountPage() {
   return (
     <div className="page-stack">
       <section className="section">
-        <div className="account-header">
+        <div className="page-heading">
           <div>
             <h1>Mon compte</h1>
             <p>Bienvenue {user?.firstName}.</p>
@@ -55,63 +56,68 @@ function AccountPage() {
             <Link to="/orders" className="btn btn-secondary">
               Mes commandes
             </Link>
+            <Link to="/settings" className="btn btn-secondary">
+              Paramètres
+            </Link>
             <button className="btn btn-secondary" onClick={handleLogout}>
               Déconnexion
             </button>
           </div>
         </div>
 
-        <div className="account-grid">
-          <div className="box">
-            <h2>Informations personnelles</h2>
+        <div className="account-layout">
+          <AccountSidebar />
 
-            {error && <div className="box error-box">{error}</div>}
-            {success && <div className="box success-box">{success}</div>}
+          <div className="account-grid-content">
+            <div className="box">
+              <h2>Informations personnelles</h2>
 
-            <form className="auth-form" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="firstName"
-                placeholder="Prénom"
-                value={form.firstName}
-                onChange={handleChange}
-              />
+              {error && <div className="box error-box">{error}</div>}
+              {success && <div className="box success-box">{success}</div>}
 
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Nom"
-                value={form.lastName}
-                onChange={handleChange}
-              />
+              <form className="auth-form" onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="Prénom"
+                  value={form.firstName}
+                  onChange={handleChange}
+                />
 
-              <input type="email" value={user?.email || ""} disabled />
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Nom"
+                  value={form.lastName}
+                  onChange={handleChange}
+                />
 
-              <input
-                type="text"
-                name="phone"
-                placeholder="Téléphone"
-                value={form.phone}
-                onChange={handleChange}
-              />
+                <input type="email" value={user?.email || ""} disabled />
 
-              <button className="btn btn-primary" type="submit" disabled={loading}>
-                {loading ? "Enregistrement..." : "Enregistrer"}
-              </button>
-            </form>
-          </div>
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="Téléphone"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
 
-          <div className="box">
-            <h2>Résumé</h2>
-            <p>
-              Cette page est prête pour être branchée plus tard à :
-            </p>
-            <ul className="clean-list">
-              <li>adresses</li>
-              <li>moyens de paiement</li>
-              <li>historique des commandes</li>
-              <li>préférences utilisateur</li>
-            </ul>
+                <button className="btn btn-primary" type="submit" disabled={loading}>
+                  {loading ? "Enregistrement..." : "Enregistrer"}
+                </button>
+              </form>
+            </div>
+
+            <div className="box">
+              <h2>Résumé du compte</h2>
+              <ul className="clean-list">
+                <li>profil utilisateur</li>
+                <li>historique commandes</li>
+                <li>préférences</li>
+                <li>future gestion des adresses</li>
+                <li>future gestion des paiements</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

@@ -1,0 +1,85 @@
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.contact-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+  resize: vertical;
+  font: inherit;
+}
+
+.chatbot-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chatbot-messages {
+  min-height: 320px;
+  max-height: 420px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.chat-message {
+  max-width: 85%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1.4;
+}
+
+.chat-message.bot {
+  background: #eef2ff;
+  align-self: flex-start;
+}
+
+.chat-message.user {
+  background: #dbeafe;
+  align-self: flex-end;
+}
+
+.chatbot-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.chatbot-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+}
+
+.legal-content h1,
+.legal-content h2,
+.legal-content p {
+  margin-top: 0;
+}
+
+.legal-content h2 {
+  margin-top: 22px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .chatbot-form {
+    grid-template-columns: 1fr;
+  }
+}

@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
       try {
         const currentUser = await getMe();
         setUser(currentUser);
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setAuthLoading(false);
@@ -55,6 +55,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       isAuthenticated: !!user,
+      isAdmin: user?.role === "admin",
       authLoading,
       login,
       register,

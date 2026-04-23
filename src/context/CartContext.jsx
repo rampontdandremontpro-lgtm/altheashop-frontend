@@ -23,7 +23,7 @@ export function CartProvider({ children }) {
           item.id === product.id
             ? {
                 ...item,
-                quantity: item.quantity + 1,
+                quantity: Math.min(item.quantity + 1, item.stock || 999),
               }
             : item
         );
@@ -50,7 +50,7 @@ export function CartProvider({ children }) {
         item.id === id
           ? {
               ...item,
-              quantity: item.quantity + 1,
+              quantity: Math.min(item.quantity + 1, item.stock || 999),
             }
           : item
       )

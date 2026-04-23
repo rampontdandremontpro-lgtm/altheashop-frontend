@@ -13,6 +13,7 @@ function RegisterPage() {
     phone: "",
     password: "",
     confirmPassword: "",
+    role: "user",
   });
 
   const [error, setError] = useState("");
@@ -54,6 +55,7 @@ function RegisterPage() {
         email: form.email,
         phone: form.phone,
         password: form.password,
+        role: form.role,
       });
 
       navigate("/account");
@@ -104,6 +106,11 @@ function RegisterPage() {
               value={form.phone}
               onChange={handleChange}
             />
+
+            <select name="role" value={form.role} onChange={handleChange}>
+              <option value="user">Utilisateur</option>
+              <option value="admin">Administrateur</option>
+            </select>
 
             <input
               type="password"

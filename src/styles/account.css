@@ -1,0 +1,94 @@
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.account-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.account-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+}
+
+.account-sidebar {
+  height: fit-content;
+}
+
+.account-sidebar h2 {
+  margin-top: 0;
+}
+
+.account-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-sidebar-nav a {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.account-sidebar-nav a.active {
+  color: var(--primary);
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+.account-grid-content {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.order-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.order-card h2,
+.order-card h3,
+.order-card p {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .account-grid,
+  .account-layout,
+  .account-grid-content {
+    grid-template-columns: 1fr;
+  }
+}

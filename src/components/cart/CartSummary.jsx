@@ -18,7 +18,7 @@ function CartSummary({ totalItems, totalPriceCents, onClearCart }) {
 
       <div className="summary-actions">
         <Link to="/checkout" className="btn btn-primary full-width">
-          Passer au checkout
+          Passer commande
         </Link>
 
         <button className="btn btn-secondary full-width" onClick={onClearCart}>

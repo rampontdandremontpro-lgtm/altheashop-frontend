@@ -41,6 +41,7 @@ export async function register(payload) {
     email: payload.email,
     password: payload.password,
     phone: payload.phone || "",
+    role: payload.role || "user",
     createdAt: new Date().toISOString(),
     orders: [],
     addresses: [],
@@ -55,6 +56,7 @@ export async function register(payload) {
     lastName: newUser.lastName,
     email: newUser.email,
     phone: newUser.phone,
+    role: newUser.role,
   };
 
   saveSession(sessionUser);
@@ -81,6 +83,7 @@ export async function login(payload) {
     lastName: user.lastName,
     email: user.email,
     phone: user.phone || "",
+    role: user.role || "user",
   };
 
   saveSession(sessionUser);

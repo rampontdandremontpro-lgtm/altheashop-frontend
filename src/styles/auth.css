@@ -1,0 +1,36 @@
+.auth-section {
+  align-items: center;
+}
+
+.auth-box {
+  width: min(520px, 100%);
+  margin: 0 auto;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-form input,
+.auth-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+}
+
+.auth-links {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.auth-links a {
+  color: var(--primary);
+  font-weight: 700;
+}

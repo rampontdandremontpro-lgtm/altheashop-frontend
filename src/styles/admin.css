@@ -1,0 +1,73 @@
+.admin-stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.admin-stat-card {
+  min-height: 150px;
+}
+
+.admin-stat-card h3 {
+  margin: 8px 0;
+  font-size: 1.8rem;
+}
+
+.admin-stat-title {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.admin-stat-subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-table .btn {
+  padding: 10px 12px;
+}
+
+.admin-product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-product-form input,
+.admin-product-form select,
+.admin-product-form textarea {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .admin-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
