@@ -3,9 +3,12 @@ import api from "./axios";
 function normalizeImage(image) {
   if (!image) return null;
 
+  const url = image.url || image.imageUrl || "";
+
   return {
     id: image.id,
-    imageUrl: image.url || image.imageUrl || "",
+    url,
+    imageUrl: url,
     altText: image.alt || image.altText || "",
     displayOrder: image.displayOrder ?? 0,
   };
@@ -27,6 +30,10 @@ function normalizeCategory(category) {
 function normalizeProduct(product) {
   if (!product) return null;
 
+  const normalizedImages = Array.isArray(product.images)
+    ? product.images.map(normalizeImage).filter(Boolean)
+    : [];
+
   return {
     id: product.id,
     sku: product.sku || "",
@@ -41,9 +48,12 @@ function normalizeProduct(product) {
     isActive: Boolean(product.isActive),
     categoryId: product.categoryId ?? product.category?.id ?? null,
     category: normalizeCategory(product.category),
-    images: Array.isArray(product.images)
-      ? product.images.map(normalizeImage)
-      : [],
+    imageUrl:
+      product.imageUrl ||
+      normalizedImages[0]?.url ||
+      normalizedImages[0]?.imageUrl ||
+      "",
+    images: normalizedImages,
     createdAt: product.createdAt || null,
     updatedAt: product.updatedAt || null,
   };
@@ -115,5 +125,10 @@ export async function getProducts(params = {}) {
 
 export async function getProductBySlug(slug) {
   const response = await api.get(`/catalog/products/${slug}`);
+  return normalizeProduct(response.data);
+}
+
+export async function getProductById(identifier) {
+  const response = await api.get(`/catalog/products/${identifier}`);
   return normalizeProduct(response.data);
 }

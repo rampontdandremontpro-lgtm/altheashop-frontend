@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProductBySlug } from "../api/catalogApi";
-import { useCart } from "../context/CartContext";
-import { formatPrice } from "../utils/formatPrice";
+import { getProductById } from "../api/catalogApi";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { formatPrice } from "../utils/formatPrice";
+import { useCart } from "../context/CartContext";
 
 const FALLBACK_IMAGE =
-  "https://placehold.co/800x500/e5e7eb/6b7280?text=Image+indisponible";
+  "https://via.placeholder.com/600x400?text=Image+indisponible";
+
+function getMainImage(product) {
+  return (
+    product?.imageUrl ||
+    product?.images?.[0]?.url ||
+    product?.images?.[0]?.imageUrl ||
+    FALLBACK_IMAGE
+  );
+}
 
 function ProductPage() {
-  const { slug } = useParams();
+  const params = useParams();
+  const identifier = params.slug || params.id;
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -19,97 +29,82 @@ function ProductPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchProduct() {
+    async function loadProduct() {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getProductBySlug(slug);
+        const data = await getProductById(identifier);
         setProduct(data);
-        setMainImage(data.images?.[0]?.imageUrl || FALLBACK_IMAGE);
+        setMainImage(getMainImage(data));
       } catch (err) {
-        setError("Produit introuvable.");
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Impossible de charger le produit."
+        );
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProduct();
-  }, [slug]);
+    if (identifier) loadProduct();
+  }, [identifier]);
 
   if (loading) return <Loader text="Chargement du produit..." />;
   if (error) return <ErrorMessage message={error} />;
-  if (!product) return null;
-
-  const images = product.images || [];
+  if (!product) return <ErrorMessage message="Produit introuvable." />;
 
   return (
     <div className="page-stack">
-      <section className="product-detail">
-        <div className="box">
-          <img
-            src={mainImage}
-            alt={product.name}
-            className="product-main-image"
-            onError={(e) => {
-              e.currentTarget.src = FALLBACK_IMAGE;
-            }}
-          />
+      <section className="section">
+        <div className="product-detail">
+          <div className="box">
+            <img
+              src={mainImage}
+              alt={product.name}
+              className="product-main-image"
+              onError={() => setMainImage(FALLBACK_IMAGE)}
+            />
+          </div>
 
-          {images.length > 0 && (
-            <div className="thumbs">
-              {images.map((img) => (
-                <button
-                  key={img.id}
-                  className="thumb-button"
-                  onClick={() => setMainImage(img.imageUrl || FALLBACK_IMAGE)}
-                >
-                  <img
-                    src={img.imageUrl || FALLBACK_IMAGE}
-                    alt={img.altText || product.name}
-                    className="thumb-image"
-                    onError={(e) => {
-                      e.currentTarget.src = FALLBACK_IMAGE;
-                    }}
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          <div className="box">
+            <p className="product-category">{product.category?.name}</p>
 
-        <div className="box">
-          <p className="product-category">{product.category?.name || "Catégorie"}</p>
-          <h1>{product.name}</h1>
-          <p className="product-price">{formatPrice(product.priceCents)}</p>
+            <h1>{product.name}</h1>
 
-          <p className={product.stock > 0 ? "stock-ok" : "stock-ko"}>
-            {product.stock > 0 ? `En stock (${product.stock})` : "Rupture de stock"}
-          </p>
+            <p className="product-price">{formatPrice(product.priceCents)}</p>
 
-          <p>{product.shortDescription || product.description}</p>
+            <p className={product.stock > 0 ? "stock-ok" : "stock-ko"}>
+              {product.stock > 0
+                ? `En stock (${product.stock})`
+                : "Rupture de stock"}
+            </p>
 
-          <button
-            className="btn btn-primary"
-            onClick={() => addToCart(product)}
-            disabled={product.stock <= 0}
-          >
-            Ajouter au panier
-          </button>
+            <p>{product.shortDescription}</p>
 
-          {product.description && (
-            <div className="detail-box">
-              <h3>Description</h3>
-              <p>{product.description}</p>
-            </div>
-          )}
+            <button
+              className="btn btn-primary"
+              onClick={() => addToCart(product)}
+              disabled={product.stock <= 0}
+            >
+              Ajouter au panier
+            </button>
 
-          {product.techSpecs && (
-            <div className="detail-box">
-              <h3>Caractéristiques techniques</h3>
-              <p>{product.techSpecs}</p>
-            </div>
-          )}
+            <hr />
+
+            <h2>Description</h2>
+            <p>{product.description}</p>
+
+            <hr />
+
+            <h2>Caractéristiques techniques</h2>
+            <p>
+              {typeof product.techSpecs === "string"
+                ? product.techSpecs
+                : product.techSpecs?.content || ""}
+            </p>
+          </div>
         </div>
       </section>
     </div>

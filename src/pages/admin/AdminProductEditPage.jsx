@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ProductAdminForm from "../../components/admin/ProductAdminForm";
-import {
-  getAdminProductById,
-  updateAdminProduct,
-} from "../../api/adminApi";
+import { getAdminProductById, updateAdminProduct } from "../../api/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 
@@ -56,8 +53,12 @@ function AdminProductEditPage() {
         <div className="page-heading">
           <div>
             <h1>Modifier un produit</h1>
-            <p>Édition d’un produit côté interface admin.</p>
+            <p>Édition d’un produit</p>
           </div>
+
+          <Link to="/admin/products" className="btn btn-secondary">
+            Retour
+          </Link>
         </div>
 
         {error && <div className="box error-box">{error}</div>}

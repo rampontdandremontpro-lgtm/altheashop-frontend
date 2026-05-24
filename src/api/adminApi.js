@@ -1,183 +1,109 @@
-const ADMIN_PRODUCTS_KEY = "althea_admin_products";
+import api from "./axios";
 
-function getStoredProducts() {
-  const raw = localStorage.getItem(ADMIN_PRODUCTS_KEY);
-  return raw ? JSON.parse(raw) : null;
+function normalizeProduct(product) {
+  const firstImageUrl =
+    product.imageUrl ||
+    product.images?.[0]?.url ||
+    product.images?.[0]?.imageUrl ||
+    "";
+
+  return {
+    id: product.id,
+    sku: product.sku || "",
+    name: product.name || "",
+    slug: product.slug || "",
+    shortDescription: product.shortDescription || "",
+    description: product.description || "",
+    techSpecs:
+      typeof product.techSpecs === "string"
+        ? product.techSpecs
+        : product.techSpecs?.content || "",
+    priceCents: product.priceCents ?? 0,
+    stock: product.stock ?? 0,
+    priority: product.priority ?? 0,
+    isActive: Boolean(product.isActive),
+    isFeatured: Boolean(product.isFeatured),
+    categoryId: product.categoryId ?? product.category?.id ?? "",
+    categoryName: product.category?.name || "",
+    category: product.category || null,
+    imageUrl: firstImageUrl,
+    images: product.images || [],
+  };
 }
 
-function saveProducts(products) {
-  localStorage.setItem(ADMIN_PRODUCTS_KEY, JSON.stringify(products));
+function normalizePayload(payload) {
+  return {
+    sku: payload.sku || undefined,
+    name: payload.name,
+    slug: payload.slug || undefined,
+    shortDescription: payload.shortDescription,
+    description: payload.description,
+    techSpecs: payload.techSpecs || "",
+    priceCents: Math.round(
+      Number(String(payload.priceEuros).replace(",", ".")) * 100
+    ),
+    stock: Number(payload.stock),
+    priority: Number(payload.priority || 0),
+    isActive: Boolean(payload.isActive),
+    isFeatured: Boolean(payload.isFeatured),
+    categoryId: Number(payload.categoryId),
+    imageUrl: payload.imageUrl || "",
+  };
 }
 
-function buildDefaultProducts() {
-  return [
-    {
-      id: 1001,
-      name: "Tensiomètre électronique bras",
-      slug: "tensiometre-bras",
-      shortDescription: "Mesure précise de la tension artérielle.",
-      description:
-        "Tensiomètre automatique avec écran LCD, mémoire intégrée et détection des battements irréguliers.",
-      techSpecs: "Mesure automatique, mémoire 90 valeurs, écran LCD",
-      priceCents: 4999,
-      stock: 25,
-      categoryName: "Diagnostic",
-      imageUrl: "https://placehold.co/800x500?text=Tensiometre",
-      isActive: true,
-      priority: 1,
-    },
-    {
-      id: 1002,
-      name: "Thermomètre infrarouge sans contact",
-      slug: "thermometre-infrarouge",
-      shortDescription: "Mesure rapide et sans contact.",
-      description:
-        "Thermomètre frontal infrarouge idéal pour enfants et adultes. Résultat en 1 seconde.",
-      techSpecs: "Sans contact, écran rétroéclairé, alarme fièvre",
-      priceCents: 2999,
-      stock: 40,
-      categoryName: "Diagnostic",
-      imageUrl: "https://placehold.co/800x500?text=Thermometre",
-      isActive: true,
-      priority: 2,
-    },
-    {
-      id: 1003,
-      name: "Oxymètre de pouls",
-      slug: "oxymetre-pouls",
-      shortDescription: "Mesure du taux d’oxygène dans le sang.",
-      description:
-        "Oxymètre compact permettant de mesurer la saturation en oxygène et la fréquence cardiaque.",
-      techSpecs: "SpO2, fréquence cardiaque, écran OLED",
-      priceCents: 1999,
-      stock: 30,
-      categoryName: "Diagnostic",
-      imageUrl: "https://placehold.co/800x500?text=Oxymetre",
-      isActive: true,
-      priority: 3,
-    },
-    {
-      id: 1004,
-      name: "Fauteuil roulant pliable",
-      slug: "fauteuil-roulant",
-      shortDescription: "Mobilité facilitée au quotidien.",
-      description:
-        "Fauteuil roulant léger et pliable, adapté à un usage intérieur et extérieur.",
-      techSpecs: "Aluminium, pliable, poids max 120kg",
-      priceCents: 19999,
-      stock: 10,
-      categoryName: "Mobilité",
-      imageUrl: "https://placehold.co/800x500?text=Fauteuil+Roulant",
-      isActive: true,
-      priority: 4,
-    },
-    {
-      id: 1005,
-      name: "Glucomètre",
-      slug: "glucometre",
-      shortDescription: "Mesure du taux de glucose sanguin.",
-      description:
-        "Glucomètre simple d’utilisation avec bandelettes et mémoire intégrée.",
-      techSpecs: "Résultat rapide, mémoire 100 mesures",
-      priceCents: 2499,
-      stock: 20,
-      categoryName: "Diabète",
-      imageUrl: "https://placehold.co/800x500?text=Glucometre",
-      isActive: true,
-      priority: 5,
-    },
-  ];
+export async function getAdminStats() {
+  const response = await api.get("/admin/stats");
+  return response.data;
 }
 
-function ensureProducts() {
-  const stored = getStoredProducts();
-  if (stored && Array.isArray(stored)) return stored;
-
-  const defaults = buildDefaultProducts();
-  saveProducts(defaults);
-  return defaults;
-}
-
-function slugify(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+export async function getAdminCategories() {
+  const response = await api.get("/admin/categories");
+  return response.data;
 }
 
 export async function getAdminProducts() {
-  return ensureProducts();
+  const response = await api.get("/admin/products");
+  const data = response.data;
+
+  if (Array.isArray(data)) return data.map(normalizeProduct);
+  if (Array.isArray(data.items)) return data.items.map(normalizeProduct);
+
+  return [];
 }
 
 export async function getAdminProductById(id) {
-  const products = ensureProducts();
-  const product = products.find((item) => String(item.id) === String(id));
-
-  if (!product) {
-    throw new Error("Produit introuvable.");
-  }
-
-  return product;
+  const response = await api.get(`/admin/products/${id}`);
+  return normalizeProduct(response.data);
 }
 
 export async function createAdminProduct(payload) {
-  const products = ensureProducts();
-
-  const newProduct = {
-    id: Date.now(),
-    name: payload.name,
-    slug: payload.slug?.trim() ? payload.slug.trim() : slugify(payload.name),
-    shortDescription: payload.shortDescription,
-    description: payload.description,
-    techSpecs: payload.techSpecs,
-    priceCents: Number(payload.priceCents),
-    stock: Number(payload.stock),
-    categoryName: payload.categoryName,
-    imageUrl: payload.imageUrl,
-    isActive: payload.isActive,
-    priority: Number(payload.priority || 0),
-  };
-
-  const updated = [newProduct, ...products];
-  saveProducts(updated);
-
-  return newProduct;
+  const response = await api.post("/admin/products", normalizePayload(payload));
+  return normalizeProduct(response.data);
 }
 
 export async function updateAdminProduct(id, payload) {
-  const products = ensureProducts();
+  const response = await api.patch(
+    `/admin/products/${id}`,
+    normalizePayload(payload)
+  );
 
-  const updated = products.map((product) => {
-    if (String(product.id) !== String(id)) return product;
-
-    return {
-      ...product,
-      name: payload.name,
-      slug: payload.slug?.trim() ? payload.slug.trim() : slugify(payload.name),
-      shortDescription: payload.shortDescription,
-      description: payload.description,
-      techSpecs: payload.techSpecs,
-      priceCents: Number(payload.priceCents),
-      stock: Number(payload.stock),
-      categoryName: payload.categoryName,
-      imageUrl: payload.imageUrl,
-      isActive: payload.isActive,
-      priority: Number(payload.priority || 0),
-    };
-  });
-
-  saveProducts(updated);
-
-  return updated.find((product) => String(product.id) === String(id));
+  return normalizeProduct(response.data);
 }
 
 export async function deleteAdminProduct(id) {
-  const products = ensureProducts();
-  const updated = products.filter((product) => String(product.id) !== String(id));
-  saveProducts(updated);
+  await api.delete(`/admin/products/${id}`);
   return true;
+}
+
+export async function uploadAdminProductImage(productId, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post(`/admin/products/${productId}/image`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return normalizeProduct(response.data);
 }

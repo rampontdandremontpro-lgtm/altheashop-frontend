@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import AdminStatsCard from "../../components/admin/AdminStatsCard";
-import { getAdminProducts } from "../../api/adminApi";
-import { getOrders } from "../../api/ordersApi";
+import SalesChart from "../../components/admin/SalesChart";
+import CategoryPieChart from "../../components/admin/CategoryPieChart";
+import { getAdminProducts, getAdminStats } from "../../api/adminApi";
 
 function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -11,32 +13,55 @@ function AdminDashboardPage() {
     revenueCents: 0,
   });
 
+  const [salesByDay, setSalesByDay] = useState([]);
+  const [salesByCategory, setSalesByCategory] = useState([]);
+  const [debugStats, setDebugStats] = useState(null);
+
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [products, orders] = await Promise.all([
-          getAdminProducts(),
-          getOrders().catch(() => []),
+        const [apiStats, products] = await Promise.all([
+          getAdminStats(),
+          getAdminProducts().catch(() => []),
         ]);
 
-        const revenueCents = orders.reduce(
-          (sum, order) => sum + (order.totalPriceCents || 0),
-          0
-        );
+        setDebugStats(apiStats);
 
         setStats({
-          products: products.length,
-          activeProducts: products.filter((item) => item.isActive).length,
-          orders: orders.length,
-          revenueCents,
+          products:
+            apiStats.productsCount ??
+            apiStats.products ??
+            apiStats.totalProducts ??
+            products.length,
+
+          activeProducts:
+            products.filter((item) => item.isActive).length,
+
+          orders:
+            apiStats.ordersCount ??
+            apiStats.orders ??
+            apiStats.totalOrders ??
+            0,
+
+          revenueCents:
+            apiStats.revenueCents ??
+            apiStats.totalRevenueCents ??
+            0,
         });
-      } catch {
-        setStats({
-          products: 0,
-          activeProducts: 0,
-          orders: 0,
-          revenueCents: 0,
-        });
+
+        setSalesByDay(
+          apiStats.salesByDay ||
+            apiStats.dailySales ||
+            []
+        );
+
+        setSalesByCategory(
+          apiStats.salesByCategory ||
+            apiStats.categorySales ||
+            []
+        );
+      } catch (err) {
+        console.error(err);
       }
     }
 
@@ -52,17 +77,17 @@ function AdminDashboardPage() {
     {
       title: "Produits actifs",
       value: String(stats.activeProducts),
-      subtitle: "Visibles dans la démo admin",
+      subtitle: "Visibles dans le catalogue",
     },
     {
       title: "Commandes",
       value: String(stats.orders),
-      subtitle: "Historique commandes actuel",
+      subtitle: "Commandes enregistrées",
     },
     {
       title: "Chiffre d'affaires",
       value: `${(stats.revenueCents / 100).toLocaleString("fr-FR")} €`,
-      subtitle: "Calcul local de démonstration",
+      subtitle: "Total des ventes",
     },
   ];
 
@@ -74,6 +99,10 @@ function AdminDashboardPage() {
             <h1>Admin Dashboard</h1>
             <p>Vue d’ensemble de la partie administration.</p>
           </div>
+
+          <Link to="/admin/products" className="btn btn-primary">
+            Gérer les produits
+          </Link>
         </div>
 
         <div className="grid admin-stats-grid">
@@ -87,16 +116,32 @@ function AdminDashboardPage() {
           ))}
         </div>
 
-        <div className="box">
-          <h2>État de l'administration</h2>
-          <ul className="clean-list">
-            <li>accès protégé par rôle admin</li>
-            <li>liste produits administrable</li>
-            <li>création et modification produit côté UI</li>
-            <li>suppression produit côté UI</li>
-            <li>structure prête pour brancher l’API backend</li>
-          </ul>
+        <div className="admin-dashboard-grid">
+          <SalesChart
+            title="Ventes par jour"
+            data={salesByDay}
+          />
+
+          <SalesChart
+            title="Ventes par catégorie"
+            data={salesByCategory}
+          />
+
+          <CategoryPieChart
+            title="Répartition des ventes par catégorie"
+            data={salesByCategory}
+          />
         </div>
+
+        <details className="box admin-debug-box">
+          <summary>
+            Vérifier les données reçues de /admin/stats
+          </summary>
+
+          <pre>
+            {JSON.stringify(debugStats, null, 2)}
+          </pre>
+        </details>
       </section>
     </div>
   );

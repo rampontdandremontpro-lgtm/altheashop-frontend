@@ -1,60 +1,20 @@
-const USERS_KEY = "althea_users";
-const SESSION_KEY = "althea_session";
-
-function getUsers() {
-  const raw = localStorage.getItem(USERS_KEY);
-  return raw ? JSON.parse(raw) : [];
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function getSession() {
-  const raw = localStorage.getItem(SESSION_KEY);
-  return raw ? JSON.parse(raw) : null;
-}
+import api from "./axios";
 
 export async function getOrders() {
-  const session = getSession();
-
-  if (!session) {
-    throw new Error("Utilisateur non connecté.");
-  }
-
-  const users = getUsers();
-  const user = users.find((item) => item.id === session.id);
-
-  return user?.orders || [];
+  const response = await api.get("/orders/me");
+  return response.data;
 }
 
-export async function createOrder(orderPayload) {
-  const session = getSession();
+export async function getOrderById(id) {
+  const response = await api.get(`/orders/${id}`);
+  return response.data;
+}
 
-  if (!session) {
-    throw new Error("Utilisateur non connecté.");
-  }
-
-  const users = getUsers();
-
-  const order = {
-    id: Date.now(),
-    reference: `ALT-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-    status: "Confirmée",
-    ...orderPayload,
-  };
-
-  const updatedUsers = users.map((user) => {
-    if (user.id !== session.id) return user;
-
-    return {
-      ...user,
-      orders: [order, ...(user.orders || [])],
-    };
+export async function createOrder(payload) {
+  const response = await api.post("/orders/checkout", {
+    shippingAddressId: payload.shippingAddressId,
+    paymentMethod: payload.paymentMethod,
   });
 
-  saveUsers(updatedUsers);
-
-  return order;
+  return response.data;
 }

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  deleteAdminProduct,
-  getAdminProducts,
-} from "../../api/adminApi";
+import { deleteAdminProduct, getAdminProducts } from "../../api/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import EmptyState from "../../components/common/EmptyState";
@@ -51,13 +48,19 @@ function AdminProductsPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Admin Produits</h1>
+            <h1>Les produits</h1>
             <p>{products.length} produit(s)</p>
           </div>
 
-          <Link to="/admin/products/new" className="btn btn-primary">
-            Nouveau produit
-          </Link>
+          <div className="admin-page-actions">
+            <Link to="/admin" className="btn btn-secondary">
+              Retour
+            </Link>
+
+            <Link to="/admin/products/new" className="btn btn-primary">
+              Nouveau produit
+            </Link>
+          </div>
         </div>
 
         {products.length === 0 ? (

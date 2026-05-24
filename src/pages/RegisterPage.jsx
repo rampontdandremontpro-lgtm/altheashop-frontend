@@ -17,7 +17,6 @@ const EMPTY_FORM = {
   phone: "",
   password: "",
   confirmPassword: "",
-  role: "user",
 };
 
 function RegisterPage() {
@@ -65,9 +64,7 @@ function RegisterPage() {
     }
 
     if (!isValidPhone(form.phone)) {
-      setError(
-        "Le numéro de téléphone doit contenir exactement 10 chiffres."
-      );
+      setError("Le numéro de téléphone doit contenir exactement 10 chiffres.");
       return;
     }
 
@@ -80,13 +77,13 @@ function RegisterPage() {
       setLoading(true);
 
       await register({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        phone: form.phone,
-        password: form.password,
-        role: form.role,
-      });
+  firstName: form.firstName,
+  lastName: form.lastName,
+  email: form.email,
+  phone: form.phone,
+  password: form.password,
+  confirmPassword: form.confirmPassword,
+});
 
       setForm(EMPTY_FORM);
       navigate("/account");
@@ -147,16 +144,6 @@ function RegisterPage() {
               maxLength={10}
               autoComplete="off"
             />
-
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              autoComplete="off"
-            >
-              <option value="user">Utilisateur</option>
-              <option value="admin">Administrateur</option>
-            </select>
 
             <input
               type="password"

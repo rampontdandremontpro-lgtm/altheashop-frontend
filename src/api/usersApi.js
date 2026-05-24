@@ -28,17 +28,18 @@ function savePaymentMethodsStorage(methods) {
 
 export async function getProfile() {
   const response = await api.get("/users/me");
-  return response.data;
+  return response.data.user || response.data;
 }
 
 export async function updateProfile(payload) {
   const response = await api.patch("/users/me", {
     firstName: payload.firstName,
     lastName: payload.lastName,
+    email: payload.email,
     phone: payload.phone,
   });
 
-  return response.data;
+  return response.data.user || response.data;
 }
 
 export async function deleteCurrentUserAccount() {
@@ -63,6 +64,7 @@ export async function createAddress(payload) {
     postalCode: payload.postalCode,
     country: payload.country,
     phone: payload.phone || "",
+    isDefault: Boolean(payload.isDefault),
   });
 
   return response.data;
@@ -79,6 +81,7 @@ export async function updateAddress(id, payload) {
     postalCode: payload.postalCode,
     country: payload.country,
     phone: payload.phone || "",
+    isDefault: Boolean(payload.isDefault),
   });
 
   return response.data;
@@ -89,17 +92,12 @@ export async function deleteAddress(id) {
   return response.data;
 }
 
-/**
- * Les moyens de paiement restent locaux pour l'instant :
- * le backend ne propose pas encore de routes dédiées.
- */
 export async function getPaymentMethods() {
   return getPaymentMethodsStorage();
 }
 
 export async function createPaymentMethod(payload) {
   const methods = getPaymentMethodsStorage();
-
   const digits = String(payload.cardNumber).replace(/\s+/g, "");
   const last4 = digits.slice(-4);
 
@@ -130,7 +128,6 @@ export async function createPaymentMethod(payload) {
 
 export async function updatePaymentMethod(id, payload) {
   const methods = getPaymentMethodsStorage();
-
   const digits = String(payload.cardNumber).replace(/\s+/g, "");
   const last4 = digits.slice(-4);
 
@@ -160,7 +157,9 @@ export async function updatePaymentMethod(id, payload) {
 }
 
 export async function deletePaymentMethod(id) {
-  let nextMethods = getPaymentMethodsStorage().filter((method) => method.id !== id);
+  let nextMethods = getPaymentMethodsStorage().filter(
+    (method) => method.id !== id
+  );
 
   if (nextMethods.length > 0 && !nextMethods.some((method) => method.isDefault)) {
     nextMethods[0].isDefault = true;

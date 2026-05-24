@@ -1,55 +1,49 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../utils/formatPrice";
 
 const FALLBACK_IMAGE =
-  "https://placehold.co/600x400/e5e7eb/6b7280?text=Image+indisponible";
+  "https://via.placeholder.com/400x400?text=Image+indisponible";
 
 function ProductCard({ product }) {
-  const { addToCart } = useCart();
   const [imageSrc, setImageSrc] = useState(
-    product.images?.[0]?.imageUrl || FALLBACK_IMAGE
+    product.imageUrl ||
+      product.images?.[0]?.url ||
+      FALLBACK_IMAGE
   );
 
   return (
-    <article className="card">
-      <Link to={`/product/${product.slug}`} className="card-image-wrapper">
+    <article className="product-card box">
+      <Link to={`/product/${product.slug || product.id}`}>
         <img
           src={imageSrc}
           alt={product.name}
-          className="card-image"
+          className="product-card-image"
           onError={() => setImageSrc(FALLBACK_IMAGE)}
         />
       </Link>
 
-      <div className="card-body">
-        <p className="product-category">{product.category?.name || "Catégorie"}</p>
-        <h3>{product.name}</h3>
-        <p className="product-description">
-          {product.shortDescription || product.description || "Aucune description"}
+      <div className="product-card-content">
+        <p className="product-card-category">
+          {product.category?.name}
         </p>
 
-        <div className="product-meta">
-          <strong>{formatPrice(product.priceCents)}</strong>
-          <span className={product.stock > 0 ? "stock-ok" : "stock-ko"}>
-            {product.stock > 0 ? `Stock: ${product.stock}` : "Rupture"}
-          </span>
-        </div>
+        <h3>{product.name}</h3>
 
-        <div className="product-actions">
-          <Link to={`/product/${product.slug}`} className="btn btn-secondary">
-            Voir
-          </Link>
+        <p className="product-card-price">
+          {formatPrice(product.priceCents)}
+        </p>
 
-          <button
-            className="btn btn-primary"
-            onClick={() => addToCart(product)}
-            disabled={product.stock <= 0}
-          >
-            Ajouter
-          </button>
-        </div>
+        <p className="product-card-description">
+          {product.shortDescription}
+        </p>
+
+        <Link
+          to={`/product/${product.slug || product.id}`}
+          className="btn btn-primary"
+        >
+          Voir le produit
+        </Link>
       </div>
     </article>
   );

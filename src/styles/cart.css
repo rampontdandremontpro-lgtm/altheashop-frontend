@@ -159,3 +159,11 @@
     height: 220px;
   }
 }
+
+.checkout-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+}

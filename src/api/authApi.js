@@ -28,6 +28,20 @@ export function getStoredUser() {
   return raw ? JSON.parse(raw) : null;
 }
 
+function saveAuthResponse(data) {
+  const token = data.accessToken || data.token;
+
+  if (token) {
+    setToken(token);
+  }
+
+  if (data.user) {
+    saveUser(data.user);
+  }
+
+  return data.user;
+}
+
 export async function register(payload) {
   const response = await api.post("/auth/register", {
     firstName: payload.firstName,
@@ -35,14 +49,10 @@ export async function register(payload) {
     email: payload.email,
     phone: payload.phone,
     password: payload.password,
+    confirmPassword: payload.confirmPassword,
   });
 
-  const { accessToken, user } = response.data;
-
-  setToken(accessToken);
-  saveUser(user);
-
-  return user;
+  return saveAuthResponse(response.data);
 }
 
 export async function login(payload) {
@@ -51,12 +61,7 @@ export async function login(payload) {
     password: payload.password,
   });
 
-  const { accessToken, user } = response.data;
-
-  setToken(accessToken);
-  saveUser(user);
-
-  return user;
+  return saveAuthResponse(response.data);
 }
 
 export async function logout() {
@@ -73,27 +78,35 @@ export async function getMe() {
   }
 
   const response = await api.get("/auth/me");
-  const user = response.data;
+  const user = response.data.user || response.data;
 
   saveUser(user);
   return user;
 }
 
 export async function forgotPassword(email) {
-  return {
-    message:
-      "La réinitialisation du mot de passe n'est pas encore disponible côté backend.",
-  };
+  const response = await api.post("/auth/forgot-password", { email });
+  return response.data;
+}
+
+export async function resetPassword(payload) {
+  const response = await api.post("/auth/reset-password", {
+    token: payload.token,
+    password: payload.password,
+  });
+
+  return response.data;
 }
 
 export async function updateProfile(payload) {
   const response = await api.patch("/users/me", {
     firstName: payload.firstName,
     lastName: payload.lastName,
+    email: payload.email,
     phone: payload.phone,
   });
 
-  const user = response.data;
+  const user = response.data.user || response.data;
   saveUser(user);
 
   return user;

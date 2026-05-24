@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProductAdminForm from "../../components/admin/ProductAdminForm";
 import { createAdminProduct } from "../../api/adminApi";
 
@@ -27,8 +27,12 @@ function AdminProductCreatePage() {
         <div className="page-heading">
           <div>
             <h1>Créer un produit</h1>
-            <p>Ajout d’un nouveau produit côté interface admin.</p>
+            <p>Ajout d’un nouveau produit</p>
           </div>
+
+          <Link to="/admin/products" className="btn btn-secondary">
+            Retour
+          </Link>
         </div>
 
         {error && <div className="box error-box">{error}</div>}

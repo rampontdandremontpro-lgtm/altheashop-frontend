@@ -15,10 +15,16 @@ function OrdersPage() {
     async function fetchOrders() {
       try {
         setLoading(true);
+        setError("");
+
         const data = await getOrders();
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
       } catch (err) {
-        setError(err.message || "Impossible de charger les commandes.");
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Impossible de charger les commandes."
+        );
       } finally {
         setLoading(false);
       }
@@ -58,6 +64,7 @@ function OrdersPage() {
                         <h2>{order.reference}</h2>
                         <p>Statut : {order.status}</p>
                       </div>
+
                       <div>
                         <strong>{formatPrice(order.totalPriceCents)}</strong>
                       </div>
@@ -65,20 +72,27 @@ function OrdersPage() {
 
                     <div className="detail-box">
                       <p>
-                        Date : {new Date(order.createdAt).toLocaleDateString("fr-FR")}
+                        Date :{" "}
+                        {new Date(order.createdAt).toLocaleDateString("fr-FR")}
                       </p>
-                      <p>
-                        Livraison : {order.shippingAddress?.addressLine1},{" "}
-                        {order.shippingAddress?.postalCode} {order.shippingAddress?.city},{" "}
-                        {order.shippingAddress?.country}
-                      </p>
+
+                      {order.shippingAddress && (
+                        <p>
+                          Livraison : {order.shippingAddress.addressLine1},{" "}
+                          {order.shippingAddress.postalCode}{" "}
+                          {order.shippingAddress.city},{" "}
+                          {order.shippingAddress.country}
+                        </p>
+                      )}
+
                       <p>Paiement : {order.paymentMethod}</p>
                     </div>
 
                     <div className="detail-box">
                       <h3>Produits</h3>
+
                       <ul className="clean-list">
-                        {order.items.map((item) => (
+                        {(order.items || []).map((item) => (
                           <li key={`${order.id}-${item.id}`}>
                             {item.name} x {item.quantity} —{" "}
                             {formatPrice(item.priceCents * item.quantity)}

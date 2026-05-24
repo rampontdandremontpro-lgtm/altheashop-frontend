@@ -12,15 +12,26 @@
 }
 
 .card-image-wrapper {
-  aspect-ratio: 16 / 10;
+  width: 100%;
+  height: 260px;
   background: #eef2ff;
   overflow: hidden;
+  border-radius: 14px;
 }
 
 .card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.product-card-image {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #eef2ff;
+  display: block;
 }
 
 .card-body {
