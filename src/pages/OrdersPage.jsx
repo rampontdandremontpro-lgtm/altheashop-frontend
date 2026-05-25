@@ -7,11 +7,14 @@ import EmptyState from "../components/common/EmptyState";
 import { formatPrice } from "../utils/formatPrice";
 import AccountSidebar from "../components/account/AccountSidebar";
 
-const FALLBACK_IMAGE =
-  "https://via.placeholder.com/80x80?text=Image";
+const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Image";
 
 function getOrderYear(order) {
   return new Date(order.createdAt).getFullYear();
+}
+
+function getItemName(item) {
+  return item.name || item.product?.name || "Produit";
 }
 
 function getItemImage(item) {
@@ -19,6 +22,7 @@ function getItemImage(item) {
     item.imageUrl ||
     item.product?.imageUrl ||
     item.product?.images?.[0]?.url ||
+    item.product?.images?.[0]?.imageUrl ||
     FALLBACK_IMAGE
   );
 }
@@ -29,7 +33,7 @@ function orderMatchesSearch(order, search) {
   if (!query) return true;
 
   const productNames = (order.items || [])
-    .map((item) => item.name || item.product?.name || "")
+    .map((item) => getItemName(item))
     .join(" ")
     .toLowerCase();
 
@@ -163,11 +167,11 @@ function OrdersPage() {
             ) : (
               <div className="orders-list">
                 {sortedYears.map((year) => (
-                  <div key={year}>
+                  <div key={year} className="orders-year-group">
                     <h2>{year}</h2>
 
                     {ordersByYear[year].map((order) => (
-                      <div key={order.id} className="box order-card">
+                      <article key={order.id} className="box order-card">
                         <div className="order-card-head">
                           <div>
                             <h3>Référence de commande : {order.reference}</h3>
@@ -202,7 +206,7 @@ function OrdersPage() {
                                 >
                                   <img
                                     src={getItemImage(item)}
-                                    alt={item.name || item.product?.name}
+                                    alt={getItemName(item)}
                                     className="order-product-image"
                                     onError={(e) => {
                                       e.currentTarget.src = FALLBACK_IMAGE;
@@ -210,9 +214,7 @@ function OrdersPage() {
                                   />
 
                                   <div>
-                                    <strong>
-                                      {item.name || item.product?.name}
-                                    </strong>
+                                    <strong>{getItemName(item)}</strong>
                                     <p>
                                       Quantité : {item.quantity} —{" "}
                                       {formatPrice(
@@ -245,7 +247,7 @@ function OrdersPage() {
                               : "Facture PDF"}
                           </button>
                         </div>
-                      </div>
+                      </article>
                     ))}
                   </div>
                 ))}
