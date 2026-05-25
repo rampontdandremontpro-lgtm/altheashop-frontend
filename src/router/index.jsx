@@ -27,6 +27,7 @@ import AdminProductsPage from "../pages/admin/AdminProductsPage";
 import AdminProductCreatePage from "../pages/admin/AdminProductCreatePage";
 import AdminProductEditPage from "../pages/admin/AdminProductEditPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
+import OrderDetailPage from "../pages/OrderDetailPage";
 
 function AppRouter() {
   return (
@@ -51,6 +52,7 @@ function AppRouter() {
         <Route path="account" element={<PrivateRoute><AccountPage /></PrivateRoute>} />
         <Route path="account/edit" element={<PrivateRoute> <AccountEditPage /></PrivateRoute>} />
         <Route path="orders" element={<PrivateRoute><OrdersPage /></PrivateRoute> } />
+        <Route path="orders/:id" element={<PrivateRoute><OrderDetailPage /></PrivateRoute>}/>
         <Route path="settings" element={<PrivateRoute><SettingsPage /></PrivateRoute> } />
         <Route path="admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
         <Route path="admin/products" element={<AdminRoute><AdminProductsPage /></AdminRoute> } />

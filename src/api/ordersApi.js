@@ -18,3 +18,20 @@ export async function createOrder(payload) {
 
   return response.data;
 }
+
+export async function downloadOrderInvoice(id, reference = "facture") {
+  const response = await api.get(`/orders/${id}/invoice`, {
+    responseType: "blob",
+  });
+
+  const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+
+  link.href = blobUrl;
+  link.download = `${reference}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+
+  link.remove();
+  window.URL.revokeObjectURL(blobUrl);
+}

@@ -186,7 +186,7 @@
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .order-card-head {
@@ -223,4 +223,31 @@
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.account-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.order-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.order-product-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.order-product-image {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #eef2ff;
 }
