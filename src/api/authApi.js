@@ -104,6 +104,7 @@ export async function updateProfile(payload) {
     lastName: payload.lastName,
     email: payload.email,
     phone: payload.phone,
+    currentPassword: payload.currentPassword || undefined,
   });
 
   const user = response.data.user || response.data;

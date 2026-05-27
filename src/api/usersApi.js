@@ -37,15 +37,25 @@ export async function updateProfile(payload) {
     lastName: payload.lastName,
     email: payload.email,
     phone: payload.phone,
+    currentPassword: payload.currentPassword || undefined,
   });
 
   return response.data.user || response.data;
 }
 
+export async function changePassword(payload) {
+  const response = await api.patch("/users/me/password", {
+    currentPassword: payload.currentPassword,
+    newPassword: payload.newPassword,
+    confirmPassword: payload.confirmPassword,
+  });
+
+  return response.data;
+}
+
 export async function deleteCurrentUserAccount() {
-  throw new Error(
-    "La suppression du compte n'est pas encore disponible côté backend."
-  );
+  const response = await api.delete("/users/me");
+  return response.data;
 }
 
 export async function getAddresses() {

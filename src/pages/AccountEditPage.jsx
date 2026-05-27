@@ -11,7 +11,7 @@ import PaymentMethods from "../components/account/PaymentMethods";
 
 function AccountEditPage() {
   const navigate = useNavigate();
-  const { user, logout, updateProfile } = useAuth();
+  const { logout, updateProfile } = useAuth();
 
   const handleSaveProfile = async (formData) => {
     const updated = await updateProfileApi(formData);
@@ -21,6 +21,7 @@ function AccountEditPage() {
       lastName: updated.lastName,
       email: updated.email,
       phone: updated.phone,
+      currentPassword: formData.currentPassword,
     });
   };
 
@@ -49,11 +50,11 @@ function AccountEditPage() {
 
           <div className="account-sections">
             <ProfileForm
-              profile={user}
               onSave={handleSaveProfile}
               onCancel={handleCancel}
               onDeleteAccount={handleDeleteAccount}
             />
+
             <AddressList />
             <PaymentMethods />
           </div>
