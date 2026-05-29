@@ -83,3 +83,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+.chatbot-header h2 {
+  margin: 0;
+}
+
+.chatbot-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.chatbot-messages {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.chat-message {
+  word-break: break-word;
+}
+
+.chat-message.bot {
+  background: #eef2ff;
+  color: var(--text);
+}
+
+.chat-message.user {
+  background: var(--primary);
+  color: white;
+}
