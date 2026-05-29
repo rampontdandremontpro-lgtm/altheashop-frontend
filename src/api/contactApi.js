@@ -17,6 +17,14 @@ export async function getContactMessages() {
   return Array.isArray(response.data) ? response.data : [];
 }
 
+export async function replyContactMessage(id, reply) {
+  const response = await api.post(`/contact/${id}/reply`, {
+    reply,
+  });
+
+  return response.data;
+}
+
 export async function deleteContactMessage(id) {
   await api.delete(`/contact/${id}`);
   return true;
