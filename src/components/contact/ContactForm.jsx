@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sendContactMessage } from "../../api/contactApi";
 
 function ContactForm() {
   const [form, setForm] = useState({
@@ -9,6 +10,7 @@ function ContactForm() {
     message: "",
   });
 
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
@@ -19,8 +21,9 @@ function ContactForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
     setSuccess("");
 
@@ -35,25 +38,42 @@ function ContactForm() {
       return;
     }
 
-    setSuccess(
-      "Votre message a bien été préparé. Le branchement avec l'API contact pourra être ajouté plus tard."
-    );
+    try {
+      setLoading(true);
 
-    setForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+      const result = await sendContactMessage(form);
+
+      setSuccess(
+        result.message || "Votre message a bien été envoyé."
+      );
+
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible d'envoyer le message."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="box">
-      <h2>Formulaire de contact</h2>
+      <h2>Contact</h2>
 
       {error && <div className="box error-box">{error}</div>}
-      {success && <div className="box success-box">{success}</div>}
+
+      {success && (
+        <div className="box success-box">{success}</div>
+      )}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <input
@@ -97,8 +117,12 @@ function ContactForm() {
           className="contact-textarea"
         />
 
-        <button className="btn btn-primary" type="submit">
-          Envoyer
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Envoi..." : "Envoyer"}
         </button>
       </form>
     </div>

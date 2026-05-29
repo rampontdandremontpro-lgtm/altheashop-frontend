@@ -95,15 +95,21 @@ function AdminDashboardPage() {
     <div className="page-stack">
       <section className="section">
         <div className="page-heading">
-          <div>
-            <h1>Admin Dashboard</h1>
-            <p>Vue d’ensemble de la partie administration.</p>
-          </div>
+  <div>
+    <h1>Admin Dashboard</h1>
+    <p>Vue d’ensemble de la partie administration.</p>
+  </div>
 
-          <Link to="/admin/products" className="btn btn-primary">
-            Gérer les produits
-          </Link>
-        </div>
+  <div className="admin-dashboard-actions">
+    <Link to="/admin/products" className="btn btn-primary">
+      Gérer les produits
+    </Link>
+
+    <Link to="/admin/contact" className="btn btn-secondary">
+      Messages contact
+    </Link>
+  </div>
+</div>
 
         <div className="grid admin-stats-grid">
           {cards.map((card) => (
@@ -132,16 +138,6 @@ function AdminDashboardPage() {
             data={salesByCategory}
           />
         </div>
-
-        <details className="box admin-debug-box">
-          <summary>
-            Vérifier les données reçues de /admin/stats
-          </summary>
-
-          <pre>
-            {JSON.stringify(debugStats, null, 2)}
-          </pre>
-        </details>
       </section>
     </div>
   );

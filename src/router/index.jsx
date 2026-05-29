@@ -28,6 +28,7 @@ import AdminProductCreatePage from "../pages/admin/AdminProductCreatePage";
 import AdminProductEditPage from "../pages/admin/AdminProductEditPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import OrderDetailPage from "../pages/OrderDetailPage";
+import AdminContactMessagesPage from "../pages/admin/AdminContactMessagesPage";
 
 function AppRouter() {
   return (
@@ -58,6 +59,7 @@ function AppRouter() {
         <Route path="admin/products" element={<AdminRoute><AdminProductsPage /></AdminRoute> } />
         <Route path="admin/products/new" element={<AdminRoute><AdminProductCreatePage /></AdminRoute>} />
         <Route path="admin/products/:id/edit" element={<AdminRoute><AdminProductEditPage /></AdminRoute>} />
+        <Route path="admin/contact"element={<AdminRoute><AdminContactMessagesPage /></AdminRoute>}/>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
