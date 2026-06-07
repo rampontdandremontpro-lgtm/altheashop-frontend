@@ -1,32 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  createAdminSlide,
   deleteAdminSlide,
   getAdminHome,
   getAdminSlides,
   updateAdminHome,
-  updateAdminSlide,
 } from "../../api/homeApi";
-
-const EMPTY_SLIDE = {
-  title: "",
-  subtitle: "",
-  imageUrl: "",
-  ctaLabel: "",
-  ctaUrl: "",
-  displayOrder: 0,
-  isActive: true,
-};
 
 function AdminHomePage() {
   const [homeText, setHomeText] = useState("");
   const [slides, setSlides] = useState([]);
-  const [slideForm, setSlideForm] = useState(EMPTY_SLIDE);
-  const [editingSlideId, setEditingSlideId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingText, setSavingText] = useState(false);
-  const [savingSlide, setSavingSlide] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -41,7 +26,7 @@ function AdminHomePage() {
       ]);
 
       setHomeText(homeData.homeText || "");
-      setSlides(slidesData);
+      setSlides(Array.isArray(slidesData) ? slidesData : []);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -75,72 +60,6 @@ function AdminHomePage() {
       );
     } finally {
       setSavingText(false);
-    }
-  };
-
-  const handleSlideChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    setSlideForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleEditSlide = (slide) => {
-    setEditingSlideId(slide.id);
-    setSlideForm({
-      title: slide.title || "",
-      subtitle: slide.subtitle || "",
-      imageUrl: slide.imageUrl || "",
-      ctaLabel: slide.ctaLabel || "",
-      ctaUrl: slide.ctaUrl || "",
-      displayOrder: slide.displayOrder ?? 0,
-      isActive: slide.isActive ?? true,
-    });
-    setError("");
-    setSuccess("");
-  };
-
-  const handleCancelEdit = () => {
-    setEditingSlideId(null);
-    setSlideForm(EMPTY_SLIDE);
-    setError("");
-    setSuccess("");
-  };
-
-  const handleSaveSlide = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!slideForm.title || !slideForm.imageUrl) {
-      setError("Le titre et l'image du slide sont obligatoires.");
-      return;
-    }
-
-    try {
-      setSavingSlide(true);
-
-      if (editingSlideId) {
-        await updateAdminSlide(editingSlideId, slideForm);
-        setSuccess("Slide modifié avec succès.");
-      } else {
-        await createAdminSlide(slideForm);
-        setSuccess("Slide créé avec succès.");
-      }
-
-      setEditingSlideId(null);
-      setSlideForm(EMPTY_SLIDE);
-      await loadAdminHome();
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Impossible d'enregistrer le slide."
-      );
-    } finally {
-      setSavingSlide(false);
     }
   };
 
@@ -183,9 +102,15 @@ function AdminHomePage() {
             <p>Modifiez le texte d'accueil et le carrousel.</p>
           </div>
 
-          <Link to="/admin" className="btn btn-secondary">
-            Retour dashboard
-          </Link>
+          <div className="admin-dashboard-actions">
+            <Link to="/admin" className="btn btn-secondary">
+              Retour
+            </Link>
+
+            <Link to="/admin/home/slides/new" className="btn btn-primary">
+              Nouveau slide
+            </Link>
+          </div>
         </div>
 
         {error && <div className="box error-box">{error}</div>}
@@ -210,91 +135,6 @@ function AdminHomePage() {
           </form>
         </div>
 
-        <div className="box">
-          <h2>{editingSlideId ? "Modifier un slide" : "Créer un slide"}</h2>
-
-          <form className="admin-product-form" onSubmit={handleSaveSlide}>
-            <input
-              type="text"
-              name="title"
-              placeholder="Titre"
-              value={slideForm.title}
-              onChange={handleSlideChange}
-            />
-
-            <input
-              type="text"
-              name="subtitle"
-              placeholder="Sous-titre"
-              value={slideForm.subtitle}
-              onChange={handleSlideChange}
-            />
-
-            <input
-              type="text"
-              name="imageUrl"
-              placeholder="URL de l'image"
-              value={slideForm.imageUrl}
-              onChange={handleSlideChange}
-            />
-
-            <input
-              type="number"
-              name="displayOrder"
-              placeholder="Ordre d'affichage"
-              value={slideForm.displayOrder}
-              onChange={handleSlideChange}
-              min="0"
-            />
-
-            <input
-              type="text"
-              name="ctaLabel"
-              placeholder="Texte du bouton"
-              value={slideForm.ctaLabel}
-              onChange={handleSlideChange}
-            />
-
-            <input
-              type="text"
-              name="ctaUrl"
-              placeholder="Lien du bouton (/catalog par exemple)"
-              value={slideForm.ctaUrl}
-              onChange={handleSlideChange}
-            />
-
-            <label className="settings-item">
-              <input
-                type="checkbox"
-                name="isActive"
-                checked={slideForm.isActive}
-                onChange={handleSlideChange}
-              />
-              Slide actif
-            </label>
-
-            <div className="admin-page-actions">
-              <button className="btn btn-primary" type="submit" disabled={savingSlide}>
-                {savingSlide
-                  ? "Enregistrement..."
-                  : editingSlideId
-                  ? "Modifier le slide"
-                  : "Créer le slide"}
-              </button>
-
-              {editingSlideId && (
-                <button
-                  className="btn btn-secondary"
-                  type="button"
-                  onClick={handleCancelEdit}
-                >
-                  Annuler
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-
         <div className="box table-wrapper">
           <h2>Slides du carrousel</h2>
 
@@ -306,6 +146,7 @@ function AdminHomePage() {
                 <tr>
                   <th>ID</th>
                   <th>Titre</th>
+                  <th>Sous-titre</th>
                   <th>Ordre</th>
                   <th>Actif</th>
                   <th>Actions</th>
@@ -317,17 +158,17 @@ function AdminHomePage() {
                   <tr key={slide.id}>
                     <td>{slide.id}</td>
                     <td>{slide.title}</td>
+                    <td>{slide.subtitle}</td>
                     <td>{slide.displayOrder}</td>
                     <td>{slide.isActive ? "Oui" : "Non"}</td>
                     <td>
                       <div className="admin-actions">
-                        <button
-                          type="button"
+                        <Link
+                          to={`/admin/home/slides/${slide.id}/edit`}
                           className="btn btn-secondary"
-                          onClick={() => handleEditSlide(slide)}
                         >
                           Modifier
-                        </button>
+                        </Link>
 
                         <button
                           type="button"

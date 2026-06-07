@@ -323,3 +323,23 @@
   border-radius: 14px;
   padding: 16px;
 }
+
+.admin-upload-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-product-preview-image {
+  width: 220px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+}
+
+.admin-file-label {
+  width: fit-content;
+  cursor: pointer;
+}
