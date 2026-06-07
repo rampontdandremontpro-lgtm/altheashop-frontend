@@ -101,11 +101,16 @@ function AdminDashboardPage() {
   </div>
 
   <div className="admin-dashboard-actions">
+
+    <Link to="/admin/home" className="btn btn-primary">
+  Gérer l'accueil
+</Link>
+
     <Link to="/admin/products" className="btn btn-primary">
       Gérer les produits
     </Link>
 
-    <Link to="/admin/categories" className="btn btn-secondary">
+    <Link to="/admin/categories" className="btn btn-primary">
   Gérer les catégories
 </Link>
 

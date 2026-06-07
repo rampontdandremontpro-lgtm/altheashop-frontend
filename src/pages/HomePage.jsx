@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getHomeData } from "../api/catalogApi";
+import { getPublicHomeData } from "../api/homeApi";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
-import Hero from "../components/home/Hero";
+import Carousel from "../components/home/Carousel";
 import CategoryCard from "../components/home/CategoryCard";
 import ProductCard from "../components/catalog/ProductCard";
 
@@ -13,6 +13,7 @@ function HomePage() {
     categories: [],
     featured: [],
   });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -20,9 +21,11 @@ function HomePage() {
     async function fetchData() {
       try {
         setLoading(true);
-        const result = await getHomeData();
+        setError("");
+
+        const result = await getPublicHomeData();
         setData(result);
-      } catch (err) {
+      } catch {
         setError("Impossible de charger la page d'accueil.");
       } finally {
         setLoading(false);
@@ -37,7 +40,7 @@ function HomePage() {
 
   return (
     <div className="page-stack">
-      <Hero />
+      <Carousel slides={data.slides} />
 
       {data.homeText && (
         <section className="section">
@@ -50,20 +53,30 @@ function HomePage() {
 
       <section className="section">
         <h2>Catégories</h2>
-        <div className="grid cards-grid">
-          {data.categories.map((category) => (
-            <CategoryCard key={category.id} category={category} />
-          ))}
-        </div>
+
+        {data.categories.length === 0 ? (
+          <div className="box">Aucune catégorie disponible.</div>
+        ) : (
+          <div className="grid cards-grid">
+            {data.categories.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="section">
         <h2>Produits mis en avant</h2>
-        <div className="grid cards-grid">
-          {data.featured.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+        {data.featured.length === 0 ? (
+          <div className="box">Aucun produit mis en avant.</div>
+        ) : (
+          <div className="grid cards-grid">
+            {data.featured.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

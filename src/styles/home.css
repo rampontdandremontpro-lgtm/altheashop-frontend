@@ -28,3 +28,158 @@
     padding: 36px 20px;
   }
 }
+
+.home-carousel {
+  position: relative;
+  height: 420px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #111827, #2563eb);
+  box-shadow: var(--shadow);
+}
+
+.home-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.65s ease-in-out;
+}
+
+.home-carousel-slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.home-carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* TEXTE SUR L'IMAGE */
+.home-carousel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 50px 28px;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.85),
+    rgba(15, 23, 42, 0.25)
+  );
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.home-carousel-overlay h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  max-width: 720px;
+  color: white;
+}
+
+.home-carousel-overlay p {
+  max-width: 620px;
+  margin: 0;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.home-carousel-overlay .hero-kicker {
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* FLÈCHES */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  transform: translateY(-50%);
+  border: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  font-size: 0;
+}
+
+.carousel-arrow span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  line-height: 1;
+  transform: translateY(-2px);
+}
+
+.carousel-arrow:hover {
+  background: white;
+}
+
+.carousel-arrow-left {
+  left: 18px;
+}
+
+.carousel-arrow-right {
+  right: 18px;
+}
+
+/* POINTS */
+.carousel-dots {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-dots button {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+
+.carousel-dots button.active {
+  background: white;
+}
+
+@media (max-width: 640px) {
+  .home-carousel {
+    height: 320px;
+  }
+
+  .home-carousel-overlay {
+    padding: 32px 20px;
+  }
+
+  .carousel-arrow {
+    width: 38px;
+    height: 38px;
+  }
+
+  .carousel-arrow span {
+    font-size: 1.6rem;
+  }
+}
