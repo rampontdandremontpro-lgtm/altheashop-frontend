@@ -107,3 +107,34 @@ export async function uploadAdminProductImage(productId, file) {
 
   return normalizeProduct(response.data);
 }
+
+export async function createAdminCategory(payload) {
+  const response = await api.post("/admin/categories", {
+    name: payload.name,
+    slug: payload.slug,
+    description: payload.description || "",
+    imageUrl: payload.imageUrl || "",
+    displayOrder: Number(payload.displayOrder || 0),
+    isActive: Boolean(payload.isActive),
+  });
+
+  return response.data;
+}
+
+export async function updateAdminCategory(id, payload) {
+  const response = await api.patch(`/admin/categories/${id}`, {
+    name: payload.name,
+    slug: payload.slug,
+    description: payload.description || "",
+    imageUrl: payload.imageUrl || "",
+    displayOrder: Number(payload.displayOrder || 0),
+    isActive: Boolean(payload.isActive),
+  });
+
+  return response.data;
+}
+
+export async function deleteAdminCategory(id) {
+  await api.delete(`/admin/categories/${id}`);
+  return true;
+}

@@ -5,6 +5,7 @@ import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { formatPrice } from "../utils/formatPrice";
 import { useCart } from "../context/CartContext";
+import SimilarProducts from "../components/catalog/SimilarProducts";
 
 const FALLBACK_IMAGE =
   "https://via.placeholder.com/600x400?text=Image+indisponible";
@@ -107,6 +108,7 @@ function ProductPage() {
           </div>
         </div>
       </section>
+       <SimilarProducts product={product} />
     </div>
   );
 }

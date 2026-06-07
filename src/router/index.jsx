@@ -29,6 +29,9 @@ import AdminProductEditPage from "../pages/admin/AdminProductEditPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import OrderDetailPage from "../pages/OrderDetailPage";
 import AdminContactMessagesPage from "../pages/admin/AdminContactMessagesPage";
+import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage";
+import AdminCategoryCreatePage from "../pages/admin/AdminCategoryCreatePage";
+import AdminCategoryEditPage from "../pages/admin/AdminCategoryEditPage";
 
 function AppRouter() {
   return (
@@ -59,7 +62,10 @@ function AppRouter() {
         <Route path="admin/products" element={<AdminRoute><AdminProductsPage /></AdminRoute> } />
         <Route path="admin/products/new" element={<AdminRoute><AdminProductCreatePage /></AdminRoute>} />
         <Route path="admin/products/:id/edit" element={<AdminRoute><AdminProductEditPage /></AdminRoute>} />
+        <Route path="admin/categories/new" element={<AdminRoute><AdminCategoryCreatePage /></AdminRoute>} />
+        <Route path="admin/categories/:id/edit" element={<AdminRoute><AdminCategoryEditPage /></AdminRoute>} />
         <Route path="admin/contact"element={<AdminRoute><AdminContactMessagesPage /></AdminRoute>}/>
+        <Route path="admin/categories" element={<AdminRoute><AdminCategoriesPage /></AdminRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

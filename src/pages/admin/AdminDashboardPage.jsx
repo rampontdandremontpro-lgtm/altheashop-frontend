@@ -105,6 +105,10 @@ function AdminDashboardPage() {
       Gérer les produits
     </Link>
 
+    <Link to="/admin/categories" className="btn btn-secondary">
+  Gérer les catégories
+</Link>
+
     <Link to="/admin/contact" className="btn btn-secondary">
       Messages contact
     </Link>

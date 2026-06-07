@@ -14,6 +14,7 @@ function SearchPage() {
   const initialCategory = searchParams.get("category") || "";
   const initialSort = searchParams.get("sort") || "priority";
   const initialAvailability = searchParams.get("availability") || "all";
+  const initialMatchMode = searchParams.get("matchMode") || "auto";
   const initialMinPrice = searchParams.get("minPriceCents") || "";
   const initialMaxPrice = searchParams.get("maxPriceCents") || "";
   const initialPage = Number(searchParams.get("page") || 1);
@@ -34,6 +35,7 @@ function SearchPage() {
     category: initialCategory,
     sort: initialSort,
     availability: initialAvailability,
+    matchMode: initialMatchMode,
     minPriceCents: initialMinPrice,
     maxPriceCents: initialMaxPrice,
   });
@@ -63,7 +65,7 @@ function SearchPage() {
           page,
           pageSize: 12,
           sort: filters.sort,
-          matchMode: "starts_with",
+          matchMode: filters.matchMode,
         };
 
         if (initialQuery.trim()) params.q = initialQuery.trim();
@@ -99,6 +101,9 @@ function SearchPage() {
     if (filters.availability !== "all") {
       params.set("availability", filters.availability);
     }
+    if (filters.matchMode !== "auto") {
+      params.set("matchMode", filters.matchMode);
+    }
     if (filters.minPriceCents) {
       params.set("minPriceCents", filters.minPriceCents);
     }
@@ -126,6 +131,7 @@ function SearchPage() {
       category: "",
       sort: "priority",
       availability: "all",
+      matchMode: "auto",
       minPriceCents: "",
       maxPriceCents: "",
     });
@@ -150,8 +156,16 @@ function SearchPage() {
         </div>
 
         <div className="filters filters-advanced search-filters-only">
-          <select value="starts_with" disabled>
+          <select
+            name="matchMode"
+            value={filters.matchMode}
+            onChange={handleChange}
+          >
+            <option value="auto">Priorité automatique</option>
+            <option value="exact">Correspondance exacte</option>
+            <option value="one_char_diff">Un caractère différent</option>
             <option value="starts_with">Commence par</option>
+            <option value="contains">Contient</option>
           </select>
 
           <select name="category" value={filters.category} onChange={handleChange}>
@@ -175,7 +189,11 @@ function SearchPage() {
             <option value="stock_asc">Stock croissant</option>
           </select>
 
-          <select name="availability" value={filters.availability} onChange={handleChange}>
+          <select
+            name="availability"
+            value={filters.availability}
+            onChange={handleChange}
+          >
             <option value="all">Toutes disponibilités</option>
             <option value="in_stock">En stock</option>
             <option value="out_of_stock">Rupture de stock</option>
