@@ -12,10 +12,10 @@ function SearchPage() {
 
   const initialQuery = searchParams.get("q") || "";
   const initialCategory = searchParams.get("category") || "";
-  const initialSort = searchParams.get("sort") || "relevance";
+  const initialSort = searchParams.get("sort") || "priority";
+  const initialAvailability = searchParams.get("availability") || "all";
   const initialMinPrice = searchParams.get("minPriceCents") || "";
   const initialMaxPrice = searchParams.get("maxPriceCents") || "";
-  const initialInStock = searchParams.get("inStock") === "true";
   const initialPage = Number(searchParams.get("page") || 1);
 
   const [productsData, setProductsData] = useState({
@@ -33,7 +33,7 @@ function SearchPage() {
   const [filters, setFilters] = useState({
     category: initialCategory,
     sort: initialSort,
-    inStock: initialInStock,
+    availability: initialAvailability,
     minPriceCents: initialMinPrice,
     maxPriceCents: initialMaxPrice,
   });
@@ -63,11 +63,14 @@ function SearchPage() {
           page,
           pageSize: 12,
           sort: filters.sort,
+          matchMode: "starts_with",
         };
 
         if (initialQuery.trim()) params.q = initialQuery.trim();
         if (filters.category) params.category = filters.category;
-        if (filters.inStock) params.inStock = true;
+        if (filters.availability !== "all") {
+          params.availability = filters.availability;
+        }
         if (filters.minPriceCents) {
           params.minPriceCents = Number(filters.minPriceCents);
         }
@@ -77,7 +80,7 @@ function SearchPage() {
 
         const data = await getProducts(params);
         setProductsData(data);
-      } catch (err) {
+      } catch {
         setError("Impossible de charger les résultats de recherche.");
       } finally {
         setLoading(false);
@@ -93,20 +96,26 @@ function SearchPage() {
     if (initialQuery.trim()) params.set("q", initialQuery.trim());
     if (filters.category) params.set("category", filters.category);
     if (filters.sort) params.set("sort", filters.sort);
-    if (filters.inStock) params.set("inStock", "true");
-    if (filters.minPriceCents) params.set("minPriceCents", filters.minPriceCents);
-    if (filters.maxPriceCents) params.set("maxPriceCents", filters.maxPriceCents);
+    if (filters.availability !== "all") {
+      params.set("availability", filters.availability);
+    }
+    if (filters.minPriceCents) {
+      params.set("minPriceCents", filters.minPriceCents);
+    }
+    if (filters.maxPriceCents) {
+      params.set("maxPriceCents", filters.maxPriceCents);
+    }
     if (page > 1) params.set("page", String(page));
 
     setSearchParams(params, { replace: true });
   }, [filters, page, initialQuery, setSearchParams]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
 
     setFilters((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
 
     setPage(1);
@@ -115,11 +124,12 @@ function SearchPage() {
   const handleReset = () => {
     setFilters({
       category: "",
-      sort: "relevance",
-      inStock: false,
+      sort: "priority",
+      availability: "all",
       minPriceCents: "",
       maxPriceCents: "",
     });
+
     setPage(1);
   };
 
@@ -140,11 +150,11 @@ function SearchPage() {
         </div>
 
         <div className="filters filters-advanced search-filters-only">
-          <select
-            name="category"
-            value={filters.category}
-            onChange={handleChange}
-          >
+          <select value="starts_with" disabled>
+            <option value="starts_with">Commence par</option>
+          </select>
+
+          <select name="category" value={filters.category} onChange={handleChange}>
             <option value="">Toutes les catégories</option>
             {categoryOptions.map((category) => (
               <option key={category.id} value={category.slug}>
@@ -154,12 +164,21 @@ function SearchPage() {
           </select>
 
           <select name="sort" value={filters.sort} onChange={handleChange}>
-            <option value="relevance">Pertinence</option>
             <option value="priority">Priorité</option>
+            <option value="newest">Nouveautés</option>
+            <option value="oldest">Plus anciens</option>
             <option value="price_asc">Prix croissant</option>
             <option value="price_desc">Prix décroissant</option>
             <option value="name_asc">Nom A-Z</option>
             <option value="name_desc">Nom Z-A</option>
+            <option value="stock_desc">Stock décroissant</option>
+            <option value="stock_asc">Stock croissant</option>
+          </select>
+
+          <select name="availability" value={filters.availability} onChange={handleChange}>
+            <option value="all">Toutes disponibilités</option>
+            <option value="in_stock">En stock</option>
+            <option value="out_of_stock">Rupture de stock</option>
           </select>
 
           <input
@@ -180,21 +199,7 @@ function SearchPage() {
             min="0"
           />
 
-          <label className="checkbox-inline">
-            <input
-              type="checkbox"
-              name="inStock"
-              checked={filters.inStock}
-              onChange={handleChange}
-            />
-            En stock
-          </label>
-
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleReset}
-          >
+          <button type="button" className="btn btn-secondary" onClick={handleReset}>
             Réinitialiser
           </button>
         </div>

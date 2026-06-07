@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { getCategories, getProducts } from "../api/catalogApi";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
@@ -6,7 +7,18 @@ import EmptyState from "../components/common/EmptyState";
 import Pagination from "../components/common/Pagination";
 import ProductCard from "../components/catalog/ProductCard";
 
-function CatalogPage() {
+function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialQuery = searchParams.get("q") || "";
+  const initialCategory = searchParams.get("category") || "";
+  const initialSort = searchParams.get("sort") || "priority";
+  const initialAvailability = searchParams.get("availability") || "all";
+  const initialMatchMode = searchParams.get("matchMode") || "contains";
+  const initialMinPrice = searchParams.get("minPriceCents") || "";
+  const initialMaxPrice = searchParams.get("maxPriceCents") || "";
+  const initialPage = Number(searchParams.get("page") || 1);
+
   const [productsData, setProductsData] = useState({
     items: [],
     page: 1,
@@ -20,17 +32,16 @@ function CatalogPage() {
   const [error, setError] = useState("");
 
   const [filters, setFilters] = useState({
-    q: "",
-    category: "",
-    sort: "priority",
-    inStock: false,
-    minPriceCents: "",
-    maxPriceCents: "",
+    category: initialCategory,
+    sort: initialSort,
+    availability: initialAvailability,
+    matchMode: initialMatchMode,
+    minPriceCents: initialMinPrice,
+    maxPriceCents: initialMaxPrice,
   });
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initialPage);
 
-  // 🔹 Charger catégories
   useEffect(() => {
     async function fetchCategoriesData() {
       try {
@@ -44,7 +55,6 @@ function CatalogPage() {
     fetchCategoriesData();
   }, []);
 
-  // 🔹 Charger produits
   useEffect(() => {
     async function fetchProductsData() {
       try {
@@ -55,11 +65,14 @@ function CatalogPage() {
           page,
           pageSize: 12,
           sort: filters.sort,
+          matchMode: filters.matchMode,
         };
 
-        if (filters.q.trim()) params.q = filters.q.trim();
+        if (initialQuery.trim()) params.q = initialQuery.trim();
         if (filters.category) params.category = filters.category;
-        if (filters.inStock) params.inStock = true;
+        if (filters.availability !== "all") {
+          params.availability = filters.availability;
+        }
         if (filters.minPriceCents) {
           params.minPriceCents = Number(filters.minPriceCents);
         }
@@ -69,38 +82,60 @@ function CatalogPage() {
 
         const data = await getProducts(params);
         setProductsData(data);
-      } catch (err) {
-        setError("Impossible de charger les produits.");
+      } catch {
+        setError("Impossible de charger les résultats de recherche.");
       } finally {
         setLoading(false);
       }
     }
 
     fetchProductsData();
-  }, [page, filters]);
+  }, [page, filters, initialQuery]);
 
-  // 🔹 Changement filtre (AUTO)
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (initialQuery.trim()) params.set("q", initialQuery.trim());
+    if (filters.category) params.set("category", filters.category);
+    if (filters.sort) params.set("sort", filters.sort);
+    if (filters.availability !== "all") {
+      params.set("availability", filters.availability);
+    }
+    if (filters.matchMode !== "contains") {
+      params.set("matchMode", filters.matchMode);
+    }
+    if (filters.minPriceCents) {
+      params.set("minPriceCents", filters.minPriceCents);
+    }
+    if (filters.maxPriceCents) {
+      params.set("maxPriceCents", filters.maxPriceCents);
+    }
+    if (page > 1) params.set("page", String(page));
+
+    setSearchParams(params, { replace: true });
+  }, [filters, page, initialQuery, setSearchParams]);
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
 
     setFilters((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
 
-    setPage(1); // reset pagination automatiquement
+    setPage(1);
   };
 
-  // 🔹 Reset
   const handleReset = () => {
     setFilters({
-      q: "",
       category: "",
       sort: "priority",
-      inStock: false,
+      availability: "all",
+      matchMode: "contains",
       minPriceCents: "",
       maxPriceCents: "",
     });
+
     setPage(1);
   };
 
@@ -111,25 +146,23 @@ function CatalogPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Catalogue</h1>
-            <p>{productsData.total} produit(s)</p>
+            <h1>Recherche</h1>
+            <p>
+              {initialQuery.trim()
+                ? `Résultats pour "${initialQuery.trim()}" — ${productsData.total} produit(s)`
+                : `${productsData.total} produit(s) trouvés`}
+            </p>
           </div>
         </div>
 
-        <div className="filters filters-advanced">
-          <input
-            type="text"
-            name="q"
-            placeholder="Rechercher un produit..."
-            value={filters.q}
-            onChange={handleChange}
-          />
+        <div className="filters filters-advanced search-filters-only">
+          <select name="matchMode" value={filters.matchMode} onChange={handleChange}>
+            <option value="contains">Contient</option>
+            <option value="starts_with">Commence par</option>
+            <option value="exact">Correspondance exacte</option>
+          </select>
 
-          <select
-            name="category"
-            value={filters.category}
-            onChange={handleChange}
-          >
+          <select name="category" value={filters.category} onChange={handleChange}>
             <option value="">Toutes les catégories</option>
             {categoryOptions.map((category) => (
               <option key={category.id} value={category.slug}>
@@ -140,10 +173,24 @@ function CatalogPage() {
 
           <select name="sort" value={filters.sort} onChange={handleChange}>
             <option value="priority">Priorité</option>
+            <option value="newest">Nouveautés</option>
+            <option value="oldest">Plus anciens</option>
             <option value="price_asc">Prix croissant</option>
             <option value="price_desc">Prix décroissant</option>
             <option value="name_asc">Nom A-Z</option>
             <option value="name_desc">Nom Z-A</option>
+            <option value="stock_desc">Stock décroissant</option>
+            <option value="stock_asc">Stock croissant</option>
+          </select>
+
+          <select
+            name="availability"
+            value={filters.availability}
+            onChange={handleChange}
+          >
+            <option value="all">Toutes disponibilités</option>
+            <option value="in_stock">En stock</option>
+            <option value="out_of_stock">Rupture de stock</option>
           </select>
 
           <input
@@ -164,27 +211,13 @@ function CatalogPage() {
             min="0"
           />
 
-          <label className="checkbox-inline">
-            <input
-              type="checkbox"
-              name="inStock"
-              checked={filters.inStock}
-              onChange={handleChange}
-            />
-            En stock
-          </label>
-
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleReset}
-          >
+          <button type="button" className="btn btn-secondary" onClick={handleReset}>
             Réinitialiser
           </button>
         </div>
       </section>
 
-      {loading && <Loader text="Chargement des produits..." />}
+      {loading && <Loader text="Chargement des résultats..." />}
       {error && <ErrorMessage message={error} />}
 
       {!loading && !error && (
@@ -199,7 +232,7 @@ function CatalogPage() {
             ) : (
               <EmptyState
                 title="Aucun produit trouvé"
-                message="Essaie de modifier les filtres."
+                message="Essaie de modifier les filtres ou de faire une nouvelle recherche depuis la barre du haut."
               />
             )}
           </section>
@@ -215,4 +248,4 @@ function CatalogPage() {
   );
 }
 
-export default CatalogPage;
+export default SearchPage;
