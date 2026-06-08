@@ -138,3 +138,50 @@ export async function deleteAdminCategory(id) {
   await api.delete(`/admin/categories/${id}`);
   return true;
 }
+
+
+export async function getAdminOrders() {
+  const response = await api.get("/admin/orders");
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function getAdminOrderById(id) {
+  const response = await api.get(`/admin/orders/${id}`);
+  return response.data;
+}
+
+export async function updateAdminOrderStatus(id, status) {
+  const response = await api.patch(`/admin/orders/${id}/status`, {
+    status,
+  });
+
+  return response.data;
+}
+
+export async function getAdminUsers() {
+  const response = await api.get("/admin/users");
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function getAdminUserById(id) {
+  const response = await api.get(`/admin/users/${id}`);
+  return response.data;
+}
+
+export async function updateAdminUser(id, payload) {
+  const response = await api.patch(`/admin/users/${id}`, {
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    phone: payload.phone,
+    role: payload.role,
+    isActive: Boolean(payload.isActive),
+  });
+
+  return response.data;
+}
+
+export async function deleteAdminUser(id) {
+  await api.delete(`/admin/users/${id}`);
+  return true;
+}

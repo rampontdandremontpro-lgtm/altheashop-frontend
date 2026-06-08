@@ -340,3 +340,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+.order-status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

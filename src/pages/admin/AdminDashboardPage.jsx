@@ -114,6 +114,14 @@ function AdminDashboardPage() {
   Gérer les catégories
 </Link>
 
+<Link to="/admin/orders" className="btn btn-primary">
+  Gérer les commandes
+</Link>
+
+<Link to="/admin/users" className="btn btn-primary">
+  Gérer les utilisateurs
+</Link>
+
     <Link to="/admin/contact" className="btn btn-secondary">
       Messages contact
     </Link>

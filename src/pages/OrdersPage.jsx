@@ -9,6 +9,16 @@ import AccountSidebar from "../components/account/AccountSidebar";
 
 const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Image";
 
+const STATUS_LABELS = {
+  pending: "En attente",
+  confirmed: "Confirmée",
+  paid: "Payée",
+  processing: "Préparation",
+  shipped: "Expédiée",
+  delivered: "Livrée",
+  cancelled: "Annulée",
+};
+
 function getOrderYear(order) {
   return new Date(order.createdAt).getFullYear();
 }
@@ -175,7 +185,12 @@ function OrdersPage() {
                         <div className="order-card-head">
                           <div>
                             <h3>Référence de commande : {order.reference}</h3>
-                            <p>Statut : {order.status}</p>
+                            <p className="order-status-line">
+  Statut :
+  <span className={`status-badge status-${order.status}`}>
+    {STATUS_LABELS[order.status] || order.status}
+  </span>
+</p>
                           </div>
 
                           <strong>
