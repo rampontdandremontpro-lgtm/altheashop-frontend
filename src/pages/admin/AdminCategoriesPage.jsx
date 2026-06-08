@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  deleteAdminCategory,
-  getAdminCategories,
-} from "../../api/adminApi";
+import { deleteAdminCategory, getAdminCategories } from "../../api/adminApi";
+import AdminTable from "../../components/admin/AdminTable";
 
 function AdminCategoriesPage() {
   const [categories, setCategories] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -33,6 +34,20 @@ function AdminCategoriesPage() {
     loadCategories();
   }, []);
 
+  const filteredCategories = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return categories;
+
+    return categories.filter((category) => {
+      const text = `${category.name || ""} ${category.slug || ""} ${
+        category.description || ""
+      }`.toLowerCase();
+
+      return text.includes(query);
+    });
+  }, [categories, search]);
+
   const handleDelete = async (id) => {
     const confirmed = window.confirm("Supprimer cette catégorie ?");
     if (!confirmed) return;
@@ -43,6 +58,7 @@ function AdminCategoriesPage() {
 
       await deleteAdminCategory(id);
       setSuccess("Catégorie supprimée avec succès.");
+      setSelectedIds((prev) => prev.filter((selectedId) => selectedId !== id));
       await loadCategories();
     } catch (err) {
       setError(
@@ -53,13 +69,55 @@ function AdminCategoriesPage() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+
+    const confirmed = window.confirm(
+      `Supprimer ${selectedIds.length} catégorie(s) sélectionnée(s) ?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      setError("");
+      setSuccess("");
+
+      await Promise.all(selectedIds.map((id) => deleteAdminCategory(id)));
+
+      setSuccess(`${selectedIds.length} catégorie(s) supprimée(s) avec succès.`);
+      setSelectedIds([]);
+      await loadCategories();
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible de supprimer la sélection. Vérifie qu'aucun produit n'est lié aux catégories sélectionnées."
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const columns = [
+    { key: "id", label: "ID" },
+    { key: "name", label: "Nom" },
+    { key: "slug", label: "Slug" },
+    { key: "displayOrder", label: "Ordre" },
+    {
+      key: "isActive",
+      label: "Active",
+      render: (category) => (category.isActive ? "Oui" : "Non"),
+    },
+  ];
+
   return (
     <div className="page-stack">
       <section className="section">
         <div className="page-heading">
           <div>
             <h1>Les catégories</h1>
-            <p>{categories.length} catégorie(s)</p>
+            <p>{filteredCategories.length} catégorie(s)</p>
           </div>
 
           <div className="admin-dashboard-actions">
@@ -76,55 +134,70 @@ function AdminCategoriesPage() {
         {error && <div className="box error-box">{error}</div>}
         {success && <div className="box success-box">{success}</div>}
 
+        <div className="box filters">
+          <input
+            type="text"
+            placeholder="Rechercher nom, slug, description..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        {selectedIds.length > 0 && (
+          <div className="box admin-bulk-actions">
+            <strong>{selectedIds.length} catégorie(s) sélectionnée(s)</strong>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setSelectedIds([])}
+              disabled={deleting}
+            >
+              Annuler la sélection
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={handleBulkDelete}
+              disabled={deleting}
+            >
+              {deleting ? "Suppression..." : "Supprimer la sélection"}
+            </button>
+          </div>
+        )}
+
         {loading ? (
           <div className="box">Chargement des catégories...</div>
-        ) : categories.length === 0 ? (
-          <div className="box">Aucune catégorie disponible.</div>
+        ) : filteredCategories.length === 0 ? (
+          <div className="box">Aucune catégorie ne correspond à votre recherche.</div>
         ) : (
-          <div className="box table-wrapper">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nom</th>
-                  <th>Slug</th>
-                  <th>Ordre</th>
-                  <th>Active</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+          <AdminTable
+            columns={columns}
+            data={filteredCategories}
+            selectable
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            emptyMessage="Aucune catégorie disponible."
+            actions={(category) => (
+              <div className="admin-actions">
+                <Link
+                  to={`/admin/categories/${category.id}/edit`}
+                  className="btn btn-secondary"
+                >
+                  Modifier
+                </Link>
 
-              <tbody>
-                {categories.map((category) => (
-                  <tr key={category.id}>
-                    <td>{category.id}</td>
-                    <td>{category.name}</td>
-                    <td>{category.slug}</td>
-                    <td>{category.displayOrder}</td>
-                    <td>{category.isActive ? "Oui" : "Non"}</td>
-                    <td>
-                      <div className="admin-actions">
-                        <Link
-                          to={`/admin/categories/${category.id}/edit`}
-                          className="btn btn-secondary"
-                        >
-                          Modifier
-                        </Link>
-
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          onClick={() => handleDelete(category.id)}
-                        >
-                          Supprimer
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => handleDelete(category.id)}
+                >
+                  Supprimer
+                </button>
+              </div>
+            )}
+          />
         )}
       </section>
     </div>

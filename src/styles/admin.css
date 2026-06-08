@@ -430,3 +430,42 @@
   background: #fee2e2;
   color: #b91c1c;
 }
+
+.admin-checkbox-cell {
+  width: 48px;
+  text-align: center;
+}
+
+.admin-checkbox-cell input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.admin-bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 0;
+}
+
+.btn-danger:hover {
+  background: #fecaca;
+}
+
+.admin-sort-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}

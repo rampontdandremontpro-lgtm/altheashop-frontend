@@ -6,6 +6,16 @@ import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { formatPrice } from "../utils/formatPrice";
 
+const STATUS_LABELS = {
+  pending: "En attente",
+  confirmed: "Confirmée",
+  paid: "Payée",
+  processing: "Préparation",
+  shipped: "Expédiée",
+  delivered: "Livrée",
+  cancelled: "Annulée",
+};
+
 function getOrderAddress(order) {
   return (
     order.shippingAddress ||
@@ -94,7 +104,12 @@ function OrderDetailPage() {
               <div className="order-card-head">
                 <div>
                   <h2>{order.reference}</h2>
-                  <p>Statut : {order.status}</p>
+                  <p className="order-status-line">
+  Statut :
+  <span className={`status-badge status-${order.status}`}>
+    {STATUS_LABELS[order.status] || order.status}
+  </span>
+</p>
                 </div>
 
                 <strong>{formatPrice(order.totalPriceCents)}</strong>

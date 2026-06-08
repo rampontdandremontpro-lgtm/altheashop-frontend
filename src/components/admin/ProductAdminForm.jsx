@@ -9,6 +9,15 @@ function toEuros(priceCents) {
   return (Number(priceCents) / 100).toFixed(2);
 }
 
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function ProductAdminForm({
   initialValues,
   onSubmit,
@@ -30,6 +39,7 @@ function ProductAdminForm({
     imageUrl: initialValues?.imageUrl || "",
     priority: initialValues?.priority || 0,
     isActive: initialValues?.isActive ?? true,
+    isFeatured: initialValues?.isFeatured ?? false,
   });
 
   const [error, setError] = useState("");
@@ -63,16 +73,25 @@ function ProductAdminForm({
       imageUrl: initialValues.imageUrl || "",
       priority: initialValues.priority || 0,
       isActive: initialValues.isActive ?? true,
+      isFeatured: initialValues.isFeatured ?? false,
     });
   }, [initialValues]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setForm((prev) => {
+      const next = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+
+      if (name === "name" && !initialValues?.slug) {
+        next.slug = slugify(value);
+      }
+
+      return next;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -80,11 +99,13 @@ function ProductAdminForm({
     setError("");
 
     if (
+      !form.sku ||
       !form.name ||
+      !form.slug ||
       !form.shortDescription ||
       !form.description ||
       !form.priceEuros ||
-      !form.stock ||
+      form.stock === "" ||
       !form.categoryId
     ) {
       setError("Merci de remplir les champs obligatoires.");
@@ -120,7 +141,7 @@ function ProductAdminForm({
         <input
           type="text"
           name="slug"
-          placeholder="Slug optionnel"
+          placeholder="Slug"
           value={form.slug}
           onChange={handleChange}
         />
@@ -135,13 +156,11 @@ function ProductAdminForm({
         </select>
 
         <input
-          type="number"
+          type="text"
           name="priceEuros"
           placeholder="Prix en euros exemple : 399,00 ou 39,99"
           value={form.priceEuros}
           onChange={handleChange}
-          min="0"
-          step="0.01"
         />
 
         <input
@@ -205,6 +224,16 @@ function ProductAdminForm({
             onChange={handleChange}
           />
           Produit actif
+        </label>
+
+        <label className="settings-item">
+          <input
+            type="checkbox"
+            name="isFeatured"
+            checked={form.isFeatured}
+            onChange={handleChange}
+          />
+          Produit mis en avant
         </label>
 
         <button className="btn btn-primary" type="submit" disabled={loading}>

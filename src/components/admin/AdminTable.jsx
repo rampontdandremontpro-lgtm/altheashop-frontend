@@ -5,6 +5,9 @@ function AdminTable({
   data = [],
   actions,
   emptyMessage = "Aucune donnée disponible.",
+  selectable = false,
+  selectedIds = [],
+  onSelectionChange,
 }) {
   const [sortConfig, setSortConfig] = useState(null);
 
@@ -25,7 +28,14 @@ function AdminTable({
     });
   }, [data, sortConfig]);
 
-  const handleSort = (key) => {
+  const allVisibleIds = sortedData.map((row) => row.id);
+  const allSelected =
+    allVisibleIds.length > 0 &&
+    allVisibleIds.every((id) => selectedIds.includes(id));
+
+  const handleSort = (key, sortable = true) => {
+    if (!sortable) return;
+
     setSortConfig((prev) => {
       if (!prev || prev.key !== key) {
         return { key, direction: "asc" };
@@ -39,6 +49,30 @@ function AdminTable({
     });
   };
 
+  const handleSelectAll = () => {
+    if (!onSelectionChange) return;
+
+    if (allSelected) {
+      onSelectionChange(
+        selectedIds.filter((id) => !allVisibleIds.includes(id))
+      );
+      return;
+    }
+
+    onSelectionChange([...new Set([...selectedIds, ...allVisibleIds])]);
+  };
+
+  const handleSelectRow = (id) => {
+    if (!onSelectionChange) return;
+
+    if (selectedIds.includes(id)) {
+      onSelectionChange(selectedIds.filter((selectedId) => selectedId !== id));
+      return;
+    }
+
+    onSelectionChange([...selectedIds, id]);
+  };
+
   if (data.length === 0) {
     return <div className="box">{emptyMessage}</div>;
   }
@@ -48,17 +82,32 @@ function AdminTable({
       <table className="admin-table">
         <thead>
           <tr>
+            {selectable && (
+              <th className="admin-checkbox-cell">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={handleSelectAll}
+                  aria-label="Tout sélectionner"
+                />
+              </th>
+            )}
+
             {columns.map((column) => (
               <th key={column.key}>
-                <button
-                  type="button"
-                  className="admin-sort-button"
-                  onClick={() => handleSort(column.key)}
-                >
-                  {column.label}
-                  {sortConfig?.key === column.key &&
-                    (sortConfig.direction === "asc" ? " ↑" : " ↓")}
-                </button>
+                {column.sortable === false ? (
+                  column.label
+                ) : (
+                  <button
+                    type="button"
+                    className="admin-sort-button"
+                    onClick={() => handleSort(column.key, column.sortable)}
+                  >
+                    {column.label}
+                    {sortConfig?.key === column.key &&
+                      (sortConfig.direction === "asc" ? " ↑" : " ↓")}
+                  </button>
+                )}
               </th>
             ))}
 
@@ -69,6 +118,17 @@ function AdminTable({
         <tbody>
           {sortedData.map((row) => (
             <tr key={row.id}>
+              {selectable && (
+                <td className="admin-checkbox-cell">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(row.id)}
+                    onChange={() => handleSelectRow(row.id)}
+                    aria-label={`Sélectionner ${row.name || row.id}`}
+                  />
+                </td>
+              )}
+
               {columns.map((column) => (
                 <td key={`${row.id}-${column.key}`}>
                   {column.render ? column.render(row) : row[column.key]}

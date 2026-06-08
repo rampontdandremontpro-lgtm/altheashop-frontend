@@ -31,17 +31,28 @@ function normalizeProduct(product) {
   };
 }
 
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function normalizePayload(payload) {
+  const price = Number(String(payload.priceEuros).replace(",", "."));
+
   return {
-    sku: payload.sku || undefined,
+    sku: payload.sku || `ALT-${Date.now()}`,
     name: payload.name,
-    slug: payload.slug || undefined,
+    slug: payload.slug || slugify(payload.name),
     shortDescription: payload.shortDescription,
     description: payload.description,
-    techSpecs: payload.techSpecs || "",
-    priceCents: Math.round(
-      Number(String(payload.priceEuros).replace(",", ".")) * 100
-    ),
+    techSpecs: {
+      content: payload.techSpecs || "",
+    },
+    priceCents: Math.round(price * 100),
     stock: Number(payload.stock),
     priority: Number(payload.priority || 0),
     isActive: Boolean(payload.isActive),
@@ -138,7 +149,6 @@ export async function deleteAdminCategory(id) {
   await api.delete(`/admin/categories/${id}`);
   return true;
 }
-
 
 export async function getAdminOrders() {
   const response = await api.get("/admin/orders");
