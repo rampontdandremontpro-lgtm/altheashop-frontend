@@ -11,10 +11,14 @@ function CheckoutSuccessPage() {
     <div className="page-stack">
       <section className="section">
         <div className="box success-page">
-          <h1>Commande confirmée</h1>
+          <div className="checkout-confirmation-badge">✓</div>
+
+          <h1>Votre commande a bien été enregistrée</h1>
 
           <p>
-            Merci pour votre achat sur <strong>Althea Shop</strong>.
+            Merci pour votre achat sur <strong>Althea Shop</strong>. Votre
+            commande a été confirmée et sera traitée prochainement par notre
+            équipe.
           </p>
 
           {reference && (

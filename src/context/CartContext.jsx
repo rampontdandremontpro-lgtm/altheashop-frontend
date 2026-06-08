@@ -60,10 +60,8 @@ export function CartProvider({ children }) {
       setCartError("");
 
       const data = await getCart();
-      const normalizedItems = normalizeCartResponse(data);
-
-      setCartItems(normalizedItems);
-    } catch (err) {
+      setCartItems(normalizeCartResponse(data));
+    } catch {
       setCartError("Impossible de charger le panier.");
     } finally {
       setCartLoading(false);
@@ -87,11 +85,11 @@ export function CartProvider({ children }) {
 
         const data = await addCartItem(product.id, 1);
         setCartItems(normalizeCartResponse(data));
-      } catch (err) {
+        return true;
+      } catch {
         setCartError("Impossible d'ajouter le produit au panier.");
+        return false;
       }
-
-      return;
     }
 
     setCartItems((prev) => {
@@ -122,11 +120,12 @@ export function CartProvider({ children }) {
         },
       ];
     });
+
+    return true;
   };
 
   const increaseQty = async (productId) => {
     const item = cartItems.find((cartItem) => cartItem.id === productId);
-
     if (!item) return;
 
     const nextQuantity = Math.min(item.quantity + 1, item.stock || 999);
@@ -137,7 +136,7 @@ export function CartProvider({ children }) {
 
         const data = await updateCartItem(item.cartItemId, nextQuantity);
         setCartItems(normalizeCartResponse(data));
-      } catch (err) {
+      } catch {
         setCartError("Impossible de modifier la quantité.");
       }
 
@@ -147,10 +146,7 @@ export function CartProvider({ children }) {
     setCartItems((prev) =>
       prev.map((cartItem) =>
         cartItem.id === productId
-          ? {
-              ...cartItem,
-              quantity: nextQuantity,
-            }
+          ? { ...cartItem, quantity: nextQuantity }
           : cartItem
       )
     );
@@ -158,7 +154,6 @@ export function CartProvider({ children }) {
 
   const decreaseQty = async (productId) => {
     const item = cartItems.find((cartItem) => cartItem.id === productId);
-
     if (!item) return;
 
     const nextQuantity = item.quantity - 1;
@@ -174,7 +169,7 @@ export function CartProvider({ children }) {
           const data = await updateCartItem(item.cartItemId, nextQuantity);
           setCartItems(normalizeCartResponse(data));
         }
-      } catch (err) {
+      } catch {
         setCartError("Impossible de modifier la quantité.");
       }
 
@@ -185,10 +180,7 @@ export function CartProvider({ children }) {
       prev
         .map((cartItem) =>
           cartItem.id === productId
-            ? {
-                ...cartItem,
-                quantity: cartItem.quantity - 1,
-              }
+            ? { ...cartItem, quantity: cartItem.quantity - 1 }
             : cartItem
         )
         .filter((cartItem) => cartItem.quantity > 0)
@@ -204,7 +196,7 @@ export function CartProvider({ children }) {
 
         const data = await deleteCartItem(item.cartItemId);
         setCartItems(normalizeCartResponse(data));
-      } catch (err) {
+      } catch {
         setCartError("Impossible de supprimer le produit du panier.");
       }
 
@@ -221,7 +213,7 @@ export function CartProvider({ children }) {
 
         const data = await clearCartApi();
         setCartItems(normalizeCartResponse(data));
-      } catch (err) {
+      } catch {
         setCartError("Impossible de vider le panier.");
       }
 

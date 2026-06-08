@@ -23,6 +23,7 @@ function CheckoutForm({
   cartItems,
   totalPriceCents,
   clearCart,
+  onOrderCompleted,
 }) {
   const navigate = useNavigate();
   const stripe = useStripe();
@@ -86,6 +87,8 @@ function CheckoutForm({
         shippingAddressId: Number(shippingAddressId),
         paymentMethod: "card",
       });
+
+      onOrderCompleted();
 
       await clearCart();
 
@@ -221,6 +224,7 @@ function CheckoutPage() {
 
   const [addresses, setAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(true);
+  const [orderCompleted, setOrderCompleted] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -243,7 +247,7 @@ function CheckoutPage() {
     loadAddresses();
   }, [isAuthenticated]);
 
-  if (!cartItems || cartItems.length === 0) {
+  if ((!cartItems || cartItems.length === 0) && !orderCompleted) {
     return <Navigate to="/cart" replace />;
   }
 
@@ -297,6 +301,7 @@ function CheckoutPage() {
             cartItems={cartItems}
             totalPriceCents={totalPriceCents}
             clearCart={clearCart}
+            onOrderCompleted={() => setOrderCompleted(true)}
           />
         </Elements>
       </section>

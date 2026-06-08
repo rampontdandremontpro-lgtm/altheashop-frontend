@@ -192,3 +192,30 @@
     grid-template-columns: 1fr;
   }
 }
+
+.cart-success-message {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.cart-success-message p {
+  margin: 6px 0 12px;
+}
+
+.checkout-confirmation-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}

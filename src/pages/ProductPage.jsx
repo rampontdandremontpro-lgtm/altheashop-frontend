@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getProductById } from "../api/catalogApi";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
@@ -22,18 +22,20 @@ function getMainImage(product) {
 function ProductPage() {
   const params = useParams();
   const identifier = params.slug || params.id;
-  const { addToCart } = useCart();
+  const { addToCart, cartError } = useCart();
 
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState(FALLBACK_IMAGE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cartSuccess, setCartSuccess] = useState("");
 
   useEffect(() => {
     async function loadProduct() {
       try {
         setLoading(true);
         setError("");
+        setCartSuccess("");
 
         const data = await getProductById(identifier);
         setProduct(data);
@@ -51,6 +53,18 @@ function ProductPage() {
 
     if (identifier) loadProduct();
   }, [identifier]);
+
+  const handleAddToCart = async () => {
+    const success = await addToCart(product);
+
+    if (!success) return;
+
+    setCartSuccess(`${product.name} a bien été ajouté à votre panier.`);
+
+    window.setTimeout(() => {
+      setCartSuccess("");
+    }, 3500);
+  };
 
   if (loading) return <Loader text="Chargement du produit..." />;
   if (error) return <ErrorMessage message={error} />;
@@ -84,9 +98,22 @@ function ProductPage() {
 
             <p>{product.shortDescription}</p>
 
+            {cartSuccess && (
+              <div className="cart-success-message">
+                <strong>Article ajouté</strong>
+                <p>{cartSuccess}</p>
+
+                <Link to="/cart" className="btn btn-secondary">
+                  Voir le panier
+                </Link>
+              </div>
+            )}
+
+            {cartError && <div className="box error-box">{cartError}</div>}
+
             <button
               className="btn btn-primary"
-              onClick={() => addToCart(product)}
+              onClick={handleAddToCart}
               disabled={product.stock <= 0}
             >
               Ajouter au panier
@@ -108,7 +135,8 @@ function ProductPage() {
           </div>
         </div>
       </section>
-       <SimilarProducts product={product} />
+
+      <SimilarProducts product={product} />
     </div>
   );
 }
