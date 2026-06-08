@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  deleteAdminUser,
-  getAdminUsers,
-} from "../../api/adminApi";
+import { deleteAdminUser, getAdminUsers } from "../../api/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import EmptyState from "../../components/common/EmptyState";
+import AdminTable from "../../components/admin/AdminTable";
 
 function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -69,6 +67,36 @@ function AdminUsersPage() {
     }
   };
 
+  const columns = [
+    {
+      key: "id",
+      label: "ID",
+    },
+    {
+      key: "fullName",
+      label: "Nom",
+      render: (user) => `${user.firstName || ""} ${user.lastName || ""}`,
+    },
+    {
+      key: "email",
+      label: "Email",
+    },
+    {
+      key: "phone",
+      label: "Téléphone",
+      render: (user) => user.phone || "-",
+    },
+    {
+      key: "role",
+      label: "Rôle",
+    },
+    {
+      key: "isActive",
+      label: "Actif",
+      render: (user) => (user.isActive ? "Oui" : "Non"),
+    },
+  ];
+
   if (loading) return <Loader text="Chargement des utilisateurs..." />;
   if (error && users.length === 0) return <ErrorMessage message={error} />;
 
@@ -112,52 +140,29 @@ function AdminUsersPage() {
             message="Aucun utilisateur ne correspond à votre recherche."
           />
         ) : (
-          <div className="box table-wrapper">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nom</th>
-                  <th>Email</th>
-                  <th>Téléphone</th>
-                  <th>Rôle</th>
-                  <th>Actif</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+          <AdminTable
+            columns={columns}
+            data={filteredUsers}
+            emptyMessage="Aucun utilisateur disponible."
+            actions={(user) => (
+              <div className="admin-actions">
+                <Link
+                  to={`/admin/users/${user.id}/edit`}
+                  className="btn btn-secondary"
+                >
+                  Modifier
+                </Link>
 
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.firstName} {user.lastName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone || "-"}</td>
-                    <td>{user.role}</td>
-                    <td>{user.isActive ? "Oui" : "Non"}</td>
-                    <td>
-                      <div className="admin-actions">
-                        <Link
-                          to={`/admin/users/${user.id}/edit`}
-                          className="btn btn-secondary"
-                        >
-                          Modifier
-                        </Link>
-
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          Supprimer
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => handleDelete(user.id)}
+                >
+                  Supprimer
+                </button>
+              </div>
+            )}
+          />
         )}
       </section>
     </div>

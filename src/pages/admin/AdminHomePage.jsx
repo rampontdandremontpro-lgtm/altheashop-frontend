@@ -6,6 +6,7 @@ import {
   getAdminSlides,
   updateAdminHome,
 } from "../../api/homeApi";
+import AdminTable from "../../components/admin/AdminTable";
 
 function AdminHomePage() {
   const [homeText, setHomeText] = useState("");
@@ -83,6 +84,31 @@ function AdminHomePage() {
     }
   };
 
+  const columns = [
+    {
+      key: "id",
+      label: "ID",
+    },
+    {
+      key: "title",
+      label: "Titre",
+    },
+    {
+      key: "subtitle",
+      label: "Sous-titre",
+      render: (slide) => slide.subtitle || "-",
+    },
+    {
+      key: "displayOrder",
+      label: "Ordre",
+    },
+    {
+      key: "isActive",
+      label: "Actif",
+      render: (slide) => (slide.isActive ? "Oui" : "Non"),
+    },
+  ];
+
   if (loading) {
     return (
       <div className="page-stack">
@@ -129,60 +155,45 @@ function AdminHomePage() {
               className="contact-textarea"
             />
 
-            <button className="btn btn-primary" type="submit" disabled={savingText}>
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={savingText}
+            >
               {savingText ? "Enregistrement..." : "Enregistrer le texte"}
             </button>
           </form>
         </div>
 
-        <div className="box table-wrapper">
+        <div className="box">
           <h2>Slides du carrousel</h2>
 
           {slides.length === 0 ? (
             <p>Aucun slide disponible.</p>
           ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Titre</th>
-                  <th>Sous-titre</th>
-                  <th>Ordre</th>
-                  <th>Actif</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+            <AdminTable
+              columns={columns}
+              data={slides}
+              emptyMessage="Aucun slide disponible."
+              actions={(slide) => (
+                <div className="admin-actions">
+                  <Link
+                    to={`/admin/home/slides/${slide.id}/edit`}
+                    className="btn btn-secondary"
+                  >
+                    Modifier
+                  </Link>
 
-              <tbody>
-                {slides.map((slide) => (
-                  <tr key={slide.id}>
-                    <td>{slide.id}</td>
-                    <td>{slide.title}</td>
-                    <td>{slide.subtitle}</td>
-                    <td>{slide.displayOrder}</td>
-                    <td>{slide.isActive ? "Oui" : "Non"}</td>
-                    <td>
-                      <div className="admin-actions">
-                        <Link
-                          to={`/admin/home/slides/${slide.id}/edit`}
-                          className="btn btn-secondary"
-                        >
-                          Modifier
-                        </Link>
-
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          onClick={() => handleDeleteSlide(slide.id)}
-                        >
-                          Supprimer
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => handleDeleteSlide(slide.id)}
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              )}
+            />
           )}
         </div>
       </section>
