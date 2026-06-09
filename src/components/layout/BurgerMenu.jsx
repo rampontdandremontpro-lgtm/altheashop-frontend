@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
+import { useI18n } from "../../context/I18nContext";
 import SearchBar from "./SearchBar";
+import LanguageSelector from "./LanguageSelector";
 
 function BurgerMenu({
   isOpen,
@@ -9,6 +11,8 @@ function BurgerMenu({
   onLogout,
   onClose,
 }) {
+  const { t } = useI18n();
+
   if (!isOpen) return null;
 
   const isAdmin = user?.role === "admin";
@@ -19,26 +23,61 @@ function BurgerMenu({
         <SearchBar onSearchDone={onClose} />
       </div>
 
+      <div className="mobile-language-selector">
+        <LanguageSelector />
+      </div>
+
       <nav className="mobile-menu-nav" aria-label="Navigation mobile">
-        <NavLink to="/" onClick={onClose}>Accueil</NavLink>
-        <NavLink to="/catalog" onClick={onClose}>Catalogue</NavLink>
-        <NavLink to="/search" onClick={onClose}>Recherche</NavLink>
-        <NavLink to="/cart" onClick={onClose}>Panier ({totalItems})</NavLink>
-        <NavLink to="/contact" onClick={onClose}>Contact</NavLink>
-        <NavLink to="/about" onClick={onClose}>À propos</NavLink>
-        <NavLink to="/legal" onClick={onClose}>Mentions légales</NavLink>
-        <NavLink to="/terms" onClick={onClose}>CGU</NavLink>
+        <NavLink to="/" onClick={onClose}>
+          {t("home")}
+        </NavLink>
+
+        <NavLink to="/catalog" onClick={onClose}>
+          {t("catalog")}
+        </NavLink>
+
+        <NavLink to="/search" onClick={onClose}>
+          {t("search")}
+        </NavLink>
+
+        <NavLink to="/cart" onClick={onClose}>
+          {t("cart")} ({totalItems})
+        </NavLink>
+
+        <NavLink to="/contact" onClick={onClose}>
+          {t("contact")}
+        </NavLink>
+
+        <NavLink to="/about" onClick={onClose}>
+          {t("about")}
+        </NavLink>
+
+        <NavLink to="/legal" onClick={onClose}>
+          {t("legal")}
+        </NavLink>
+
+        <NavLink to="/terms" onClick={onClose}>
+          {t("terms")}
+        </NavLink>
 
         {isAuthenticated ? (
           <>
             <NavLink to="/account" onClick={onClose}>
-              {user?.firstName || "Mon compte"}
+              {user?.firstName || t("account")}
             </NavLink>
-            <NavLink to="/orders" onClick={onClose}>Mes commandes</NavLink>
-            <NavLink to="/settings" onClick={onClose}>Paramètres</NavLink>
+
+            <NavLink to="/orders" onClick={onClose}>
+              {t("orders")}
+            </NavLink>
+
+            <NavLink to="/settings" onClick={onClose}>
+              {t("settings")}
+            </NavLink>
 
             {isAdmin && (
-              <NavLink to="/admin" onClick={onClose}>Admin</NavLink>
+              <NavLink to="/admin" onClick={onClose}>
+                {t("admin")}
+              </NavLink>
             )}
 
             <button
@@ -49,11 +88,13 @@ function BurgerMenu({
                 onClose();
               }}
             >
-              Déconnexion
+              {t("logout")}
             </button>
           </>
         ) : (
-          <NavLink to="/login" onClick={onClose}>Connexion</NavLink>
+          <NavLink to="/login" onClick={onClose}>
+            {t("login")}
+          </NavLink>
         )}
       </nav>
     </div>

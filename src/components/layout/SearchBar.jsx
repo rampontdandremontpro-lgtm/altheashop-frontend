@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useI18n } from "../../context/I18nContext";
 
 function SearchBar({ onSearchDone }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -37,13 +39,14 @@ function SearchBar({ onSearchDone }) {
     <form className="header-search" onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Rechercher un produit..."
+        placeholder={t("searchPlaceholder")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        aria-label="Rechercher un produit"
+        aria-label={t("searchAria")}
       />
+
       <button type="submit" className="btn btn-primary">
-        Rechercher
+        {t("searchButton")}
       </button>
     </form>
   );

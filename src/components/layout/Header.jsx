@@ -2,13 +2,16 @@ import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { useI18n } from "../../context/I18nContext";
 import BurgerMenu from "./BurgerMenu";
 import SearchBar from "./SearchBar";
+import LanguageSelector from "./LanguageSelector";
 
 function Header() {
   const navigate = useNavigate();
   const { totalItems } = useCart();
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
+  const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -29,27 +32,34 @@ function Header() {
         </div>
 
         <nav className="nav nav-desktop" aria-label="Navigation principale">
-          <NavLink to="/">Accueil</NavLink>
-          <NavLink to="/catalog">Catalogue</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
-          <NavLink to="/cart">Panier ({totalItems})</NavLink>
+          <NavLink to="/">{t("home")}</NavLink>
+          <NavLink to="/catalog">{t("catalog")}</NavLink>
+          <NavLink to="/contact">{t("contact")}</NavLink>
+          <NavLink to="/cart">
+            {t("cart")} ({totalItems})
+          </NavLink>
 
           {isAuthenticated ? (
             <>
-              <NavLink to="/account">{user?.firstName || "Mon compte"}</NavLink>
-              {isAdmin && <NavLink to="/admin">Admin</NavLink>}
+              <NavLink to="/account">{user?.firstName || t("account")}</NavLink>
+              {isAdmin && <NavLink to="/admin">{t("admin")}</NavLink>}
+
               <button
                 type="button"
                 className="nav-logout-btn"
                 onClick={handleLogout}
               >
-                Déconnexion
+                {t("logout")}
               </button>
             </>
           ) : (
-            <NavLink to="/login">Connexion</NavLink>
+            <NavLink to="/login">{t("login")}</NavLink>
           )}
         </nav>
+
+        <div className="header-language desktop-only">
+          <LanguageSelector />
+        </div>
 
         <button
           type="button"
