@@ -1,12 +1,15 @@
 import { Outlet } from "react-router-dom";
+import { useI18n } from "../../context/I18nContext";
 import Header from "./Header";
 import Footer from "./Footer";
 
 function Layout() {
+  const { t } = useI18n();
+
   return (
     <div className="app-shell">
       <a href="#main-content" className="skip-link">
-        Aller au contenu principal
+        {t("skipToContent")}
       </a>
 
       <Header />

@@ -27,7 +27,7 @@ function BurgerMenu({
         <LanguageSelector />
       </div>
 
-      <nav className="mobile-menu-nav" aria-label="Navigation mobile">
+      <nav className="mobile-menu-nav" aria-label={t("mobileNavigation")}>
         <NavLink to="/" onClick={onClose}>
           {t("home")}
         </NavLink>
@@ -92,9 +92,15 @@ function BurgerMenu({
             </button>
           </>
         ) : (
-          <NavLink to="/login" onClick={onClose}>
-            {t("login")}
-          </NavLink>
+          <>
+            <NavLink to="/login" onClick={onClose}>
+              {t("login")}
+            </NavLink>
+
+            <NavLink to="/register" onClick={onClose}>
+              {t("register")}
+            </NavLink>
+          </>
         )}
       </nav>
     </div>

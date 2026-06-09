@@ -270,3 +270,44 @@
     width: 100%;
   }
 }
+
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.language-selector select {
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.language-selector select:focus {
+  outline: 2px solid #111827;
+  outline-offset: 2px;
+}
+
+.header-language {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-language-selector {
+  padding: 0.75rem 0;
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+html[dir="rtl"] .header-inner,
+html[dir="rtl"] .footer-container,
+html[dir="rtl"] .mobile-menu-nav {
+  direction: rtl;
+}
