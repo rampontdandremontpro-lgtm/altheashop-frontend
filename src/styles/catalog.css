@@ -267,3 +267,22 @@
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
 }
+
+@media (max-width: 640px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .product-actions {
+    flex-direction: column;
+  }
+
+  .product-main-image {
+    aspect-ratio: 4 / 3;
+  }
+
+  .thumb-image {
+    width: 64px;
+    height: 64px;
+  }
+}

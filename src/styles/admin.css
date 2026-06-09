@@ -469,3 +469,22 @@
   cursor: pointer;
   padding: 0;
 }
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table {
+    min-width: 760px;
+  }
+
+  .admin-bulk-actions {
+    align-items: stretch;
+  }
+
+  .admin-bulk-actions .btn {
+    width: 100%;
+  }
+}

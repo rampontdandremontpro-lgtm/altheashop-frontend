@@ -20,7 +20,7 @@ function Header() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <Link to="/" className="brand">
+        <Link to="/" className="brand" aria-label="Retour à l'accueil">
           Althea Shop
         </Link>
 
@@ -28,7 +28,7 @@ function Header() {
           <SearchBar />
         </div>
 
-        <nav className="nav nav-desktop">
+        <nav className="nav nav-desktop" aria-label="Navigation principale">
           <NavLink to="/">Accueil</NavLink>
           <NavLink to="/catalog">Catalogue</NavLink>
           <NavLink to="/contact">Contact</NavLink>
@@ -36,25 +36,28 @@ function Header() {
 
           {isAuthenticated ? (
             <>
-              <NavLink to="/account">
-                {user?.firstName || "Mon compte"}
-              </NavLink>
+              <NavLink to="/account">{user?.firstName || "Mon compte"}</NavLink>
               {isAdmin && <NavLink to="/admin">Admin</NavLink>}
-              <button className="nav-logout-btn" onClick={handleLogout}>
+              <button
+                type="button"
+                className="nav-logout-btn"
+                onClick={handleLogout}
+              >
                 Déconnexion
               </button>
             </>
           ) : (
-            <>
-              <NavLink to="/login">Connexion</NavLink>
-            </>
+            <NavLink to="/login">Connexion</NavLink>
           )}
         </nav>
 
         <button
+          type="button"
           className="burger-button"
           onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label="Ouvrir le menu"
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
         >
           ☰
         </button>
