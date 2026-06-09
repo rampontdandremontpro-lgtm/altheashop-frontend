@@ -23,7 +23,7 @@ function Header() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <Link to="/" className="brand" aria-label={t("backHome")}>
+        <Link to="/" className="brand" aria-label="Retour à l'accueil">
           Althea Shop
         </Link>
 
@@ -31,11 +31,10 @@ function Header() {
           <SearchBar />
         </div>
 
-        <nav className="nav nav-desktop" aria-label={t("mainNavigation")}>
+        <nav className="nav nav-desktop" aria-label="Navigation principale">
           <NavLink to="/">{t("home")}</NavLink>
           <NavLink to="/catalog">{t("catalog")}</NavLink>
           <NavLink to="/contact">{t("contact")}</NavLink>
-
           <NavLink to="/cart">
             {t("cart")} ({totalItems})
           </NavLink>
@@ -43,7 +42,6 @@ function Header() {
           {isAuthenticated ? (
             <>
               <NavLink to="/account">{user?.firstName || t("account")}</NavLink>
-
               {isAdmin && <NavLink to="/admin">{t("admin")}</NavLink>}
 
               <button
@@ -67,7 +65,7 @@ function Header() {
           type="button"
           className="burger-button"
           onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
         >
