@@ -7,6 +7,26 @@ import EmptyState from "../../components/common/EmptyState";
 import AdminTable from "../../components/admin/AdminTable";
 import { formatPrice } from "../../utils/formatPrice";
 
+const ORDER_STATUSES = [
+  "pending",
+  "confirmed",
+  "paid",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
+
+const STATUS_LABELS = {
+  pending: "En attente",
+  confirmed: "Confirmée",
+  paid: "Payée",
+  processing: "Préparation",
+  shipped: "Expédiée",
+  delivered: "Livrée",
+  cancelled: "Annulée",
+};
+
 function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState("");
@@ -72,10 +92,14 @@ function AdminOrdersPage() {
       render: (order) => formatPrice(order.totalPriceCents),
     },
     {
-      key: "status",
-      label: "Statut",
-      render: (order) => order.status,
-    },
+  key: "status",
+  label: "Statut",
+  render: (order) => (
+    <span className={`status-badge status-${order.status}`}>
+      {STATUS_LABELS[order.status] || order.status}
+    </span>
+  ),
+},
     {
       key: "createdAt",
       label: "Date",
@@ -117,7 +141,7 @@ function AdminOrdersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
+          
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
