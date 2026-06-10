@@ -121,6 +121,10 @@ function AdminDashboardPage() {
             <Link to="/admin/contact" className="btn btn-secondary">
               Messages contact
             </Link>
+
+            <Link to="/admin/chatbot" className="btn btn-secondary">
+  Conversations chatbot
+</Link>
           </div>
         </div>
 

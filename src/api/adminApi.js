@@ -293,3 +293,22 @@ export async function deleteAdminProductGalleryImage(productId, imageId) {
   await api.delete(`/admin/products/${productId}/images/${imageId}`);
   return true;
 }
+
+export async function getAdminChatbotMessages(page = 1, limit = 20) {
+  const response = await api.get("/admin/chatbot/messages", {
+    params: {
+      page,
+      limit,
+    },
+  });
+
+  const data = response.data || {};
+
+  return {
+    items: Array.isArray(data.items) ? data.items : [],
+    page: data.page ?? page,
+    limit: data.limit ?? limit,
+    total: data.total ?? 0,
+    totalPages: data.totalPages ?? 1,
+  };
+}

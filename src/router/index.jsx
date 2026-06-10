@@ -39,6 +39,7 @@ import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
 import AdminOrderDetailPage from "../pages/admin/AdminOrderDetailPage";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import AdminUserEditPage from "../pages/admin/AdminUserEditPage";
+import AdminChatbotMessagesPage from "../pages/admin/AdminChatbotMessagesPage";
 
 function AppRouter() {
   return (
@@ -74,7 +75,7 @@ function AppRouter() {
         <Route path="admin/products/:id/edit" element={<AdminRoute><AdminProductEditPage /></AdminRoute>} />
         <Route path="admin/categories/new" element={<AdminRoute><AdminCategoryCreatePage /></AdminRoute>} />
         <Route path="admin/categories/:id/edit" element={<AdminRoute><AdminCategoryEditPage /></AdminRoute>} />
-        <Route path="admin/contact"element={<AdminRoute><AdminContactMessagesPage /></AdminRoute>}/>
+        <Route path="admin/chatbot" element={<AdminRoute><AdminChatbotMessagesPage /></AdminRoute>}/>
         <Route path="admin/categories" element={<AdminRoute><AdminCategoriesPage /></AdminRoute>} />
         <Route path="admin/orders" element={<AdminRoute><AdminOrdersPage /></AdminRoute>} />
         <Route path="admin/orders/:id" element={<AdminRoute><AdminOrderDetailPage /></AdminRoute>} />
