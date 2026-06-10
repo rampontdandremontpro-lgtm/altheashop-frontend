@@ -20,6 +20,8 @@ const contact = {
   loadingChatHistory: "Chargement de l'historique...",
   chatbotReplyLoading: "Réponse en cours...",
   writeMessage: "Écrire un message...",
+  chatbotGuestReply:
+  "Je peux vous aider, mais pour accéder à l'historique complet du chatbot, connectez-vous à votre compte. Vous pouvez aussi nous contacter via le formulaire.",
 };
 
 export default contact;

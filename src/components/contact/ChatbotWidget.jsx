@@ -29,6 +29,10 @@ function normalizeApiMessages(apiMessages, welcomeMessage) {
   return [welcomeMessage, ...normalized];
 }
 
+function isUnauthorizedError(err) {
+  return err.response?.status === 401;
+}
+
 function ChatbotWidget() {
   const { t } = useI18n();
   const messagesEndRef = useRef(null);
@@ -93,14 +97,24 @@ function ChatbotWidget() {
       const botMessage = {
         id: `local-bot-${Date.now()}`,
         role: "bot",
-        text:
-          result.reply ||
-          result.message ||
-          t("chatbotFallbackReply"),
+        text: result.reply || result.message || t("chatbotFallbackReply"),
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
+      if (isUnauthorizedError(err)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `local-guest-${Date.now()}`,
+            role: "bot",
+            text: t("chatbotGuestReply"),
+          },
+        ]);
+
+        return;
+      }
+
       setError(
         err.response?.data?.message ||
           err.message ||

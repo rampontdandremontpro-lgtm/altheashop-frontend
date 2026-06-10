@@ -19,6 +19,8 @@ const contact = {
   loadingChatHistory: "טוען היסטוריית שיחה...",
   chatbotReplyLoading: "מכין תשובה...",
   writeMessage: "כתוב הודעה...",
+  chatbotGuestReply:
+  "אני יכול לעזור לך, אך כדי לגשת להיסטוריית הצ'אט המלאה יש להתחבר לחשבון. ניתן גם ליצור איתנו קשר באמצעות הטופס.",
 };
 
 export default contact;

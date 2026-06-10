@@ -27,6 +27,8 @@ const contact = {
   chatbotReplyLoading:
     "Generating response...",
   writeMessage: "Write a message...",
+  chatbotGuestReply:
+  "I can help you, but to access the full chatbot history, please log in to your account. You can also contact us using the form.",
 };
 
 export default contact;
