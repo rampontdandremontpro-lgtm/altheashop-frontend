@@ -4,6 +4,7 @@ import CategoryAdminForm from "../../components/admin/CategoryAdminForm";
 import {
   getAdminCategories,
   updateAdminCategory,
+  uploadAdminCategoryImage,
 } from "../../api/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
@@ -15,24 +16,31 @@ function AdminCategoryEditPage() {
   const [category, setCategory] = useState(null);
   const [loadingPage, setLoadingPage] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  async function loadCategory() {
+    const categories = await getAdminCategories();
+
+    const foundCategory = categories.find(
+      (item) => Number(item.id) === Number(id)
+    );
+
+    if (!foundCategory) {
+      throw new Error("Catégorie introuvable.");
+    }
+
+    setCategory(foundCategory);
+  }
 
   useEffect(() => {
-    async function loadCategory() {
+    async function loadPageData() {
       try {
         setLoadingPage(true);
         setError("");
 
-        const categories = await getAdminCategories();
-        const foundCategory = categories.find(
-          (item) => Number(item.id) === Number(id)
-        );
-
-        if (!foundCategory) {
-          throw new Error("Catégorie introuvable.");
-        }
-
-        setCategory(foundCategory);
+        await loadCategory();
       } catch (err) {
         setError(
           err.response?.data?.message ||
@@ -44,13 +52,14 @@ function AdminCategoryEditPage() {
       }
     }
 
-    loadCategory();
+    loadPageData();
   }, [id]);
 
   const handleSave = async (formData) => {
     try {
       setSaving(true);
       setError("");
+      setSuccess("");
 
       await updateAdminCategory(id, formData);
       navigate("/admin/categories");
@@ -62,6 +71,41 @@ function AdminCategoryEditPage() {
       );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Merci de choisir un fichier image.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setError("");
+      setSuccess("");
+
+      const updatedCategory = await uploadAdminCategoryImage(id, file);
+
+      setCategory((prev) => ({
+        ...prev,
+        ...updatedCategory,
+      }));
+
+      setSuccess("Image de la catégorie envoyée avec succès.");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible d'envoyer l'image de la catégorie."
+      );
+    } finally {
+      setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -83,6 +127,37 @@ function AdminCategoryEditPage() {
         </div>
 
         {error && <div className="box error-box">{error}</div>}
+        {success && <div className="box success-box">{success}</div>}
+
+        <div className="box admin-upload-box">
+          <h2>Image de la catégorie</h2>
+
+          {category.imageUrl ? (
+            <img
+              src={category.imageUrl}
+              alt={category.name}
+              className="admin-category-preview-image"
+            />
+          ) : (
+            <p>Aucune image pour cette catégorie.</p>
+          )}
+
+          <label className="btn btn-secondary admin-file-label">
+            {uploading ? "Envoi en cours..." : "Choisir une image"}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              disabled={uploading}
+              hidden
+            />
+          </label>
+
+          <p className="form-help-text">
+            L’image sera utilisée côté catalogue et accueil si la catégorie est
+            affichée.
+          </p>
+        </div>
 
         <CategoryAdminForm
           initialValues={category}

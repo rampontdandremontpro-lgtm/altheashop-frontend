@@ -1,15 +1,38 @@
-import api from "./axios";
+import api, { resolveImageUrl } from "./axios";
 
 function normalizeSlide(slide) {
   return {
     id: slide.id,
     title: slide.title || "",
     subtitle: slide.subtitle || "",
-    imageUrl: slide.imageUrl || "",
+    imageUrl: resolveImageUrl(slide.imageUrl || ""),
     ctaLabel: slide.ctaLabel || "",
     ctaUrl: slide.ctaUrl || "",
     displayOrder: slide.displayOrder ?? 0,
     isActive: Boolean(slide.isActive),
+  };
+}
+
+function normalizeCategory(category) {
+  return {
+    ...category,
+    imageUrl: resolveImageUrl(category.imageUrl || ""),
+  };
+}
+
+function normalizeProduct(product) {
+  const images = Array.isArray(product.images)
+    ? product.images.map((image) => ({
+        ...image,
+        url: resolveImageUrl(image.url || image.imageUrl || ""),
+        imageUrl: resolveImageUrl(image.url || image.imageUrl || ""),
+      }))
+    : [];
+
+  return {
+    ...product,
+    imageUrl: resolveImageUrl(product.imageUrl || images[0]?.url || ""),
+    images,
   };
 }
 
@@ -20,8 +43,12 @@ export async function getPublicHomeData() {
   return {
     slides: Array.isArray(data?.slides) ? data.slides.map(normalizeSlide) : [],
     homeText: data?.homeText || "",
-    categories: Array.isArray(data?.categories) ? data.categories : [],
-    featured: Array.isArray(data?.featured) ? data.featured : [],
+    categories: Array.isArray(data?.categories)
+  ? data.categories.map(normalizeCategory)
+  : [],
+featured: Array.isArray(data?.featured)
+  ? data.featured.map(normalizeProduct)
+  : [],
   };
 }
 

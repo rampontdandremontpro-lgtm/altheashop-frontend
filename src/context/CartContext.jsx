@@ -6,6 +6,8 @@ import {
   getCart,
   updateCartItem,
 } from "../api/cartApi";
+import { resolveImageUrl } from "../api/axios";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
@@ -16,7 +18,7 @@ function hasToken() {
 }
 
 function normalizeImage(product) {
-  return product?.imageUrl || product?.images?.[0]?.url || "";
+  return resolveImageUrl(product?.imageUrl || product?.images?.[0]?.url || "");
 }
 
 function normalizeCartResponse(data) {
@@ -45,7 +47,11 @@ function saveLocalCart(items) {
 }
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState(() => getLocalCart());
+  const { user, isAuthenticated, authLoading } = useAuth();
+
+  const [cartItems, setCartItems] = useState(() =>
+    hasToken() ? [] : getLocalCart()
+  );
   const [cartLoading, setCartLoading] = useState(false);
   const [cartError, setCartError] = useState("");
 
@@ -63,14 +69,21 @@ export function CartProvider({ children }) {
       setCartItems(normalizeCartResponse(data));
     } catch {
       setCartError("Impossible de charger le panier.");
+      setCartItems([]);
     } finally {
       setCartLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCart();
-  }, []);
+    if (authLoading) return;
+
+    if (isAuthenticated) {
+      loadCart();
+    } else {
+      setCartItems(getLocalCart());
+    }
+  }, [authLoading, isAuthenticated, user?.id]);
 
   useEffect(() => {
     if (!hasToken()) {

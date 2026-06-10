@@ -2,8 +2,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ProductAdminForm from "../../components/admin/ProductAdminForm";
 import {
+  deleteAdminProductGalleryImage,
   getAdminProductById,
+  getAdminProductImages,
   updateAdminProduct,
+  uploadAdminProductGalleryImage,
   uploadAdminProductImage,
 } from "../../api/adminApi";
 import Loader from "../../components/common/Loader";
@@ -14,19 +17,31 @@ function AdminProductEditPage() {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
   const [loadingPage, setLoadingPage] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   async function loadProduct() {
+    const data = await getAdminProductById(id);
+    setProduct(data);
+  }
+
+  async function loadGalleryImages() {
+    const images = await getAdminProductImages(id);
+    setGalleryImages(images);
+  }
+
+  async function loadPageData() {
     try {
       setLoadingPage(true);
       setError("");
 
-      const data = await getAdminProductById(id);
-      setProduct(data);
+      await Promise.all([loadProduct(), loadGalleryImages()]);
     } catch (err) {
       setError(err.message || "Impossible de charger le produit.");
     } finally {
@@ -35,7 +50,7 @@ function AdminProductEditPage() {
   }
 
   useEffect(() => {
-    loadProduct();
+    loadPageData();
   }, [id]);
 
   const handleSave = async (formData) => {
@@ -69,9 +84,9 @@ function AdminProductEditPage() {
       setSuccess("");
 
       await uploadAdminProductImage(id, file);
-      setSuccess("Image envoyée avec succès.");
+      setSuccess("Image principale envoyée avec succès.");
 
-      await loadProduct();
+      await Promise.all([loadProduct(), loadGalleryImages()]);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -81,6 +96,64 @@ function AdminProductEditPage() {
     } finally {
       setUploading(false);
       e.target.value = "";
+    }
+  };
+
+  const handleGalleryUpload = async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Merci de choisir un fichier image.");
+      return;
+    }
+
+    try {
+      setUploadingGallery(true);
+      setError("");
+      setSuccess("");
+
+      await uploadAdminProductGalleryImage(id, file);
+      setSuccess("Image ajoutée à la galerie avec succès.");
+
+      await Promise.all([loadProduct(), loadGalleryImages()]);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible d'ajouter l'image à la galerie."
+      );
+    } finally {
+      setUploadingGallery(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleDeleteGalleryImage = async (imageId) => {
+    const confirmed = window.confirm(
+      "Voulez-vous vraiment supprimer cette image de la galerie ?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeletingImageId(imageId);
+      setError("");
+      setSuccess("");
+
+      await deleteAdminProductGalleryImage(id, imageId);
+      setSuccess("Image supprimée de la galerie.");
+
+      await Promise.all([loadProduct(), loadGalleryImages()]);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible de supprimer l'image."
+      );
+    } finally {
+      setDeletingImageId(null);
     }
   };
 
@@ -105,7 +178,7 @@ function AdminProductEditPage() {
         {success && <div className="box success-box">{success}</div>}
 
         <div className="box admin-upload-box">
-          <h2>Image du produit</h2>
+          <h2>Image principale du produit</h2>
 
           {product.imageUrl ? (
             <img
@@ -118,7 +191,7 @@ function AdminProductEditPage() {
           )}
 
           <label className="btn btn-secondary admin-file-label">
-            {uploading ? "Envoi en cours..." : "Choisir une image"}
+            {uploading ? "Envoi en cours..." : "Changer l’image principale"}
             <input
               type="file"
               accept="image/*"
@@ -127,10 +200,58 @@ function AdminProductEditPage() {
               hidden
             />
           </label>
+        </div>
+
+        <div className="box admin-upload-box">
+          <h2>Galerie du produit</h2>
 
           <p className="form-help-text">
-            Vous pouvez aussi garder l’URL image dans le formulaire ci-dessous.
+            Les images ajoutées ici apparaissent dans la galerie sur la fiche
+            produit côté client.
           </p>
+
+          <label className="btn btn-secondary admin-file-label">
+            {uploadingGallery ? "Ajout en cours..." : "Ajouter une image"}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleGalleryUpload}
+              disabled={uploadingGallery}
+              hidden
+            />
+          </label>
+
+          {galleryImages.length === 0 ? (
+            <p>Aucune image dans la galerie.</p>
+          ) : (
+            <div className="admin-product-gallery">
+              {galleryImages.map((image) => (
+                <div key={image.id} className="admin-product-gallery-item">
+                  <img
+                    src={image.url || image.imageUrl}
+                    alt={image.altText || product.name}
+                    className="admin-product-gallery-image"
+                  />
+
+                  <div className="admin-product-gallery-info">
+                    <strong>{image.altText || product.name}</strong>
+                    <span>Ordre : {image.displayOrder ?? 0}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteGalleryImage(image.id)}
+                    disabled={deletingImageId === image.id}
+                  >
+                    {deletingImageId === image.id
+                      ? "Suppression..."
+                      : "Supprimer"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <ProductAdminForm

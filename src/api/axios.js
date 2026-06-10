@@ -1,7 +1,25 @@
 import axios from "axios";
 
+export const API_BASE_URL = "http://10.111.0.75:3001/api";
+export const ASSET_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
+export function resolveImageUrl(url) {
+  if (!url) return "";
+
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("data:") ||
+    url.startsWith("blob:")
+  ) {
+    return url;
+  }
+
+  return `${ASSET_BASE_URL}${url.startsWith("/") ? url : `/${url}`}`;
+}
+
 const api = axios.create({
-  baseURL: 'http://10.111.0.75:3001/api',
+  baseURL: API_BASE_URL,
   timeout: 10000,
 });
 

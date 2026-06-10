@@ -1,10 +1,9 @@
-import api from "./axios";
+import api, { resolveImageUrl } from "./axios";
 
 function normalizeImage(image) {
   if (!image) return null;
 
-  const url = image.url || image.imageUrl || "";
-
+  const url = resolveImageUrl(image.url || image.imageUrl || "");
   return {
     id: image.id,
     url,
@@ -22,7 +21,7 @@ function normalizeCategory(category) {
     name: category.name,
     slug: category.slug,
     description: category.description || "",
-    imageUrl: category.imageUrl || "",
+    imageUrl: resolveImageUrl(category.imageUrl || ""),
     displayOrder: category.displayOrder ?? 0,
   };
 }
@@ -49,7 +48,7 @@ function normalizeProduct(product) {
     categoryId: product.categoryId ?? product.category?.id ?? null,
     category: normalizeCategory(product.category),
     imageUrl:
-      product.imageUrl ||
+      resolveImageUrl(product.imageUrl || "") ||
       normalizedImages[0]?.url ||
       normalizedImages[0]?.imageUrl ||
       "",
@@ -66,7 +65,7 @@ function normalizeSlide(slide) {
     id: slide.id,
     title: slide.title || "",
     subtitle: slide.subtitle || "",
-    imageUrl: slide.imageUrl || "",
+    imageUrl: resolveImageUrl(slide.imageUrl || ""),
     ctaLabel: slide.ctaLabel || "",
     ctaUrl: slide.ctaUrl || "",
     displayOrder: slide.displayOrder ?? 0,
