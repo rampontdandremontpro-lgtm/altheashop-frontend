@@ -12,22 +12,18 @@ import { createPaymentIntent } from "../api/paymentsApi";
 import { getAddresses } from "../api/usersApi";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { useI18n } from "../context/I18nContext";
 import { formatPrice } from "../utils/formatPrice";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-function CheckoutForm({
-  addresses,
-  cartItems,
-  totalPriceCents,
-  clearCart,
-  onOrderCompleted,
-}) {
+function CheckoutForm({ addresses, cartItems, totalPriceCents, clearCart }) {
   const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
+  const { t } = useI18n();
 
   const [shippingAddressId, setShippingAddressId] = useState(
     addresses[0]?.id ? String(addresses[0].id) : ""
@@ -43,19 +39,19 @@ function CheckoutForm({
     setError("");
 
     if (!shippingAddressId) {
-      setError("Merci de sélectionner une adresse de livraison.");
+      setError(t("selectShippingAddressError"));
       return;
     }
 
     if (!stripe || !elements) {
-      setError("Stripe n'est pas encore prêt.");
+      setError(t("stripeNotReady"));
       return;
     }
 
     const cardElement = elements.getElement(CardElement);
 
     if (!cardElement) {
-      setError("Merci de renseigner les informations de carte.");
+      setError(t("cardRequired"));
       return;
     }
 
@@ -74,12 +70,12 @@ function CheckoutForm({
       );
 
       if (result.error) {
-        setError(result.error.message || "Paiement refusé.");
+        setError(result.error.message || t("paymentDeclined"));
         return;
       }
 
       if (result.paymentIntent.status !== "succeeded") {
-        setError("Le paiement n'a pas pu être validé.");
+        setError(t("paymentNotValidated"));
         return;
       }
 
@@ -88,8 +84,6 @@ function CheckoutForm({
         paymentMethod: "card",
       });
 
-      onOrderCompleted();
-
       await clearCart();
 
       navigate(
@@ -97,9 +91,7 @@ function CheckoutForm({
       );
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Impossible de confirmer la commande."
+        err.response?.data?.message || err.message || t("orderConfirmError")
       );
     } finally {
       setLoadingOrder(false);
@@ -112,13 +104,14 @@ function CheckoutForm({
         {error && <ErrorMessage message={error} />}
 
         <div className="detail-box">
-          <h2>1. Adresse de livraison</h2>
+          <h2>{t("shippingAddressStep")}</h2>
 
           {addresses.length === 0 ? (
             <div className="checkout-warning">
-              <p>Aucune adresse enregistrée.</p>
+              <p>{t("noAddress")}</p>
+
               <Link to="/account/edit" className="btn btn-primary">
-                Ajouter une adresse
+                {t("addAddress")}
               </Link>
             </div>
           ) : (
@@ -137,16 +130,19 @@ function CheckoutForm({
 
               {selectedAddress && (
                 <div className="checkout-selected-box">
-                  <strong>Adresse sélectionnée</strong>
+                  <strong>{t("selectedAddress")}</strong>
+
                   <p>
                     {selectedAddress.firstName} {selectedAddress.lastName}
                   </p>
+
                   <p>
                     {selectedAddress.addressLine1}
                     {selectedAddress.addressLine2
                       ? `, ${selectedAddress.addressLine2}`
                       : ""}
                   </p>
+
                   <p>
                     {selectedAddress.postalCode} {selectedAddress.city},{" "}
                     {selectedAddress.country}
@@ -158,7 +154,7 @@ function CheckoutForm({
         </div>
 
         <div className="detail-box">
-          <h2>2. Paiement sécurisé</h2>
+          <h2>{t("securePaymentStep")}</h2>
 
           <div className="stripe-card-box">
             <CardElement
@@ -173,14 +169,11 @@ function CheckoutForm({
             />
           </div>
 
-          <p className="form-help-text">
-            Le paiement est traité par Stripe. Les informations bancaires ne
-            sont pas stockées dans le site.
-          </p>
+          <p className="form-help-text">{t("stripeHelp")}</p>
         </div>
 
         <div className="detail-box">
-          <h2>3. Validation</h2>
+          <h2>{t("validationStep")}</h2>
 
           <button
             className="btn btn-primary"
@@ -188,14 +181,14 @@ function CheckoutForm({
             disabled={loadingOrder || addresses.length === 0}
           >
             {loadingOrder
-              ? "Paiement en cours..."
-              : `Payer ${formatPrice(totalPriceCents)}`}
+              ? t("paymentLoading")
+              : `${t("pay")} ${formatPrice(totalPriceCents)}`}
           </button>
         </div>
       </div>
 
       <aside className="box">
-        <h2>Résumé commande</h2>
+        <h2>{t("orderSummary")}</h2>
 
         <div className="checkout-summary-list">
           {cartItems.map((item) => (
@@ -203,6 +196,7 @@ function CheckoutForm({
               <span>
                 {item.name} x {item.quantity}
               </span>
+
               <strong>{formatPrice(item.priceCents * item.quantity)}</strong>
             </div>
           ))}
@@ -210,7 +204,7 @@ function CheckoutForm({
 
         <div className="detail-box">
           <p className="checkout-total">
-            Total : <strong>{formatPrice(totalPriceCents)}</strong>
+            {t("total")} : <strong>{formatPrice(totalPriceCents)}</strong>
           </p>
         </div>
       </aside>
@@ -219,12 +213,12 @@ function CheckoutForm({
 }
 
 function CheckoutPage() {
+  const { t } = useI18n();
   const { isAuthenticated, user } = useAuth();
   const { cartItems, totalPriceCents, clearCart } = useCart();
 
   const [addresses, setAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(true);
-  const [orderCompleted, setOrderCompleted] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -238,21 +232,21 @@ function CheckoutPage() {
         const data = await getAddresses();
         setAddresses(Array.isArray(data) ? data : []);
       } catch {
-        setError("Impossible de charger les adresses.");
+        setError(t("loadAddressesError"));
       } finally {
         setLoadingAddresses(false);
       }
     }
 
     loadAddresses();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
-  if ((!cartItems || cartItems.length === 0) && !orderCompleted) {
+  if (!cartItems || cartItems.length === 0) {
     return <Navigate to="/cart" replace />;
   }
 
   if (loadingAddresses) {
-    return <Loader text="Chargement du checkout..." />;
+    return <Loader text={t("loadingCheckout")} />;
   }
 
   if (!isAuthenticated) {
@@ -260,10 +254,11 @@ function CheckoutPage() {
       <div className="page-stack">
         <section className="section">
           <div className="box checkout-warning">
-            <h1>Connexion requise</h1>
-            <p>Vous devez être connecté pour finaliser votre commande.</p>
+            <h1>{t("loginRequired")}</h1>
+            <p>{t("loginRequiredMessage")}</p>
+
             <Link to="/login" className="btn btn-primary">
-              Se connecter
+              {t("loginAction")}
             </Link>
           </div>
         </section>
@@ -275,7 +270,7 @@ function CheckoutPage() {
     return (
       <div className="page-stack">
         <section className="section">
-          <ErrorMessage message="Clé publique Stripe manquante dans le fichier .env : VITE_STRIPE_PUBLIC_KEY." />
+          <ErrorMessage message={t("stripeMissingKey")} />
         </section>
       </div>
     );
@@ -286,9 +281,9 @@ function CheckoutPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Checkout</h1>
+            <h1>{t("checkoutTitle")}</h1>
             <p>
-              Connecté avec : <strong>{user?.email}</strong>
+              {t("connectedWith")} : <strong>{user?.email}</strong>
             </p>
           </div>
         </div>
@@ -301,7 +296,6 @@ function CheckoutPage() {
             cartItems={cartItems}
             totalPriceCents={totalPriceCents}
             clearCart={clearCart}
-            onOrderCompleted={() => setOrderCompleted(true)}
           />
         </Elements>
       </section>

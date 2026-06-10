@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useI18n } from "../context/I18nContext";
 import { formatPrice } from "../utils/formatPrice";
 import CartSummary from "../components/cart/CartSummary";
 import EmptyState from "../components/common/EmptyState";
 
 function CartPage() {
+  const { t } = useI18n();
+
   const {
     cartItems,
     increaseQty,
@@ -20,15 +23,17 @@ function CartPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Panier</h1>
-            <p>{totalItems} article(s)</p>
+            <h1>{t("cart")}</h1>
+            <p>
+              {totalItems} {t("cartItemsCount")}
+            </p>
           </div>
         </div>
 
         {cartItems.length === 0 ? (
           <EmptyState
-            title="Votre panier est vide"
-            message="Ajoutez des produits depuis le catalogue pour commencer."
+            title={t("cartEmptyTitle")}
+            message={t("cartEmptyMessage")}
           />
         ) : (
           <div className="cart-layout">
@@ -36,7 +41,10 @@ function CartPage() {
               {cartItems.map((item) => (
                 <div className="cart-item box" key={item.id}>
                   <img
-                    src={item.imageUrl || "https://placehold.co/120x120?text=Produit"}
+                    src={
+                      item.imageUrl ||
+                      "https://placehold.co/120x120?text=Produit"
+                    }
                     alt={item.name}
                     className="cart-item-image"
                   />
@@ -51,26 +59,43 @@ function CartPage() {
                       </div>
 
                       <button
+                        type="button"
                         className="link-danger"
                         onClick={() => removeFromCart(item.id)}
                       >
-                        Supprimer
+                        {t("remove")}
                       </button>
                     </div>
 
                     <div className="qty-controls">
-                      <button onClick={() => decreaseQty(item.id)}>-</button>
+                      <button
+                        type="button"
+                        onClick={() => decreaseQty(item.id)}
+                        aria-label="Diminuer la quantité"
+                      >
+                        -
+                      </button>
+
                       <span>{item.quantity}</span>
-                      <button onClick={() => increaseQty(item.id)}>+</button>
+
+                      <button
+                        type="button"
+                        onClick={() => increaseQty(item.id)}
+                        aria-label="Augmenter la quantité"
+                      >
+                        +
+                      </button>
                     </div>
 
                     <p className="cart-line-total">
-                      Sous-total :{" "}
-                      <strong>{formatPrice(item.priceCents * item.quantity)}</strong>
+                      {t("subtotal")} :{" "}
+                      <strong>
+                        {formatPrice(item.priceCents * item.quantity)}
+                      </strong>
                     </p>
 
                     <Link to={`/product/${item.slug}`} className="cart-back-link">
-                      Revoir le produit
+                      {t("viewProductAgain")}
                     </Link>
                   </div>
                 </div>

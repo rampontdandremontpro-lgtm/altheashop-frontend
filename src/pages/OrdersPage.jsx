@@ -6,25 +6,16 @@ import ErrorMessage from "../components/common/ErrorMessage";
 import EmptyState from "../components/common/EmptyState";
 import { formatPrice } from "../utils/formatPrice";
 import AccountSidebar from "../components/account/AccountSidebar";
+import { useI18n } from "../context/I18nContext";
 
 const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Image";
-
-const STATUS_LABELS = {
-  pending: "En attente",
-  confirmed: "Confirmée",
-  paid: "Payée",
-  processing: "Préparation",
-  shipped: "Expédiée",
-  delivered: "Livrée",
-  cancelled: "Annulée",
-};
 
 function getOrderYear(order) {
   return new Date(order.createdAt).getFullYear();
 }
 
-function getItemName(item) {
-  return item.name || item.product?.name || "Produit";
+function getItemName(item, t) {
+  return item.name || item.product?.name || t("product");
 }
 
 function getItemImage(item) {
@@ -43,7 +34,7 @@ function orderMatchesSearch(order, search) {
   if (!query) return true;
 
   const productNames = (order.items || [])
-    .map((item) => getItemName(item))
+    .map((item) => item.name || item.product?.name || "")
     .join(" ")
     .toLowerCase();
 
@@ -55,12 +46,24 @@ function orderMatchesSearch(order, search) {
 }
 
 function OrdersPage() {
+  const { t } = useI18n();
+
   const [orders, setOrders] = useState([]);
   const [selectedYear, setSelectedYear] = useState("all");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [invoiceLoadingId, setInvoiceLoadingId] = useState(null);
   const [error, setError] = useState("");
+
+  const statusLabels = {
+    pending: t("statusPending"),
+    confirmed: t("statusConfirmed"),
+    paid: t("statusPaid"),
+    processing: t("statusProcessing"),
+    shipped: t("statusShipped"),
+    delivered: t("statusDelivered"),
+    cancelled: t("statusCancelled"),
+  };
 
   useEffect(() => {
     async function fetchOrders() {
@@ -74,7 +77,7 @@ function OrdersPage() {
         setError(
           err.response?.data?.message ||
             err.message ||
-            "Impossible de charger les commandes."
+            t("loadOrdersError")
         );
       } finally {
         setLoading(false);
@@ -82,7 +85,7 @@ function OrdersPage() {
     }
 
     fetchOrders();
-  }, []);
+  }, [t]);
 
   const years = useMemo(() => {
     return [...new Set(orders.map(getOrderYear))].sort((a, b) => b - a);
@@ -122,14 +125,14 @@ function OrdersPage() {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de télécharger la facture."
+          t("downloadInvoiceError")
       );
     } finally {
       setInvoiceLoadingId(null);
     }
   };
 
-  if (loading) return <Loader text="Chargement des commandes..." />;
+  if (loading) return <Loader text={t("loadingOrders")} />;
   if (error && orders.length === 0) return <ErrorMessage message={error} />;
 
   return (
@@ -137,8 +140,10 @@ function OrdersPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Historique des commandes</h1>
-            <p>{filteredOrders.length} commande(s)</p>
+            <h1>{t("ordersHistory")}</h1>
+            <p>
+              {filteredOrders.length} {t("ordersCount")}
+            </p>
           </div>
         </div>
 
@@ -151,7 +156,7 @@ function OrdersPage() {
             <div className="box filters">
               <input
                 type="text"
-                placeholder="Rechercher par référence, produit, date..."
+                placeholder={t("ordersSearchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -160,7 +165,7 @@ function OrdersPage() {
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
               >
-                <option value="all">Toutes les années</option>
+                <option value="all">{t("allYears")}</option>
                 {years.map((year) => (
                   <option key={year} value={year}>
                     {year}
@@ -171,8 +176,8 @@ function OrdersPage() {
 
             {filteredOrders.length === 0 ? (
               <EmptyState
-                title="Aucune commande"
-                message="Aucune commande ne correspond à votre recherche."
+                title={t("noOrdersTitle")}
+                message={t("noOrdersMessage")}
               />
             ) : (
               <div className="orders-list">
@@ -184,23 +189,26 @@ function OrdersPage() {
                       <article key={order.id} className="box order-card">
                         <div className="order-card-head">
                           <div>
-                            <h3>Référence de commande : {order.reference}</h3>
+                            <h3>
+                              {t("orderReference")} : {order.reference}
+                            </h3>
+
                             <p className="order-status-line">
-  Statut :
-  <span className={`status-badge status-${order.status}`}>
-    {STATUS_LABELS[order.status] || order.status}
-  </span>
-</p>
+                              {t("status")} :
+                              <span className={`status-badge status-${order.status}`}>
+                                {statusLabels[order.status] || order.status}
+                              </span>
+                            </p>
                           </div>
 
                           <strong>
-                            Total : {formatPrice(order.totalPriceCents)}
+                            {t("total")} : {formatPrice(order.totalPriceCents)}
                           </strong>
                         </div>
 
                         <div className="detail-box">
                           <p>
-                            Commande effectuée le{" "}
+                            {t("orderPlacedOn")}{" "}
                             {new Date(order.createdAt).toLocaleDateString(
                               "fr-FR"
                             )}
@@ -208,10 +216,10 @@ function OrdersPage() {
                         </div>
 
                         <div className="detail-box">
-                          <h4>Produits</h4>
+                          <h4>{t("products")}</h4>
 
                           {(order.items || []).length === 0 ? (
-                            <p>Aucun produit disponible.</p>
+                            <p>{t("noProductAvailable")}</p>
                           ) : (
                             <div className="order-products-list">
                               {order.items.map((item) => (
@@ -221,7 +229,7 @@ function OrdersPage() {
                                 >
                                   <img
                                     src={getItemImage(item)}
-                                    alt={getItemName(item)}
+                                    alt={getItemName(item, t)}
                                     className="order-product-image"
                                     onError={(e) => {
                                       e.currentTarget.src = FALLBACK_IMAGE;
@@ -229,9 +237,9 @@ function OrdersPage() {
                                   />
 
                                   <div>
-                                    <strong>{getItemName(item)}</strong>
+                                    <strong>{getItemName(item, t)}</strong>
                                     <p>
-                                      Quantité : {item.quantity} —{" "}
+                                      {t("quantity")} : {item.quantity} —{" "}
                                       {formatPrice(
                                         item.priceCents * item.quantity
                                       )}
@@ -248,7 +256,7 @@ function OrdersPage() {
                             to={`/orders/${order.id}`}
                             className="btn btn-primary"
                           >
-                            Voir le détail
+                            {t("viewDetails")}
                           </Link>
 
                           <button
@@ -258,8 +266,8 @@ function OrdersPage() {
                             disabled={invoiceLoadingId === order.id}
                           >
                             {invoiceLoadingId === order.id
-                              ? "Téléchargement..."
-                              : "Facture PDF"}
+                              ? t("downloading")
+                              : t("invoicePdf")}
                           </button>
                         </div>
                       </article>
