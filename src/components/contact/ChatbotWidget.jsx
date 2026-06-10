@@ -3,16 +3,11 @@ import {
   getChatbotMessages,
   sendChatbotMessage,
 } from "../../api/contactApi";
+import { useI18n } from "../../context/I18nContext";
 
-const WELCOME_MESSAGE = {
-  id: "welcome",
-  role: "bot",
-  text: "Bonjour, je suis l'assistant Althea Shop. Comment puis-je vous aider ?",
-};
-
-function normalizeApiMessages(apiMessages) {
+function normalizeApiMessages(apiMessages, welcomeMessage) {
   if (!Array.isArray(apiMessages) || apiMessages.length === 0) {
-    return [WELCOME_MESSAGE];
+    return [welcomeMessage];
   }
 
   const normalized = apiMessages
@@ -31,13 +26,20 @@ function normalizeApiMessages(apiMessages) {
       },
     ]);
 
-  return [WELCOME_MESSAGE, ...normalized];
+  return [welcomeMessage, ...normalized];
 }
 
 function ChatbotWidget() {
+  const { t } = useI18n();
   const messagesEndRef = useRef(null);
 
-  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
+  const welcomeMessage = {
+    id: "welcome",
+    role: "bot",
+    text: t("chatbotWelcome"),
+  };
+
+  const [messages, setMessages] = useState([welcomeMessage]);
   const [input, setInput] = useState("");
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [sending, setSending] = useState(false);
@@ -50,16 +52,16 @@ function ChatbotWidget() {
         setError("");
 
         const data = await getChatbotMessages();
-        setMessages(normalizeApiMessages(data));
+        setMessages(normalizeApiMessages(data, welcomeMessage));
       } catch {
-        setMessages([WELCOME_MESSAGE]);
+        setMessages([welcomeMessage]);
       } finally {
         setLoadingHistory(false);
       }
     }
 
     loadHistory();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -94,7 +96,7 @@ function ChatbotWidget() {
         text:
           result.reply ||
           result.message ||
-          "Merci pour votre message. Un conseiller pourra vous répondre prochainement.",
+          t("chatbotFallbackReply"),
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -102,7 +104,7 @@ function ChatbotWidget() {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de contacter le chatbot."
+          t("chatbotContactError")
       );
 
       setMessages((prev) => [
@@ -110,7 +112,7 @@ function ChatbotWidget() {
         {
           id: `local-error-${Date.now()}`,
           role: "bot",
-          text: "Désolé, le chatbot est momentanément indisponible.",
+          text: t("chatbotUnavailable"),
         },
       ]);
     } finally {
@@ -122,8 +124,8 @@ function ChatbotWidget() {
     <div className="box chatbot-box">
       <div className="chatbot-header">
         <div>
-          <h2>Assistant Althea Shop</h2>
-          <p>Posez une question sur une commande, une livraison ou un produit.</p>
+          <h2>{t("chatbotTitle")}</h2>
+          <p>{t("chatbotSubtitle")}</p>
         </div>
       </div>
 
@@ -132,7 +134,7 @@ function ChatbotWidget() {
       <div className="chatbot-messages">
         {loadingHistory ? (
           <div className="chat-message bot">
-            <span>Chargement de l'historique...</span>
+            <span>{t("loadingChatHistory")}</span>
           </div>
         ) : (
           messages.map((message) => (
@@ -149,7 +151,7 @@ function ChatbotWidget() {
 
         {sending && (
           <div className="chat-message bot">
-            <span>Réponse en cours...</span>
+            <span>{t("chatbotReplyLoading")}</span>
           </div>
         )}
 
@@ -159,14 +161,14 @@ function ChatbotWidget() {
       <form className="chatbot-form" onSubmit={handleSend}>
         <input
           type="text"
-          placeholder="Écrire un message..."
+          placeholder={t("writeMessage")}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={sending}
         />
 
         <button className="btn btn-primary" type="submit" disabled={sending}>
-          {sending ? "Envoi..." : "Envoyer"}
+          {sending ? t("sending") : t("send")}
         </button>
       </form>
     </div>

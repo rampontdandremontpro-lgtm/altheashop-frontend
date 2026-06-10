@@ -1,7 +1,9 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { formatPrice } from "../utils/formatPrice";
+import { useI18n } from "../context/I18nContext";
 
 function CheckoutSuccessPage() {
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
 
   const reference = searchParams.get("reference");
@@ -13,38 +15,34 @@ function CheckoutSuccessPage() {
         <div className="box success-page">
           <div className="checkout-confirmation-badge">✓</div>
 
-          <h1>Votre commande a bien été enregistrée</h1>
+          <h1>{t("checkoutSuccessTitle")}</h1>
 
           <p>
-            Merci pour votre achat sur <strong>Althea Shop</strong>. Votre
-            commande a été confirmée et sera traitée prochainement par notre
-            équipe.
+            {t("checkoutSuccessThanks")} <strong>Althea Shop</strong>.{" "}
+            {t("checkoutSuccessMessage")}
           </p>
 
           {reference && (
             <p>
-              Référence de commande : <strong>{reference}</strong>
+              {t("orderReference")} : <strong>{reference}</strong>
             </p>
           )}
 
           {total > 0 && (
             <p>
-              Total payé : <strong>{formatPrice(total)}</strong>
+              {t("totalPaid")} : <strong>{formatPrice(total)}</strong>
             </p>
           )}
 
-          <p>
-            Vous pouvez retrouver le détail de votre commande et télécharger la
-            facture depuis votre espace client.
-          </p>
+          <p>{t("checkoutSuccessInfo")}</p>
 
           <div className="success-actions">
             <Link to="/orders" className="btn btn-primary">
-              Voir mes commandes
+              {t("viewMyOrders")}
             </Link>
 
             <Link to="/catalog" className="btn btn-secondary">
-              Retour au catalogue
+              {t("backToCatalog")}
             </Link>
           </div>
         </div>

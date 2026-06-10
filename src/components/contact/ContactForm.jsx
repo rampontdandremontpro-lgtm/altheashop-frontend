@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { sendContactMessage } from "../../api/contactApi";
+import { useI18n } from "../../context/I18nContext";
 
 function ContactForm() {
+  const { t } = useI18n();
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -34,7 +37,7 @@ function ContactForm() {
       !form.subject ||
       !form.message
     ) {
-      setError("Merci de remplir tous les champs.");
+      setError(t("contactFormRequired"));
       return;
     }
 
@@ -43,9 +46,7 @@ function ContactForm() {
 
       const result = await sendContactMessage(form);
 
-      setSuccess(
-        result.message || "Votre message a bien été envoyé."
-      );
+      setSuccess(result.message || t("contactFormSuccess"));
 
       setForm({
         firstName: "",
@@ -58,7 +59,7 @@ function ContactForm() {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible d'envoyer le message."
+          t("contactFormError")
       );
     } finally {
       setLoading(false);
@@ -67,19 +68,17 @@ function ContactForm() {
 
   return (
     <div className="box">
-      <h2>Contact</h2>
+      <h2>{t("contactFormTitle")}</h2>
 
       {error && <div className="box error-box">{error}</div>}
 
-      {success && (
-        <div className="box success-box">{success}</div>
-      )}
+      {success && <div className="box success-box">{success}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <input
           type="text"
           name="firstName"
-          placeholder="Prénom"
+          placeholder={t("firstName")}
           value={form.firstName}
           onChange={handleChange}
         />
@@ -87,7 +86,7 @@ function ContactForm() {
         <input
           type="text"
           name="lastName"
-          placeholder="Nom"
+          placeholder={t("lastName")}
           value={form.lastName}
           onChange={handleChange}
         />
@@ -95,7 +94,7 @@ function ContactForm() {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder={t("email")}
           value={form.email}
           onChange={handleChange}
         />
@@ -103,26 +102,22 @@ function ContactForm() {
         <input
           type="text"
           name="subject"
-          placeholder="Sujet"
+          placeholder={t("subject")}
           value={form.subject}
           onChange={handleChange}
         />
 
         <textarea
           name="message"
-          placeholder="Votre message"
+          placeholder={t("yourMessage")}
           value={form.message}
           onChange={handleChange}
           rows="6"
           className="contact-textarea"
         />
 
-        <button
-          className="btn btn-primary"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Envoi..." : "Envoyer"}
+        <button className="btn btn-primary" type="submit" disabled={loading}>
+          {loading ? t("sending") : t("send")}
         </button>
       </form>
     </div>

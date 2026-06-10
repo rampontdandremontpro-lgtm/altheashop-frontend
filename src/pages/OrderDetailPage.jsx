@@ -5,16 +5,7 @@ import AccountSidebar from "../components/account/AccountSidebar";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { formatPrice } from "../utils/formatPrice";
-
-const STATUS_LABELS = {
-  pending: "En attente",
-  confirmed: "Confirmée",
-  paid: "Payée",
-  processing: "Préparation",
-  shipped: "Expédiée",
-  delivered: "Livrée",
-  cancelled: "Annulée",
-};
+import { useI18n } from "../context/I18nContext";
 
 function getOrderAddress(order) {
   return (
@@ -27,12 +18,23 @@ function getOrderAddress(order) {
 }
 
 function OrderDetailPage() {
+  const { t } = useI18n();
   const { id } = useParams();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
+
+  const statusLabels = {
+    pending: t("statusPending"),
+    confirmed: t("statusConfirmed"),
+    paid: t("statusPaid"),
+    processing: t("statusProcessing"),
+    shipped: t("statusShipped"),
+    delivered: t("statusDelivered"),
+    cancelled: t("statusCancelled"),
+  };
 
   useEffect(() => {
     async function loadOrder() {
@@ -46,7 +48,7 @@ function OrderDetailPage() {
         setError(
           err.response?.data?.message ||
             err.message ||
-            "Impossible de charger la commande."
+            t("loadOrderDetailError")
         );
       } finally {
         setLoading(false);
@@ -54,7 +56,7 @@ function OrderDetailPage() {
     }
 
     loadOrder();
-  }, [id]);
+  }, [id, t]);
 
   const handleDownloadInvoice = async () => {
     try {
@@ -64,16 +66,16 @@ function OrderDetailPage() {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de télécharger la facture."
+          t("downloadInvoiceError")
       );
     } finally {
       setDownloading(false);
     }
   };
 
-  if (loading) return <Loader text="Chargement de la commande..." />;
+  if (loading) return <Loader text={t("loadingOrderDetail")} />;
   if (error && !order) return <ErrorMessage message={error} />;
-  if (!order) return <ErrorMessage message="Commande introuvable." />;
+  if (!order) return <ErrorMessage message={t("orderNotFound")} />;
 
   const address = getOrderAddress(order);
 
@@ -82,15 +84,17 @@ function OrderDetailPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Commande {order.reference}</h1>
+            <h1>
+              {t("order")} {order.reference}
+            </h1>
             <p>
-              Passée le{" "}
+              {t("orderPlacedOn")}{" "}
               {new Date(order.createdAt).toLocaleDateString("fr-FR")}
             </p>
           </div>
 
           <Link to="/orders" className="btn btn-secondary">
-            Retour commandes
+            {t("backToOrders")}
           </Link>
         </div>
 
@@ -104,48 +108,53 @@ function OrderDetailPage() {
               <div className="order-card-head">
                 <div>
                   <h2>{order.reference}</h2>
+
                   <p className="order-status-line">
-  Statut :
-  <span className={`status-badge status-${order.status}`}>
-    {STATUS_LABELS[order.status] || order.status}
-  </span>
-</p>
+                    {t("status")} :
+                    <span className={`status-badge status-${order.status}`}>
+                      {statusLabels[order.status] || order.status}
+                    </span>
+                  </p>
                 </div>
 
                 <strong>{formatPrice(order.totalPriceCents)}</strong>
               </div>
 
               <div className="detail-box">
-                <h3>Adresse de livraison</h3>
+                <h3>{t("shippingAddress")}</h3>
 
                 {address ? (
                   <p>
                     {address.addressLine1}
                     {address.addressLine2 ? `, ${address.addressLine2}` : ""},{" "}
-                    {address.postalCode} {address.city},{" "}
-                    {address.country}
+                    {address.postalCode} {address.city}, {address.country}
                   </p>
                 ) : (
-                  <p>Adresse non disponible.</p>
+                  <p>{t("addressUnavailable")}</p>
                 )}
               </div>
 
               <div className="detail-box">
-                <h3>Paiement</h3>
-                <p>{order.paymentMethod || "Non renseigné"}</p>
+                <h3>{t("payment")}</h3>
+                <p>{order.paymentMethod || t("notProvided")}</p>
               </div>
 
               <div className="detail-box">
-                <h3>Produits commandés</h3>
+                <h3>{t("orderedProducts")}</h3>
 
-                <ul className="clean-list">
-                  {(order.items || []).map((item) => (
-                    <li key={item.id}>
-                      {item.name} x {item.quantity} —{" "}
-                      {formatPrice(item.priceCents * item.quantity)}
-                    </li>
-                  ))}
-                </ul>
+                {(order.items || []).length > 0 ? (
+                  <ul className="clean-list">
+                    {(order.items || []).map((item) => (
+                      <li key={item.id}>
+                        {item.name || item.product?.name || t("product")} x{" "}
+                        {item.quantity} —{" "}
+                        {formatPrice(item.priceCents * item.quantity)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>{t("noOrderedProducts")}</p>
+                )}
               </div>
 
               <div className="account-card-actions">
@@ -155,9 +164,7 @@ function OrderDetailPage() {
                   onClick={handleDownloadInvoice}
                   disabled={downloading}
                 >
-                  {downloading
-                    ? "Téléchargement..."
-                    : "Télécharger la facture PDF"}
+                  {downloading ? t("downloading") : t("downloadInvoicePdf")}
                 </button>
               </div>
             </div>

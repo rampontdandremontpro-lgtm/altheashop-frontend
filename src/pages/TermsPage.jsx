@@ -1,39 +1,28 @@
+import { useI18n } from "../context/I18nContext";
+
 function TermsPage() {
+  const { t } = useI18n();
+
   return (
     <div className="page-stack">
       <section className="section">
         <div className="box legal-content">
-          <h1>Conditions Générales d’Utilisation</h1>
+          <h1>{t("termsTitle")}</h1>
 
-          <h2>Objet</h2>
-          <p>
-            Les présentes conditions définissent les modalités d’utilisation de
-            la plateforme Althea Shop.
-          </p>
+          <h2>{t("termsPurposeTitle")}</h2>
+          <p>{t("termsPurposeText")}</p>
 
-          <h2>Accès au service</h2>
-          <p>
-            L’accès au site est ouvert aux utilisateurs disposant d’un navigateur
-            compatible et d’une connexion internet.
-          </p>
+          <h2>{t("termsAccessTitle")}</h2>
+          <p>{t("termsAccessText")}</p>
 
-          <h2>Compte utilisateur</h2>
-          <p>
-            L’utilisateur est responsable des informations transmises lors de
-            son inscription et de la confidentialité de ses identifiants.
-          </p>
+          <h2>{t("termsAccountTitle")}</h2>
+          <p>{t("termsAccountText")}</p>
 
-          <h2>Responsabilité</h2>
-          <p>
-            Cette version est une version pédagogique et de démonstration du
-            projet e-commerce.
-          </p>
+          <h2>{t("termsResponsibilityTitle")}</h2>
+          <p>{t("termsResponsibilityText")}</p>
 
-          <h2>Évolution des services</h2>
-          <p>
-            Les fonctionnalités peuvent évoluer selon l’avancement du frontend,
-            du backend et du cahier des charges.
-          </p>
+          <h2>{t("termsEvolutionTitle")}</h2>
+          <p>{t("termsEvolutionText")}</p>
         </div>
       </section>
     </div>

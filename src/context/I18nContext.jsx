@@ -175,6 +175,90 @@ resetFilters: "Réinitialiser",
 noProductsFound: "Aucun produit trouvé",
 noProductsFoundMessage:
   "Essaie de modifier les filtres ou de faire une nouvelle recherche depuis la barre du haut.",
+loadingOrderDetail: "Chargement de la commande...",
+loadOrderDetailError: "Impossible de charger la commande.",
+orderNotFound: "Commande introuvable.",
+order: "Commande",
+backToOrders: "Retour commandes",
+shippingAddress: "Adresse de livraison",
+addressUnavailable: "Adresse non disponible.",
+payment: "Paiement",
+notProvided: "Non renseigné",
+orderedProducts: "Produits commandés",
+noOrderedProducts: "Aucun produit dans cette commande.",
+downloadInvoicePdf: "Télécharger la facture PDF",
+checkoutSuccessTitle: "Votre commande a bien été enregistrée",
+checkoutSuccessThanks: "Merci pour votre achat sur",
+checkoutSuccessMessage:
+  "Votre commande a été confirmée et sera traitée prochainement par notre équipe.",
+totalPaid: "Total payé",
+checkoutSuccessInfo:
+  "Vous pouvez retrouver le détail de votre commande et télécharger la facture depuis votre espace client.",
+viewMyOrders: "Voir mes commandes",
+backToCatalog: "Retour au catalogue",
+contactTitle: "Contact",
+contactSubtitle:
+  "Le chatbot est à votre disposition ou contactez-nous via le formulaire.",
+contactFormTitle: "Contact",
+contactFormRequired: "Merci de remplir tous les champs.",
+contactFormSuccess: "Votre message a bien été envoyé.",
+contactFormError: "Impossible d'envoyer le message.",
+firstName: "Prénom",
+lastName: "Nom",
+subject: "Sujet",
+yourMessage: "Votre message",
+sending: "Envoi...",
+send: "Envoyer",
+
+chatbotWelcome:
+  "Bonjour, je suis l'assistant Althea Shop. Comment puis-je vous aider ?",
+chatbotFallbackReply:
+  "Merci pour votre message. Un conseiller pourra vous répondre prochainement.",
+chatbotContactError: "Impossible de contacter le chatbot.",
+chatbotUnavailable: "Désolé, le chatbot est momentanément indisponible.",
+chatbotTitle: "Assistant Althea Shop",
+chatbotSubtitle:
+  "Posez une question sur une commande, une livraison ou un produit.",
+loadingChatHistory: "Chargement de l'historique...",
+chatbotReplyLoading: "Réponse en cours...",
+writeMessage: "Écrire un message...",
+aboutTitle: "À propos",
+aboutParagraph1:
+  "Althea Shop est un projet e-commerce réalisé en binôme dans le cadre du Bachelor CPI Développement.",
+aboutParagraph2:
+  "Le projet comprend un frontend React/Vite et un backend NestJS, avec catalogue, panier, compte utilisateur, checkout et backoffice admin.",
+aboutParagraph3:
+  "Cette page présente l’entreprise, le projet et la logique globale de la plateforme.",
+legalTitle: "Mentions légales",
+legalEditorTitle: "Éditeur du site",
+legalEditorText: "Althea Shop — projet pédagogique.",
+legalManagersTitle: "Responsables du projet",
+legalManagersText: "Daphné et Gregory.",
+legalHostingTitle: "Hébergement",
+legalHostingText:
+  "L’hébergement final sera précisé une fois la plateforme déployée.",
+legalIntellectualPropertyTitle: "Propriété intellectuelle",
+legalIntellectualPropertyText:
+  "L’ensemble des contenus présents sur cette plateforme est utilisé dans le cadre d’un projet pédagogique et ne peut être reproduit sans autorisation.",
+legalPersonalDataTitle: "Données personnelles",
+legalPersonalDataText:
+  "Les traitements réels de données seront définis lorsque l’API finale et la mise en production seront prêtes.",
+termsTitle: "Conditions Générales d’Utilisation",
+termsPurposeTitle: "Objet",
+termsPurposeText:
+  "Les présentes conditions définissent les modalités d’utilisation de la plateforme Althea Shop.",
+termsAccessTitle: "Accès au service",
+termsAccessText:
+  "L’accès au site est ouvert aux utilisateurs disposant d’un navigateur compatible et d’une connexion internet.",
+termsAccountTitle: "Compte utilisateur",
+termsAccountText:
+  "L’utilisateur est responsable des informations transmises lors de son inscription et de la confidentialité de ses identifiants.",
+termsResponsibilityTitle: "Responsabilité",
+termsResponsibilityText:
+  "Cette version est une version pédagogique et de démonstration du projet e-commerce.",
+termsEvolutionTitle: "Évolution des services",
+termsEvolutionText:
+  "Les fonctionnalités peuvent évoluer selon l’avancement du frontend, du backend et du cahier des charges.",
   },
 
   en: {
@@ -340,6 +424,89 @@ resetFilters: "Reset",
 noProductsFound: "No product found",
 noProductsFoundMessage:
   "Try changing the filters or making a new search from the top search bar.",
+loadingOrderDetail: "Loading order...",
+loadOrderDetailError: "Unable to load the order.",
+orderNotFound: "Order not found.",
+order: "Order",
+backToOrders: "Back to orders",
+shippingAddress: "Shipping address",
+addressUnavailable: "Address unavailable.",
+payment: "Payment",
+notProvided: "Not provided",
+orderedProducts: "Ordered products",
+noOrderedProducts: "No product in this order.",
+downloadInvoicePdf: "Download PDF invoice",
+checkoutSuccessTitle: "Your order has been successfully placed",
+checkoutSuccessThanks: "Thank you for your purchase on",
+checkoutSuccessMessage:
+  "Your order has been confirmed and will be processed soon by our team.",
+totalPaid: "Total paid",
+checkoutSuccessInfo:
+  "You can find your order details and download the invoice from your customer account.",
+viewMyOrders: "View my orders",
+backToCatalog: "Back to catalog",
+contactTitle: "Contact",
+contactSubtitle:
+  "The chatbot is available to assist you, or contact us using the form.",
+contactFormTitle: "Contact",
+contactFormRequired: "Please fill in all fields.",
+contactFormSuccess: "Your message has been sent successfully.",
+contactFormError: "Unable to send the message.",
+firstName: "First name",
+lastName: "Last name",
+subject: "Subject",
+yourMessage: "Your message",
+sending: "Sending...",
+send: "Send",
+
+chatbotWelcome:
+  "Hello, I am the Althea Shop assistant. How can I help you?",
+chatbotFallbackReply:
+  "Thank you for your message. An advisor will be able to reply soon.",
+chatbotContactError: "Unable to contact the chatbot.",
+chatbotUnavailable: "Sorry, the chatbot is temporarily unavailable.",
+chatbotTitle: "Althea Shop Assistant",
+chatbotSubtitle: "Ask a question about an order, delivery, or product.",
+loadingChatHistory: "Loading history...",
+chatbotReplyLoading: "Reply in progress...",
+writeMessage: "Write a message...",
+aboutTitle: "About",
+aboutParagraph1:
+  "Althea Shop is an e-commerce project created by a two-person team as part of the Bachelor CPI Development program.",
+aboutParagraph2:
+  "The project includes a React/Vite frontend and a NestJS backend, with a catalog, cart, user account, checkout, and admin back office.",
+aboutParagraph3:
+  "This page presents the company, the project, and the overall logic of the platform.",
+legalTitle: "Legal notice",
+legalEditorTitle: "Website publisher",
+legalEditorText: "Althea Shop — educational project.",
+legalManagersTitle: "Project managers",
+legalManagersText: "Daphné and Gregory.",
+legalHostingTitle: "Hosting",
+legalHostingText:
+  "The final hosting provider will be specified once the platform is deployed.",
+legalIntellectualPropertyTitle: "Intellectual property",
+legalIntellectualPropertyText:
+  "All content on this platform is used as part of an educational project and may not be reproduced without permission.",
+legalPersonalDataTitle: "Personal data",
+legalPersonalDataText:
+  "Actual data processing will be defined once the final API and production deployment are ready.",
+termsTitle: "Terms of Use",
+termsPurposeTitle: "Purpose",
+termsPurposeText:
+  "These terms define the conditions of use of the Althea Shop platform.",
+termsAccessTitle: "Service access",
+termsAccessText:
+  "Access to the website is open to users with a compatible browser and an internet connection.",
+termsAccountTitle: "User account",
+termsAccountText:
+  "The user is responsible for the information provided during registration and for keeping their login credentials confidential.",
+termsResponsibilityTitle: "Responsibility",
+termsResponsibilityText:
+  "This version is an educational and demonstration version of the e-commerce project.",
+termsEvolutionTitle: "Service evolution",
+termsEvolutionText:
+  "Features may evolve depending on the progress of the frontend, backend, and project specifications.",
   },
 
   ar: {
@@ -505,6 +672,89 @@ resetFilters: "إعادة التعيين",
 noProductsFound: "لم يتم العثور على أي منتج",
 noProductsFoundMessage:
   "جرّب تعديل الفلاتر أو إجراء بحث جديد من شريط البحث العلوي.",
+loadingOrderDetail: "جارٍ تحميل الطلب...",
+loadOrderDetailError: "تعذر تحميل الطلب.",
+orderNotFound: "الطلب غير موجود.",
+order: "طلب",
+backToOrders: "العودة إلى الطلبات",
+shippingAddress: "عنوان التوصيل",
+addressUnavailable: "العنوان غير متاح.",
+payment: "الدفع",
+notProvided: "غير مذكور",
+orderedProducts: "المنتجات المطلوبة",
+noOrderedProducts: "لا يوجد أي منتج في هذا الطلب.",
+downloadInvoicePdf: "تحميل الفاتورة PDF",
+checkoutSuccessTitle: "تم تسجيل طلبك بنجاح",
+checkoutSuccessThanks: "شكرًا لشرائك من",
+checkoutSuccessMessage:
+  "تم تأكيد طلبك وسيتم معالجته قريبًا من طرف فريقنا.",
+totalPaid: "المبلغ المدفوع",
+checkoutSuccessInfo:
+  "يمكنك العثور على تفاصيل طلبك وتحميل الفاتورة من حسابك الشخصي.",
+viewMyOrders: "عرض طلباتي",
+backToCatalog: "العودة إلى الكتالوج",
+contactTitle: "اتصل بنا",
+contactSubtitle:
+  "روبوت الدردشة متاح لمساعدتك أو يمكنك التواصل معنا عبر النموذج.",
+contactFormTitle: "اتصل بنا",
+contactFormRequired: "يرجى ملء جميع الحقول.",
+contactFormSuccess: "تم إرسال رسالتك بنجاح.",
+contactFormError: "تعذر إرسال الرسالة.",
+firstName: "الاسم الأول",
+lastName: "اسم العائلة",
+subject: "الموضوع",
+yourMessage: "رسالتك",
+sending: "جارٍ الإرسال...",
+send: "إرسال",
+
+chatbotWelcome:
+  "مرحبًا، أنا مساعد Althea Shop. كيف يمكنني مساعدتك؟",
+chatbotFallbackReply:
+  "شكرًا على رسالتك. سيتمكن مستشار من الرد عليك قريبًا.",
+chatbotContactError: "تعذر التواصل مع روبوت الدردشة.",
+chatbotUnavailable: "عذرًا، روبوت الدردشة غير متاح مؤقتًا.",
+chatbotTitle: "مساعد Althea Shop",
+chatbotSubtitle: "اطرح سؤالًا حول طلب أو توصيل أو منتج.",
+loadingChatHistory: "جارٍ تحميل السجل...",
+chatbotReplyLoading: "جارٍ تحضير الرد...",
+writeMessage: "اكتب رسالة...",
+aboutTitle: "حول المشروع",
+aboutParagraph1:
+  "Althea Shop هو مشروع تجارة إلكترونية تم إنجازه ضمن فريق ثنائي في إطار Bachelor CPI Développement.",
+aboutParagraph2:
+  "يتضمن المشروع واجهة أمامية React/Vite وواجهة خلفية NestJS، مع كتالوج وسلة شراء وحساب مستخدم ودفع ولوحة إدارة.",
+aboutParagraph3:
+  "تعرض هذه الصفحة الشركة والمشروع والمنطق العام للمنصة.",
+legalTitle: "الإشعارات القانونية",
+legalEditorTitle: "ناشر الموقع",
+legalEditorText: "Althea Shop — مشروع تعليمي.",
+legalManagersTitle: "مسؤولو المشروع",
+legalManagersText: "Daphné و Gregory.",
+legalHostingTitle: "الاستضافة",
+legalHostingText:
+  "سيتم تحديد مزود الاستضافة النهائي بعد نشر المنصة.",
+legalIntellectualPropertyTitle: "الملكية الفكرية",
+legalIntellectualPropertyText:
+  "تُستخدم جميع المحتويات الموجودة على هذه المنصة في إطار مشروع تعليمي ولا يجوز إعادة إنتاجها دون إذن.",
+legalPersonalDataTitle: "البيانات الشخصية",
+legalPersonalDataText:
+  "سيتم تحديد المعالجات الفعلية للبيانات عندما تكون واجهة API النهائية والنشر في بيئة الإنتاج جاهزين.",
+termsTitle: "شروط الاستخدام العامة",
+termsPurposeTitle: "الغرض",
+termsPurposeText:
+  "تحدد هذه الشروط قواعد استخدام منصة Althea Shop.",
+termsAccessTitle: "الوصول إلى الخدمة",
+termsAccessText:
+  "الوصول إلى الموقع متاح للمستخدمين الذين لديهم متصفح متوافق واتصال بالإنترنت.",
+termsAccountTitle: "حساب المستخدم",
+termsAccountText:
+  "المستخدم مسؤول عن المعلومات المقدمة أثناء التسجيل وعن الحفاظ على سرية بيانات تسجيل الدخول الخاصة به.",
+termsResponsibilityTitle: "المسؤولية",
+termsResponsibilityText:
+  "هذه النسخة هي نسخة تعليمية وتجريبية من مشروع التجارة الإلكترونية.",
+termsEvolutionTitle: "تطور الخدمات",
+termsEvolutionText:
+  "قد تتطور الميزات حسب تقدم الواجهة الأمامية والواجهة الخلفية ودفتر الشروط.",
   },
 
   he: {
@@ -669,6 +919,89 @@ resetFilters: "איפוס",
 noProductsFound: "לא נמצא מוצר",
 noProductsFoundMessage:
   "נסה לשנות את המסננים או לבצע חיפוש חדש משורת החיפוש העליונה.",
+loadingOrderDetail: "טוען הזמנה...",
+loadOrderDetailError: "לא ניתן לטעון את ההזמנה.",
+orderNotFound: "ההזמנה לא נמצאה.",
+order: "הזמנה",
+backToOrders: "חזרה להזמנות",
+shippingAddress: "כתובת למשלוח",
+addressUnavailable: "הכתובת לא זמינה.",
+payment: "תשלום",
+notProvided: "לא צוין",
+orderedProducts: "מוצרים שהוזמנו",
+noOrderedProducts: "אין מוצרים בהזמנה זו.",
+downloadInvoicePdf: "הורד חשבונית PDF",
+checkoutSuccessTitle: "ההזמנה שלך נרשמה בהצלחה",
+checkoutSuccessThanks: "תודה על הרכישה שלך ב",
+checkoutSuccessMessage:
+  "ההזמנה שלך אושרה ותטופל בקרוב על ידי הצוות שלנו.",
+totalPaid: "סה״כ שולם",
+checkoutSuccessInfo:
+  "ניתן למצוא את פרטי ההזמנה ולהוריד את החשבונית מתוך אזור הלקוח.",
+viewMyOrders: "ראה את ההזמנות שלי",
+backToCatalog: "חזרה לקטלוג",
+contactTitle: "צור קשר",
+contactSubtitle:
+  "הצ'אטבוט זמין לשירותך או שניתן ליצור איתנו קשר באמצעות הטופס.",
+contactFormTitle: "צור קשר",
+contactFormRequired: "נא למלא את כל השדות.",
+contactFormSuccess: "ההודעה שלך נשלחה בהצלחה.",
+contactFormError: "לא ניתן לשלוח את ההודעה.",
+firstName: "שם פרטי",
+lastName: "שם משפחה",
+subject: "נושא",
+yourMessage: "ההודעה שלך",
+sending: "שולח...",
+send: "שלח",
+
+chatbotWelcome:
+  "שלום, אני העוזר של Althea Shop. איך אוכל לעזור לך?",
+chatbotFallbackReply:
+  "תודה על ההודעה שלך. יועץ יוכל לענות לך בקרוב.",
+chatbotContactError: "לא ניתן ליצור קשר עם הצ'אטבוט.",
+chatbotUnavailable: "מצטערים, הצ'אטבוט אינו זמין כרגע.",
+chatbotTitle: "העוזר של Althea Shop",
+chatbotSubtitle: "שאל שאלה על הזמנה, משלוח או מוצר.",
+loadingChatHistory: "טוען היסטוריה...",
+chatbotReplyLoading: "מכין תשובה...",
+writeMessage: "כתוב הודעה...",
+aboutTitle: "אודות",
+aboutParagraph1:
+  "Althea Shop הוא פרויקט מסחר אלקטרוני שנוצר בצוות של שני אנשים במסגרת Bachelor CPI Développement.",
+aboutParagraph2:
+  "הפרויקט כולל צד לקוח React/Vite וצד שרת NestJS, עם קטלוג, עגלת קניות, חשבון משתמש, תשלום וממשק ניהול.",
+aboutParagraph3:
+  "עמוד זה מציג את החברה, את הפרויקט ואת ההיגיון הכללי של הפלטפורמה.",
+legalTitle: "הצהרה משפטית",
+legalEditorTitle: "מוציא לאור של האתר",
+legalEditorText: "Althea Shop — פרויקט לימודי.",
+legalManagersTitle: "אחראי הפרויקט",
+legalManagersText: "Daphné ו-Gregory.",
+legalHostingTitle: "אחסון",
+legalHostingText:
+  "ספק האחסון הסופי יצוין לאחר פריסת הפלטפורמה.",
+legalIntellectualPropertyTitle: "קניין רוחני",
+legalIntellectualPropertyText:
+  "כל התכנים בפלטפורמה זו משמשים במסגרת פרויקט לימודי ואין לשכפל אותם ללא אישור.",
+legalPersonalDataTitle: "נתונים אישיים",
+legalPersonalDataText:
+  "עיבוד הנתונים בפועל יוגדר כאשר ה-API הסופי והפריסה לייצור יהיו מוכנים.",
+termsTitle: "תנאי שימוש",
+termsPurposeTitle: "מטרה",
+termsPurposeText:
+  "תנאים אלה מגדירים את אופן השימוש בפלטפורמת Althea Shop.",
+termsAccessTitle: "גישה לשירות",
+termsAccessText:
+  "הגישה לאתר פתוחה למשתמשים בעלי דפדפן תואם וחיבור לאינטרנט.",
+termsAccountTitle: "חשבון משתמש",
+termsAccountText:
+  "המשתמש אחראי למידע שנמסר בעת ההרשמה ולשמירה על סודיות פרטי ההתחברות שלו.",
+termsResponsibilityTitle: "אחריות",
+termsResponsibilityText:
+  "גרסה זו היא גרסה לימודית והדגמתית של פרויקט המסחר האלקטרוני.",
+termsEvolutionTitle: "התפתחות השירותים",
+termsEvolutionText:
+  "הפונקציונליות עשויה להתפתח בהתאם להתקדמות צד הלקוח, צד השרת ומפרט הפרויקט.",
   },
 };
 
