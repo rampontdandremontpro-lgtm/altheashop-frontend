@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProducts } from "../api/catalogApi";
+import {
+  getCategoryBySlug,
+  getProducts,
+} from "../api/catalogApi";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 import Pagination from "../components/common/Pagination";
@@ -11,6 +14,8 @@ import { useI18n } from "../context/I18nContext";
 function CategoriesPage() {
   const { t } = useI18n();
   const { slug } = useParams();
+
+  const [category, setCategory] = useState(null);
 
   const [productsData, setProductsData] = useState({
     items: [],
@@ -29,7 +34,7 @@ function CategoriesPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchCategoryAndProducts() {
       try {
         setLoading(true);
         setError("");
@@ -41,11 +46,21 @@ function CategoriesPage() {
           sort,
         };
 
-        if (search.trim()) params.q = search.trim();
-        if (inStock) params.inStock = true;
+        if (search.trim()) {
+          params.q = search.trim();
+        }
 
-        const data = await getProducts(params);
-        setProductsData(data);
+        if (inStock) {
+          params.inStock = true;
+        }
+
+        const [categoryData, products] = await Promise.all([
+          getCategoryBySlug(slug),
+          getProducts(params),
+        ]);
+
+        setCategory(categoryData);
+        setProductsData(products);
       } catch {
         setError(t("categoryProductsLoadError"));
       } finally {
@@ -53,7 +68,7 @@ function CategoriesPage() {
       }
     }
 
-    fetchProducts();
+    fetchCategoryAndProducts();
   }, [slug, page, search, sort, inStock, t]);
 
   const handleSubmit = (e) => {
@@ -74,9 +89,34 @@ function CategoriesPage() {
   return (
     <div className="page-stack">
       <section className="section">
-        <h1>
-          {t("categoryTitle")} : {slug}
-        </h1>
+        <div className="category-header">
+          {category?.imageUrl ? (
+            <div className="category-banner">
+              <img
+                src={category.imageUrl}
+                alt={category.name || slug}
+                className="category-banner-image"
+              />
+
+              <div className="category-banner-overlay">
+                <p className="hero-kicker">{t("categoryTitle")}</p>
+                <h1>{category.name || slug}</h1>
+              </div>
+            </div>
+          ) : (
+            <div className="box">
+              <h1>
+                {t("categoryTitle")} : {category?.name || slug}
+              </h1>
+            </div>
+          )}
+
+          {category?.description && (
+            <div className="box category-description">
+              <p>{category.description}</p>
+            </div>
+          )}
+        </div>
 
         <ProductFilters
           search={search}
