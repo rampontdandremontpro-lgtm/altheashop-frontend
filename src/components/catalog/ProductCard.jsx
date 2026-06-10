@@ -1,15 +1,16 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { formatPrice } from "../../utils/formatPrice";
+import { useI18n } from "../../context/I18nContext";
 
 const FALLBACK_IMAGE =
   "https://via.placeholder.com/400x400?text=Image+indisponible";
 
 function ProductCard({ product }) {
+  const { t } = useI18n();
+
   const [imageSrc, setImageSrc] = useState(
-    product.imageUrl ||
-      product.images?.[0]?.url ||
-      FALLBACK_IMAGE
+    product.imageUrl || product.images?.[0]?.url || FALLBACK_IMAGE
   );
 
   return (
@@ -24,15 +25,11 @@ function ProductCard({ product }) {
       </Link>
 
       <div className="product-card-content">
-        <p className="product-card-category">
-          {product.category?.name}
-        </p>
+        <p className="product-card-category">{product.category?.name}</p>
 
         <h3>{product.name}</h3>
 
-        <p className="product-card-price">
-          {formatPrice(product.priceCents)}
-        </p>
+        <p className="product-card-price">{formatPrice(product.priceCents)}</p>
 
         <p className="product-card-description">
           {product.shortDescription}
@@ -42,7 +39,7 @@ function ProductCard({ product }) {
           to={`/product/${product.slug || product.id}`}
           className="btn btn-primary"
         >
-          Voir le produit
+          {t("viewProduct")}
         </Link>
       </div>
     </article>

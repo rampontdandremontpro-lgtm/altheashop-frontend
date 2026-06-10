@@ -1,4 +1,8 @@
+import { useI18n } from "../../context/I18nContext";
+
 function Pagination({ page, totalPages, onPageChange }) {
+  const { t } = useI18n();
+
   if (!totalPages || totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
@@ -10,7 +14,7 @@ function Pagination({ page, totalPages, onPageChange }) {
         disabled={page === 1}
         onClick={() => onPageChange(page - 1)}
       >
-        Précédent
+        {t("previous")}
       </button>
 
       <div className="pagination-pages">
@@ -30,7 +34,7 @@ function Pagination({ page, totalPages, onPageChange }) {
         disabled={page === totalPages}
         onClick={() => onPageChange(page + 1)}
       >
-        Suivant
+        {t("next")}
       </button>
     </div>
   );

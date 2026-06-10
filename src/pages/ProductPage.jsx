@@ -6,6 +6,7 @@ import ErrorMessage from "../components/common/ErrorMessage";
 import { formatPrice } from "../utils/formatPrice";
 import { useCart } from "../context/CartContext";
 import SimilarProducts from "../components/catalog/SimilarProducts";
+import { useI18n } from "../context/I18nContext";
 
 const FALLBACK_IMAGE =
   "https://via.placeholder.com/600x400?text=Image+indisponible";
@@ -35,6 +36,7 @@ function getProductImages(product) {
 }
 
 function ProductPage() {
+  const { t } = useI18n();
   const params = useParams();
   const identifier = params.slug || params.id;
   const { addToCart, cartError } = useCart();
@@ -63,7 +65,7 @@ function ProductPage() {
         setError(
           err.response?.data?.message ||
             err.message ||
-            "Impossible de charger le produit."
+            t("loadProductError")
         );
       } finally {
         setLoading(false);
@@ -73,7 +75,7 @@ function ProductPage() {
     if (identifier) {
       loadProduct();
     }
-  }, [identifier]);
+  }, [identifier, t]);
 
   const handlePreviousImage = () => {
     setCurrentImageIndex((prev) =>
@@ -92,16 +94,16 @@ function ProductPage() {
 
     if (!success) return;
 
-    setCartSuccess(`${product.name} a bien été ajouté à votre panier.`);
+    setCartSuccess(product.name);
 
     window.setTimeout(() => {
       setCartSuccess("");
     }, 3500);
   };
 
-  if (loading) return <Loader text="Chargement du produit..." />;
+  if (loading) return <Loader text={t("loadingProduct")} />;
   if (error) return <ErrorMessage message={error} />;
-  if (!product) return <ErrorMessage message="Produit introuvable." />;
+  if (!product) return <ErrorMessage message={t("productNotFound")} />;
 
   const currentImage = productImages[currentImageIndex];
 
@@ -126,7 +128,7 @@ function ProductPage() {
                     type="button"
                     className="product-gallery-arrow product-gallery-arrow-left"
                     onClick={handlePreviousImage}
-                    aria-label="Image précédente"
+                    aria-label={t("previousImage")}
                   >
                     ‹
                   </button>
@@ -135,7 +137,7 @@ function ProductPage() {
                     type="button"
                     className="product-gallery-arrow product-gallery-arrow-right"
                     onClick={handleNextImage}
-                    aria-label="Image suivante"
+                    aria-label={t("nextImage")}
                   >
                     ›
                   </button>
@@ -155,7 +157,7 @@ function ProductPage() {
                         : "thumb-button"
                     }
                     onClick={() => setCurrentImageIndex(index)}
-                    aria-label={`Afficher l'image ${index + 1}`}
+                    aria-label={`${t("showImage")} ${index + 1}`}
                   >
                     <img
                       src={image}
@@ -180,16 +182,18 @@ function ProductPage() {
 
             <p className={product.stock > 0 ? "stock-ok" : "stock-ko"}>
               {product.stock > 0
-                ? `En stock (${product.stock})`
-                : "Rupture de stock"}
+                ? `${t("inStock")} (${product.stock})`
+                : t("outOfStock")}
             </p>
 
             <p>{product.shortDescription}</p>
 
             {cartSuccess && (
               <div className="cart-success-message">
-                <strong>Article ajouté</strong>
-                <p>{cartSuccess}</p>
+                <strong>{t("productAddedTitle")}</strong>
+                <p>
+                  {cartSuccess} {t("productAddedSuffix")}
+                </p>
               </div>
             )}
 
@@ -200,21 +204,21 @@ function ProductPage() {
               onClick={handleAddToCart}
               disabled={product.stock <= 0}
             >
-              Ajouter au panier
+              {t("addToCart")}
             </button>
 
             <hr />
 
-            <h2>Description</h2>
-            <p>{product.description}</p>
+            <h2>{t("description")}</h2>
+            <p>{product.description || t("noDescriptionAvailable")}</p>
 
             <hr />
 
-            <h2>Caractéristiques techniques</h2>
+            <h2>{t("technicalSpecs")}</h2>
             <p>
               {typeof product.techSpecs === "string"
-                ? product.techSpecs
-                : product.techSpecs?.content || ""}
+                ? product.techSpecs || t("noTechnicalSpecsAvailable")
+                : product.techSpecs?.content || t("noTechnicalSpecsAvailable")}
             </p>
           </div>
         </div>

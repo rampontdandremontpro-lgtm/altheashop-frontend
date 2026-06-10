@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../../api/catalogApi";
 import ProductCard from "./ProductCard";
+import { useI18n } from "../../context/I18nContext";
 
 function SimilarProducts({ product }) {
+  const { t } = useI18n();
   const [similarProducts, setSimilarProducts] = useState([]);
 
   useEffect(() => {
@@ -39,8 +41,8 @@ function SimilarProducts({ product }) {
     <section className="section">
       <div className="page-heading">
         <div>
-          <h2>Produits similaires</h2>
-          <p>Découvrez d’autres produits de la même catégorie.</p>
+          <h2>{t("similarProducts")}</h2>
+          <p>{t("similarProductsDescription")}</p>
         </div>
       </div>
 

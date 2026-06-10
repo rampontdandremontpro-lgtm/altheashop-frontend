@@ -6,8 +6,10 @@ import ErrorMessage from "../components/common/ErrorMessage";
 import EmptyState from "../components/common/EmptyState";
 import Pagination from "../components/common/Pagination";
 import ProductCard from "../components/catalog/ProductCard";
+import { useI18n } from "../context/I18nContext";
 
-function SearchPage() {
+function CatalogPage() {
+  const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialQuery = searchParams.get("q") || "";
@@ -83,14 +85,14 @@ function SearchPage() {
         const data = await getProducts(params);
         setProductsData(data);
       } catch {
-        setError("Impossible de charger les résultats de recherche.");
+        setError(t("loadCatalogError"));
       } finally {
         setLoading(false);
       }
     }
 
     fetchProductsData();
-  }, [page, filters, initialQuery]);
+  }, [page, filters, initialQuery, t]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -146,24 +148,34 @@ function SearchPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Recherche</h1>
+            <h1>{t("catalogTitle")}</h1>
             <p>
               {initialQuery.trim()
-                ? `Résultats pour "${initialQuery.trim()}" — ${productsData.total} produit(s)`
-                : `${productsData.total} produit(s) trouvés`}
+                ? `${t("catalogResultsFor")} "${initialQuery.trim()}" — ${
+                    productsData.total
+                  } ${t("productsFound")}`
+                : `${productsData.total} ${t("productsFound")}`}
             </p>
           </div>
         </div>
 
         <div className="filters filters-advanced search-filters-only">
-          <select name="matchMode" value={filters.matchMode} onChange={handleChange}>
-            <option value="contains">Contient</option>
-            <option value="starts_with">Commence par</option>
-            <option value="exact">Correspondance exacte</option>
+          <select
+            name="matchMode"
+            value={filters.matchMode}
+            onChange={handleChange}
+          >
+            <option value="contains">{t("matchContains")}</option>
+            <option value="starts_with">{t("matchStartsWith")}</option>
+            <option value="exact">{t("matchExact")}</option>
           </select>
 
-          <select name="category" value={filters.category} onChange={handleChange}>
-            <option value="">Toutes les catégories</option>
+          <select
+            name="category"
+            value={filters.category}
+            onChange={handleChange}
+          >
+            <option value="">{t("allCategories")}</option>
             {categoryOptions.map((category) => (
               <option key={category.id} value={category.slug}>
                 {category.name}
@@ -172,15 +184,15 @@ function SearchPage() {
           </select>
 
           <select name="sort" value={filters.sort} onChange={handleChange}>
-            <option value="priority">Priorité</option>
-            <option value="newest">Nouveautés</option>
-            <option value="oldest">Plus anciens</option>
-            <option value="price_asc">Prix croissant</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="name_asc">Nom A-Z</option>
-            <option value="name_desc">Nom Z-A</option>
-            <option value="stock_desc">Stock décroissant</option>
-            <option value="stock_asc">Stock croissant</option>
+            <option value="priority">{t("sortPriority")}</option>
+            <option value="newest">{t("sortNewest")}</option>
+            <option value="oldest">{t("sortOldest")}</option>
+            <option value="price_asc">{t("sortPriceAsc")}</option>
+            <option value="price_desc">{t("sortPriceDesc")}</option>
+            <option value="name_asc">{t("sortNameAsc")}</option>
+            <option value="name_desc">{t("sortNameDesc")}</option>
+            <option value="stock_desc">{t("sortStockDesc")}</option>
+            <option value="stock_asc">{t("sortStockAsc")}</option>
           </select>
 
           <select
@@ -188,15 +200,15 @@ function SearchPage() {
             value={filters.availability}
             onChange={handleChange}
           >
-            <option value="all">Toutes disponibilités</option>
-            <option value="in_stock">En stock</option>
-            <option value="out_of_stock">Rupture de stock</option>
+            <option value="all">{t("allAvailabilities")}</option>
+            <option value="in_stock">{t("inStock")}</option>
+            <option value="out_of_stock">{t("outOfStock")}</option>
           </select>
 
           <input
             type="number"
             name="minPriceCents"
-            placeholder="Prix min (centimes)"
+            placeholder={t("minPricePlaceholder")}
             value={filters.minPriceCents}
             onChange={handleChange}
             min="0"
@@ -205,19 +217,23 @@ function SearchPage() {
           <input
             type="number"
             name="maxPriceCents"
-            placeholder="Prix max (centimes)"
+            placeholder={t("maxPricePlaceholder")}
             value={filters.maxPriceCents}
             onChange={handleChange}
             min="0"
           />
 
-          <button type="button" className="btn btn-secondary" onClick={handleReset}>
-            Réinitialiser
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleReset}
+          >
+            {t("resetFilters")}
           </button>
         </div>
       </section>
 
-      {loading && <Loader text="Chargement des résultats..." />}
+      {loading && <Loader text={t("loadingCatalog")} />}
       {error && <ErrorMessage message={error} />}
 
       {!loading && !error && (
@@ -231,8 +247,8 @@ function SearchPage() {
               </div>
             ) : (
               <EmptyState
-                title="Aucun produit trouvé"
-                message="Essaie de modifier les filtres ou de faire une nouvelle recherche depuis la barre du haut."
+                title={t("noProductsFound")}
+                message={t("noProductsFoundMessage")}
               />
             )}
           </section>
@@ -248,4 +264,4 @@ function SearchPage() {
   );
 }
 
-export default SearchPage;
+export default CatalogPage;
