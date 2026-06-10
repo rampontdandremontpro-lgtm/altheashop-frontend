@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useI18n } from "../context/I18nContext";
 
@@ -7,21 +7,23 @@ const EMPTY_FORM = {
   firstName: "",
   lastName: "",
   email: "",
+  phone: "",
   password: "",
 };
 
 function RegisterPage() {
-  const navigate = useNavigate();
   const { register } = useAuth();
   const { t } = useI18n();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setForm(EMPTY_FORM);
     setError("");
+    setSuccess("");
   }, []);
 
   const handleChange = (e) => {
@@ -34,26 +36,37 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (!form.firstName || !form.lastName || !form.email || !form.password) {
       setError(t("registerRequiredFields"));
       return;
     }
 
+    if (form.phone.length !== 10) {
+    setError(t("phoneInvalid"));
+    return;
+  }
+
     try {
       setLoading(true);
 
       await register({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: form.password,
-      });
+  firstName: form.firstName,
+  lastName: form.lastName,
+  email: form.email,
+  phone: form.phone,
+  password: form.password,
+});
 
       setForm(EMPTY_FORM);
-      navigate("/");
+      setSuccess(t("emailConfirmationSent"));
     } catch (err) {
-      setError(err.message || t("registerError"));
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("registerError")
+      );
     } finally {
       setLoading(false);
     }
@@ -66,6 +79,7 @@ function RegisterPage() {
           <h1>{t("registerTitle")}</h1>
 
           {error && <div className="box error-box">{error}</div>}
+          {success && <div className="box success-box">{success}</div>}
 
           <form
             className="auth-form"
@@ -98,6 +112,20 @@ function RegisterPage() {
               onChange={handleChange}
               autoComplete="off"
             />
+
+            <input
+  type="tel"
+  name="phone"
+  placeholder={t("phone")}
+  value={form.phone}
+  onChange={(e) =>
+    setForm((prev) => ({
+      ...prev,
+      phone: e.target.value.replace(/\D/g, "").slice(0, 10),
+    }))
+  }
+  maxLength={10}
+/>
 
             <input
               type="password"

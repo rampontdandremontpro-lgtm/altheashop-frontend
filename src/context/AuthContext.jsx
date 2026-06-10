@@ -35,10 +35,9 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (payload) => {
-    const newUser = await registerApi(payload);
-    setUser(newUser);
-    return newUser;
-  };
+  const result = await registerApi(payload);
+  return result;
+};
 
   const logout = async () => {
     await logoutApi();

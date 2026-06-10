@@ -34,3 +34,7 @@
   color: var(--primary);
   font-weight: 700;
 }
+
+.auth-links .btn {
+  color: white;
+}

@@ -33,6 +33,15 @@ resetPasswordRequiredFields: "يرجى ملء الحقلين.",
 resetPasswordMismatch: "كلمتا المرور غير متطابقتين.",
 resetPasswordSuccess: "تمت إعادة تعيين كلمة المرور بنجاح.",
 resetPasswordError: "تعذر إعادة تعيين كلمة المرور.",
+emailConfirmationSent:
+  "تم إرسال بريد إلكتروني للتأكيد. يرجى التحقق من بريدك لتفعيل حسابك.",
+verifyEmailTitle: "تأكيد البريد الإلكتروني",
+verifyEmailLoading: "جارٍ تأكيد بريدك الإلكتروني...",
+verifyEmailSuccess:
+  "تم تأكيد بريدك الإلكتروني بنجاح. يمكنك الآن تسجيل الدخول.",
+verifyEmailError: "رابط التأكيد غير صالح أو منتهي الصلاحية.",
+verifyEmailMissingToken: "رابط التأكيد غير مكتمل.",
+goToLogin: "الذهاب إلى تسجيل الدخول",
 };
 
 export default auth;

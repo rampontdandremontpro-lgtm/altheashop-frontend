@@ -32,6 +32,15 @@ resetPasswordRequiredFields: "Merci de remplir les deux champs.",
 resetPasswordMismatch: "Les mots de passe ne correspondent pas.",
 resetPasswordSuccess: "Votre mot de passe a bien été réinitialisé.",
 resetPasswordError: "Impossible de réinitialiser le mot de passe.",
+emailConfirmationSent:
+  "Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte mail pour activer votre compte.",
+verifyEmailTitle: "Confirmation de l'email",
+verifyEmailLoading: "Validation de votre email...",
+verifyEmailSuccess:
+  "Votre adresse email a bien été confirmée. Vous pouvez maintenant vous connecter.",
+verifyEmailError: "Lien de confirmation invalide ou expiré.",
+verifyEmailMissingToken: "Lien de confirmation incomplet.",
+goToLogin: "Aller à la connexion",
 };
 
 export default auth;

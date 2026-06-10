@@ -32,6 +32,15 @@ resetPasswordRequiredFields: "Please fill in both fields.",
 resetPasswordMismatch: "Passwords do not match.",
 resetPasswordSuccess: "Your password has been reset successfully.",
 resetPasswordError: "Unable to reset password.",
+emailConfirmationSent:
+  "A confirmation email has been sent to you. Please check your inbox to activate your account.",
+verifyEmailTitle: "Email confirmation",
+verifyEmailLoading: "Confirming your email...",
+verifyEmailSuccess:
+  "Your email address has been confirmed. You can now log in.",
+verifyEmailError: "Invalid or expired confirmation link.",
+verifyEmailMissingToken: "Incomplete confirmation link.",
+goToLogin: "Go to login",
 };
 
 export default auth;

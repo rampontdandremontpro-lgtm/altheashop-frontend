@@ -40,6 +40,7 @@ import AdminOrderDetailPage from "../pages/admin/AdminOrderDetailPage";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import AdminUserEditPage from "../pages/admin/AdminUserEditPage";
 import AdminChatbotMessagesPage from "../pages/admin/AdminChatbotMessagesPage";
+import VerifyEmailPage from "../pages/VerifyEmailPage";
 
 function AppRouter() {
   return (
@@ -61,6 +62,7 @@ function AppRouter() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
+        <Route path="verify-email" element={<VerifyEmailPage />} />
         <Route path="account" element={<PrivateRoute><AccountPage /></PrivateRoute>} />
         <Route path="account/edit" element={<PrivateRoute> <AccountEditPage /></PrivateRoute>} />
         <Route path="orders" element={<PrivateRoute><OrdersPage /></PrivateRoute> } />

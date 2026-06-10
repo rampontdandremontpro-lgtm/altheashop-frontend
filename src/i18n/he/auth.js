@@ -32,6 +32,15 @@ resetPasswordRequiredFields: "נא למלא את שני השדות.",
 resetPasswordMismatch: "הסיסמאות אינן תואמות.",
 resetPasswordSuccess: "הסיסמה שלך אופסה בהצלחה.",
 resetPasswordError: "לא ניתן לאפס את הסיסמה.",
+emailConfirmationSent:
+  "נשלח אליך אימייל אישור. נא לבדוק את תיבת הדואר שלך כדי להפעיל את החשבון.",
+verifyEmailTitle: "אישור אימייל",
+verifyEmailLoading: "מאשר את האימייל שלך...",
+verifyEmailSuccess:
+  "כתובת האימייל שלך אושרה בהצלחה. כעת ניתן להתחבר.",
+verifyEmailError: "קישור האישור אינו תקין או שפג תוקפו.",
+verifyEmailMissingToken: "קישור האישור חסר.",
+goToLogin: "עבור להתחברות",
 };
 
 export default auth;

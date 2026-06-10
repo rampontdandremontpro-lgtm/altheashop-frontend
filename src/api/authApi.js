@@ -52,9 +52,8 @@ export async function register(payload) {
     confirmPassword: payload.confirmPassword,
   });
 
-  return saveAuthResponse(response.data);
+  return response.data;
 }
-
 export async function login(payload) {
   const response = await api.post("/auth/login", {
     email: payload.email,
@@ -95,6 +94,11 @@ export async function resetPassword(payload) {
     password: payload.password,
   });
 
+  return response.data;
+}
+
+export async function verifyEmail(token) {
+  const response = await api.get(`/auth/verify-email/${token}`);
   return response.data;
 }
 
