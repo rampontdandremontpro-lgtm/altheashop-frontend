@@ -114,6 +114,9 @@ securitySettingsDescription:
 notificationSettingsTitle: "Notifications",
 notificationSettingsDescription:
   "Notification preferences may be configured in a future update.",
+cardCvv: "CVV",
+cardCvvRequired: "Please enter the CVV.",
+cardCvvInvalid: "The CVV must contain 3 digits.",
 };
 
 export default account;

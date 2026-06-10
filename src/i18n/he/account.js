@@ -114,6 +114,9 @@ securitySettingsDescription:
 notificationSettingsTitle: "התראות",
 notificationSettingsDescription:
   "ניתן יהיה להגדיר העדפות התראה בעדכון עתידי.",
+cardCvv: "CVV",
+cardCvvRequired: "נא להזין את CVV.",
+cardCvvInvalid: "CVV חייב להכיל 3 ספרות.",
 };
 
 export default account;

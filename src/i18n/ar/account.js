@@ -116,6 +116,9 @@ securitySettingsDescription:
 notificationSettingsTitle: "الإشعارات",
 notificationSettingsDescription:
   "يمكن تكوين تفضيلات الإشعارات في تحديث مستقبلي.",
+cardCvv: "CVV",
+cardCvvRequired: "يرجى إدخال CVV.",
+cardCvvInvalid: "يجب أن يحتوي CVV على 3 أرقام.",
 };
 
 export default account;

@@ -105,7 +105,7 @@ function parseExpiry(expiry) {
 }
 
 export async function getPaymentMethods() {
-  const response = await api.get("/payment-methods");
+  const response = await api.get("/users/me/payment-methods");
 
   return Array.isArray(response.data)
     ? response.data.map(formatPaymentMethod).filter(Boolean)
@@ -113,14 +113,11 @@ export async function getPaymentMethods() {
 }
 
 export async function createPaymentMethod(payload) {
-  const { expiryMonth, expiryYear } = parseExpiry(payload.expiry);
-
-  const response = await api.post("/payment-methods", {
-    brand: payload.brand || "cb",
-    cardholderName: payload.cardName,
+  const response = await api.post("/users/me/payment-methods", {
+    cardName: payload.cardName,
     cardNumber: String(payload.cardNumber || "").replace(/\s+/g, ""),
-    expiryMonth,
-    expiryYear,
+    expiry: payload.expiry,
+    brand: payload.brand || "cb",
     isDefault: Boolean(payload.isDefault),
   });
 
@@ -128,14 +125,10 @@ export async function createPaymentMethod(payload) {
 }
 
 export async function updatePaymentMethod(id, payload) {
-  const { expiryMonth, expiryYear } = parseExpiry(payload.expiry);
-
-  const response = await api.patch(`/payment-methods/${id}`, {
+  const response = await api.patch(`/users/me/payment-methods/${id}`, {
+    cardName: payload.cardName,
+    expiry: payload.expiry,
     brand: payload.brand || "cb",
-    cardholderName: payload.cardName,
-    cardNumber: String(payload.cardNumber || "").replace(/\s+/g, ""),
-    expiryMonth,
-    expiryYear,
     isDefault: Boolean(payload.isDefault),
   });
 
@@ -143,11 +136,11 @@ export async function updatePaymentMethod(id, payload) {
 }
 
 export async function deletePaymentMethod(id) {
-  const response = await api.delete(`/payment-methods/${id}`);
+  const response = await api.delete(`/users/me/payment-methods/${id}`);
   return response.data;
 }
 
 export async function setDefaultPaymentMethod(id) {
-  const response = await api.patch(`/payment-methods/${id}/default`);
+  const response = await api.patch(`/users/me/payment-methods/${id}/default`);
   return formatPaymentMethod(response.data);
 }

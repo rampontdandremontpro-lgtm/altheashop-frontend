@@ -18,6 +18,7 @@ const CARD_BRANDS = [
 const EMPTY_FORM = {
   cardName: "",
   cardNumber: "",
+  cvv: "",
   expiry: "",
   brand: "cb",
   isDefault: false,
@@ -25,7 +26,12 @@ const EMPTY_FORM = {
 
 function normalizeCardNumber(value) {
   const digits = value.replace(/\D/g, "").slice(0, 16);
+
   return digits.replace(/(.{4})/g, "$1 ").trim();
+}
+
+function normalizeCvv(value) {
+  return value.replace(/\D/g, "").slice(0, 3);
 }
 
 function normalizeExpiry(value) {
@@ -107,6 +113,10 @@ function PaymentMethods() {
       nextValue = normalizeCardNumber(value);
     }
 
+    if (name === "cvv") {
+      nextValue = normalizeCvv(value);
+    }
+
     if (name === "expiry") {
       nextValue = normalizeExpiry(value);
 
@@ -129,6 +139,7 @@ function PaymentMethods() {
     setForm({
       cardName: method.cardName || method.cardholderName || "",
       cardNumber: "",
+      cvv: "",
       expiry: method.expiry || "",
       brand: method.brand || "cb",
       isDefault: Boolean(method.isDefault),
@@ -155,8 +166,18 @@ function PaymentMethods() {
       return;
     }
 
-    if (!form.cardNumber.trim()) {
-      setError(editingId ? t("cardNumberRequiredForEdit") : t("cardNumberRequired"));
+    if (!editingId && !form.cardNumber.trim()) {
+      setError(t("cardNumberRequired"));
+      return;
+    }
+
+    if (!editingId && !form.cvv.trim()) {
+      setError(t("cardCvvRequired"));
+      return;
+    }
+
+    if (!editingId && form.cvv.trim().length !== 3) {
+      setError(t("cardCvvInvalid"));
       return;
     }
 
@@ -305,15 +326,29 @@ function PaymentMethods() {
             onChange={handleChange}
           />
 
-          <input
-            type="text"
-            name="cardNumber"
-            placeholder={editingId ? t("reEnterCardNumber") : t("cardNumber")}
-            value={form.cardNumber}
-            onChange={handleChange}
-            inputMode="numeric"
-            maxLength={19}
-          />
+          {!editingId && (
+            <>
+              <input
+                type="text"
+                name="cardNumber"
+                placeholder={t("cardNumber")}
+                value={form.cardNumber}
+                onChange={handleChange}
+                inputMode="numeric"
+                maxLength={19}
+              />
+
+              <input
+                type="text"
+                name="cvv"
+                placeholder={t("cardCvv")}
+                value={form.cvv}
+                onChange={handleChange}
+                inputMode="numeric"
+                maxLength={3}
+              />
+            </>
+          )}
 
           <input
             type="text"

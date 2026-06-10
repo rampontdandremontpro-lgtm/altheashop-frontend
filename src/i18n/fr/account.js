@@ -118,6 +118,9 @@ securitySettingsDescription:
 notificationSettingsTitle: "Notifications",
 notificationSettingsDescription:
   "Les préférences de notification pourront être configurées dans une prochaine évolution.",
+  cardCvv: "CVV",
+cardCvvRequired: "Merci de saisir le CVV.",
+cardCvvInvalid: "Le CVV doit contenir 3 chiffres.",
 };
 
 export default account;
