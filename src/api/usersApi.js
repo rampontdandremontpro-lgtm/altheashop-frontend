@@ -1,30 +1,4 @@
 import api from "./axios";
-import { getStoredUser } from "./authApi";
-
-const PAYMENT_METHODS_PREFIX = "althea_payment_methods_";
-
-function getCurrentUserId() {
-  const user = getStoredUser();
-
-  if (!user?.id) {
-    throw new Error("Utilisateur non connecté.");
-  }
-
-  return user.id;
-}
-
-function getPaymentStorageKey() {
-  return `${PAYMENT_METHODS_PREFIX}${getCurrentUserId()}`;
-}
-
-function getPaymentMethodsStorage() {
-  const raw = localStorage.getItem(getPaymentStorageKey());
-  return raw ? JSON.parse(raw) : [];
-}
-
-function savePaymentMethodsStorage(methods) {
-  localStorage.setItem(getPaymentStorageKey(), JSON.stringify(methods));
-}
 
 export async function getProfile() {
   const response = await api.get("/users/me");
@@ -102,89 +76,78 @@ export async function deleteAddress(id) {
   return response.data;
 }
 
+function formatPaymentMethod(method) {
+  if (!method) return null;
+
+  const expiryMonth = String(method.expiryMonth || "").padStart(2, "0");
+  const expiryYear = String(method.expiryYear || "").slice(-2);
+
+  return {
+    id: method.id,
+    cardName: method.cardName || method.cardholderName || "",
+    cardholderName: method.cardholderName || method.cardName || "",
+    last4: method.last4 || "",
+    expiry: method.expiry || `${expiryMonth}/${expiryYear}`,
+    expiryMonth: method.expiryMonth,
+    expiryYear: method.expiryYear,
+    brand: method.brand || "cb",
+    isDefault: Boolean(method.isDefault),
+  };
+}
+
+function parseExpiry(expiry) {
+  const [month, year] = String(expiry || "").split("/");
+
+  return {
+    expiryMonth: Number(month),
+    expiryYear: Number(`20${year}`),
+  };
+}
+
 export async function getPaymentMethods() {
-  return getPaymentMethodsStorage();
+  const response = await api.get("/payment-methods");
+
+  return Array.isArray(response.data)
+    ? response.data.map(formatPaymentMethod).filter(Boolean)
+    : [];
 }
 
 export async function createPaymentMethod(payload) {
-  const methods = getPaymentMethodsStorage();
-  const digits = String(payload.cardNumber).replace(/\s+/g, "");
-  const last4 = digits.slice(-4);
+  const { expiryMonth, expiryYear } = parseExpiry(payload.expiry);
 
-  const newMethod = {
-    id: Date.now(),
-    cardName: payload.cardName,
-    last4,
-    expiry: payload.expiry,
+  const response = await api.post("/payment-methods", {
     brand: payload.brand || "cb",
+    cardholderName: payload.cardName,
+    cardNumber: String(payload.cardNumber || "").replace(/\s+/g, ""),
+    expiryMonth,
+    expiryYear,
     isDefault: Boolean(payload.isDefault),
-  };
+  });
 
-  let nextMethods = [...methods];
-
-  if (newMethod.isDefault || nextMethods.length === 0) {
-    nextMethods = nextMethods.map((method) => ({
-      ...method,
-      isDefault: false,
-    }));
-    newMethod.isDefault = true;
-  }
-
-  nextMethods.push(newMethod);
-  savePaymentMethodsStorage(nextMethods);
-
-  return newMethod;
+  return formatPaymentMethod(response.data);
 }
 
 export async function updatePaymentMethod(id, payload) {
-  const methods = getPaymentMethodsStorage();
-  const digits = String(payload.cardNumber).replace(/\s+/g, "");
-  const last4 = digits.slice(-4);
+  const { expiryMonth, expiryYear } = parseExpiry(payload.expiry);
 
-  let nextMethods = methods.map((method) =>
-    method.id === id
-      ? {
-          ...method,
-          cardName: payload.cardName,
-          last4,
-          expiry: payload.expiry,
-          brand: payload.brand || "cb",
-          isDefault: Boolean(payload.isDefault),
-        }
-      : method
-  );
+  const response = await api.patch(`/payment-methods/${id}`, {
+    brand: payload.brand || "cb",
+    cardholderName: payload.cardName,
+    cardNumber: String(payload.cardNumber || "").replace(/\s+/g, ""),
+    expiryMonth,
+    expiryYear,
+    isDefault: Boolean(payload.isDefault),
+  });
 
-  if (payload.isDefault) {
-    nextMethods = nextMethods.map((method) => ({
-      ...method,
-      isDefault: method.id === id,
-    }));
-  }
-
-  savePaymentMethodsStorage(nextMethods);
-
-  return nextMethods.find((method) => method.id === id);
+  return formatPaymentMethod(response.data);
 }
 
 export async function deletePaymentMethod(id) {
-  let nextMethods = getPaymentMethodsStorage().filter(
-    (method) => method.id !== id
-  );
-
-  if (nextMethods.length > 0 && !nextMethods.some((method) => method.isDefault)) {
-    nextMethods[0].isDefault = true;
-  }
-
-  savePaymentMethodsStorage(nextMethods);
-  return true;
+  const response = await api.delete(`/payment-methods/${id}`);
+  return response.data;
 }
 
 export async function setDefaultPaymentMethod(id) {
-  const nextMethods = getPaymentMethodsStorage().map((method) => ({
-    ...method,
-    isDefault: method.id === id,
-  }));
-
-  savePaymentMethodsStorage(nextMethods);
-  return true;
+  const response = await api.patch(`/payment-methods/${id}/default`);
+  return formatPaymentMethod(response.data);
 }

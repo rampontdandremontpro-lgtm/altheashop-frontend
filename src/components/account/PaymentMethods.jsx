@@ -76,10 +76,15 @@ function PaymentMethods() {
 
   const loadMethods = async () => {
     try {
+      setError("");
       const data = await getPaymentMethods();
       setMethods(data);
     } catch (err) {
-      setError(err.message || t("paymentMethodsLoadError"));
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("paymentMethodsLoadError")
+      );
     }
   };
 
@@ -122,7 +127,7 @@ function PaymentMethods() {
     setEditingId(method.id);
 
     setForm({
-      cardName: method.cardName || "",
+      cardName: method.cardName || method.cardholderName || "",
       cardNumber: "",
       expiry: method.expiry || "",
       brand: method.brand || "cb",
@@ -150,13 +155,8 @@ function PaymentMethods() {
       return;
     }
 
-    if (editingId && !form.cardNumber.trim()) {
-      setError(t("cardNumberRequiredForEdit"));
-      return;
-    }
-
-    if (!editingId && !form.cardNumber.trim()) {
-      setError(t("cardNumberRequired"));
+    if (!form.cardNumber.trim()) {
+      setError(editingId ? t("cardNumberRequiredForEdit") : t("cardNumberRequired"));
       return;
     }
 
@@ -177,7 +177,11 @@ function PaymentMethods() {
       resetForm();
       await loadMethods();
     } catch (err) {
-      setError(err.message || t("paymentMethodSaveError"));
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("paymentMethodSaveError")
+      );
     }
   };
 
@@ -187,6 +191,9 @@ function PaymentMethods() {
     if (!confirmed) return;
 
     try {
+      setError("");
+      setSuccess("");
+
       await deletePaymentMethod(id);
       setSuccess(t("paymentMethodDeleted"));
       await loadMethods();
@@ -195,17 +202,28 @@ function PaymentMethods() {
         resetForm();
       }
     } catch (err) {
-      setError(err.message || t("paymentMethodDeleteError"));
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("paymentMethodDeleteError")
+      );
     }
   };
 
   const handleSetDefault = async (id) => {
     try {
+      setError("");
+      setSuccess("");
+
       await setDefaultPaymentMethod(id);
       setSuccess(t("paymentDefaultUpdated"));
       await loadMethods();
     } catch (err) {
-      setError(err.message || t("paymentDefaultUpdateError"));
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("paymentDefaultUpdateError")
+      );
     }
   };
 
@@ -231,11 +249,13 @@ function PaymentMethods() {
                 <strong>{getBrandLabel(method.brand, t)}</strong>
 
                 {method.isDefault && (
-                  <span className="badge-default">{t("defaultPaymentMethod")}</span>
+                  <span className="badge-default">
+                    {t("defaultPaymentMethod")}
+                  </span>
                 )}
               </div>
 
-              <p>{method.cardName}</p>
+              <p>{method.cardName || method.cardholderName}</p>
               <p>**** **** **** {method.last4}</p>
               <p>
                 {t("expires")} : {method.expiry}
@@ -288,11 +308,11 @@ function PaymentMethods() {
           <input
             type="text"
             name="cardNumber"
-            placeholder={
-              editingId ? t("reEnterCardNumber") : t("cardNumber")
-            }
+            placeholder={editingId ? t("reEnterCardNumber") : t("cardNumber")}
             value={form.cardNumber}
             onChange={handleChange}
+            inputMode="numeric"
+            maxLength={19}
           />
 
           <input
@@ -301,6 +321,8 @@ function PaymentMethods() {
             placeholder={t("cardExpiryPlaceholder")}
             value={form.expiry}
             onChange={handleChange}
+            inputMode="numeric"
+            maxLength={5}
           />
 
           <select name="brand" value={form.brand} onChange={handleChange}>
