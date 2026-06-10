@@ -183,3 +183,20 @@
     font-size: 1.6rem;
   }
 }
+
+.home-carousel {
+  direction: ltr;
+  overflow: hidden;
+}
+
+.home-carousel-track {
+  direction: ltr;
+}
+
+.home-carousel-slide {
+  direction: ltr;
+}
+
+html[dir="rtl"] .home-carousel-overlay {
+  text-align: right;
+}

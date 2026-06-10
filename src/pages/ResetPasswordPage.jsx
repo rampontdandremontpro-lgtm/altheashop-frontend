@@ -1,63 +1,77 @@
-import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { resetPassword } from "../api/authApi";
+import { useI18n } from "../context/I18nContext";
 
 function ResetPasswordPage() {
-  const navigate = useNavigate();
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
 
   const token = searchParams.get("token");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!success) return;
+
+    const timer = setTimeout(() => {
+      setSuccess("");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [success]);
+
+  useEffect(() => {
+    if (!error) return;
+
+    const timer = setTimeout(() => {
+      setError("");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
     setSuccess("");
 
     if (!token) {
-      setError("Lien de réinitialisation invalide ou expiré.");
+      setError(t("resetPasswordMissingToken"));
       return;
     }
 
     if (!password || !confirmPassword) {
-      setError("Merci de remplir les deux champs.");
+      setError(t("resetPasswordRequiredFields"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t("resetPasswordMismatch"));
       return;
     }
 
     try {
       setLoading(true);
 
-      const result = await resetPassword({
+      await resetPassword({
         token,
         password,
       });
 
-      setSuccess(
-        result.message ||
-          "Votre mot de passe a bien été réinitialisé. Vous pouvez vous connecter."
-      );
-
+      setSuccess(t("resetPasswordSuccess"));
       setPassword("");
       setConfirmPassword("");
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de réinitialiser le mot de passe."
+          t("resetPasswordError")
       );
     } finally {
       setLoading(false);
@@ -68,46 +82,32 @@ function ResetPasswordPage() {
     <div className="page-stack">
       <section className="section auth-section">
         <div className="box auth-box">
-          <h1>Réinitialiser le mot de passe</h1>
+          <h1>{t("resetPasswordTitle")}</h1>
 
-          {!token && (
-            <div className="box error-box">
-              Lien de réinitialisation invalide ou expiré.
-            </div>
-          )}
+          <p>{t("resetPasswordDescription")}</p>
 
           {error && <div className="box error-box">{error}</div>}
           {success && <div className="box success-box">{success}</div>}
 
-          <form className="auth-form" onSubmit={handleSubmit} autoComplete="off">
+          <form className="auth-form" onSubmit={handleSubmit}>
             <input
               type="password"
-              placeholder="Nouveau mot de passe"
+              placeholder={t("newPassword")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
             />
 
             <input
               type="password"
-              placeholder="Confirmer le mot de passe"
+              placeholder={t("confirmNewPassword")}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
             />
 
-            <button
-              className="btn btn-primary"
-              type="submit"
-              disabled={loading || !token}
-            >
-              {loading ? "Réinitialisation..." : "Réinitialiser"}
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+              {loading ? t("resetPasswordLoading") : t("resetPasswordSubmit")}
             </button>
           </form>
-
-          <div className="auth-links">
-            <Link to="/login">Retour à la connexion</Link>
-          </div>
         </div>
       </section>
     </div>

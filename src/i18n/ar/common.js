@@ -76,6 +76,14 @@ const common = {
   termsEvolutionTitle: "تطور الخدمات",
   termsEvolutionText:
     "قد تتطور الوظائف وفقًا لتقدم الواجهة الأمامية والخلفية ومتطلبات المشروع.",
+    notFoundTitle: "الصفحة غير موجودة",
+notFoundMessage:
+  "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+backHome: "العودة إلى الصفحة الرئيسية",
+emptyStateTitle: "لا توجد نتائج",
+emptyStateMessage:
+  "لا يوجد أي عنصر لعرضه حالياً.",
+genericError: "حدث خطأ. يرجى المحاولة مرة أخرى لاحقًا.",
 };
 
 export default common;

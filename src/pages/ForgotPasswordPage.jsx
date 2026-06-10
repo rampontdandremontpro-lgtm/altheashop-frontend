@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { forgotPassword } from "../api/authApi";
 import { useI18n } from "../context/I18nContext";
 
@@ -10,8 +10,29 @@ function ForgotPasswordPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+  if (!success) return;
+
+  const timer = setTimeout(() => {
+    setSuccess("");
+  }, 5000);
+
+  return () => clearTimeout(timer);
+}, [success]);
+
+useEffect(() => {
+  if (!error) return;
+
+  const timer = setTimeout(() => {
+    setError("");
+  }, 5000);
+
+  return () => clearTimeout(timer);
+}, [error]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
     setSuccess("");
 
@@ -25,10 +46,7 @@ function ForgotPasswordPage() {
 
       const result = await forgotPassword(email);
 
-      setSuccess(
-        result.message || t("forgotPasswordSuccess")
-      );
-
+      setSuccess(t("forgotPasswordSuccess"));
       setEmail("");
     } catch (err) {
       setError(

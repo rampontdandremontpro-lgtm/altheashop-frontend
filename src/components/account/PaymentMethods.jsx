@@ -6,12 +6,13 @@ import {
   setDefaultPaymentMethod,
   updatePaymentMethod,
 } from "../../api/usersApi";
+import { useI18n } from "../../context/I18nContext";
 
 const CARD_BRANDS = [
-  { value: "cb", label: "💳 Carte bancaire" },
-  { value: "visa", label: "🟦 Visa" },
-  { value: "mastercard", label: "🟧 Mastercard" },
-  { value: "amex", label: "⬛ American Express" },
+  { value: "cb", labelKey: "cardBrandCb", icon: "💳" },
+  { value: "visa", labelKey: "cardBrandVisa", icon: "🟦" },
+  { value: "mastercard", labelKey: "cardBrandMastercard", icon: "🟧" },
+  { value: "amex", labelKey: "cardBrandAmex", icon: "⬛" },
 ];
 
 const EMPTY_FORM = {
@@ -53,11 +54,19 @@ function isExpiryValid(expiry) {
   return month >= currentMonth;
 }
 
-function getBrandLabel(brand) {
-  return CARD_BRANDS.find((item) => item.value === brand)?.label || "💳 Carte";
+function getBrandLabel(brand, t) {
+  const foundBrand = CARD_BRANDS.find((item) => item.value === brand);
+
+  if (!foundBrand) {
+    return `💳 ${t("cardBrandDefault")}`;
+  }
+
+  return `${foundBrand.icon} ${t(foundBrand.labelKey)}`;
 }
 
 function PaymentMethods() {
+  const { t } = useI18n();
+
   const [methods, setMethods] = useState([]);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
@@ -70,7 +79,7 @@ function PaymentMethods() {
       const data = await getPaymentMethods();
       setMethods(data);
     } catch (err) {
-      setError(err.message || "Impossible de charger les moyens de paiement.");
+      setError(err.message || t("paymentMethodsLoadError"));
     }
   };
 
@@ -97,11 +106,7 @@ function PaymentMethods() {
       nextValue = normalizeExpiry(value);
 
       if (nextValue.length === 5) {
-        setExpiryError(
-          isExpiryValid(nextValue)
-            ? ""
-            : "Cette carte est expirée ou la date est invalide."
-        );
+        setExpiryError(isExpiryValid(nextValue) ? "" : t("cardExpiryInvalid"));
       } else {
         setExpiryError("");
       }
@@ -115,6 +120,7 @@ function PaymentMethods() {
 
   const handleEdit = (method) => {
     setEditingId(method.id);
+
     setForm({
       cardName: method.cardName || "",
       cardNumber: "",
@@ -124,11 +130,7 @@ function PaymentMethods() {
     });
 
     if (method.expiry) {
-      setExpiryError(
-        isExpiryValid(method.expiry)
-          ? ""
-          : "Cette carte est expirée ou la date est invalide."
-      );
+      setExpiryError(isExpiryValid(method.expiry) ? "" : t("cardExpiryInvalid"));
     } else {
       setExpiryError("");
     }
@@ -139,95 +141,105 @@ function PaymentMethods() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
     setSuccess("");
 
     if (!form.cardName || !form.expiry || !form.brand) {
-      setError("Merci de remplir les champs obligatoires.");
+      setError(t("paymentRequiredFields"));
       return;
     }
 
     if (editingId && !form.cardNumber.trim()) {
-      setError("Merci de saisir à nouveau le numéro de carte pour la modification.");
+      setError(t("cardNumberRequiredForEdit"));
       return;
     }
 
     if (!editingId && !form.cardNumber.trim()) {
-      setError("Merci de saisir le numéro de carte.");
+      setError(t("cardNumberRequired"));
       return;
     }
 
     if (!isExpiryValid(form.expiry)) {
-      setError("La date d'expiration est invalide ou la carte est expirée.");
+      setError(t("cardExpiryInvalid"));
       return;
     }
 
     try {
       if (editingId) {
         await updatePaymentMethod(editingId, form);
-        setSuccess("Moyen de paiement mis à jour.");
+        setSuccess(t("paymentMethodUpdated"));
       } else {
         await createPaymentMethod(form);
-        setSuccess("Moyen de paiement ajouté.");
+        setSuccess(t("paymentMethodAdded"));
       }
 
       resetForm();
       await loadMethods();
     } catch (err) {
-      setError(err.message || "Impossible d'enregistrer le moyen de paiement.");
+      setError(err.message || t("paymentMethodSaveError"));
     }
   };
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm(t("paymentDeleteConfirm"));
+
+    if (!confirmed) return;
+
     try {
       await deletePaymentMethod(id);
-      setSuccess("Moyen de paiement supprimé.");
+      setSuccess(t("paymentMethodDeleted"));
       await loadMethods();
 
       if (editingId === id) {
         resetForm();
       }
     } catch (err) {
-      setError(err.message || "Impossible de supprimer le moyen de paiement.");
+      setError(err.message || t("paymentMethodDeleteError"));
     }
   };
 
   const handleSetDefault = async (id) => {
     try {
       await setDefaultPaymentMethod(id);
-      setSuccess("Méthode par défaut mise à jour.");
+      setSuccess(t("paymentDefaultUpdated"));
       await loadMethods();
     } catch (err) {
-      setError(err.message || "Impossible de mettre à jour la méthode par défaut.");
+      setError(err.message || t("paymentDefaultUpdateError"));
     }
   };
 
   const formTitle = useMemo(
-    () => (editingId ? "Modifier une carte" : "Ajouter une carte"),
-    [editingId]
+    () => (editingId ? t("editCard") : t("addCard")),
+    [editingId, t]
   );
 
   return (
     <div className="box">
-      <h2>Moyens de paiement</h2>
+      <h2>{t("paymentMethodsTitle")}</h2>
 
       {error && <div className="box error-box">{error}</div>}
       {success && <div className="box success-box">{success}</div>}
 
       <div className="account-cards-list">
         {methods.length === 0 ? (
-          <p>Aucun moyen de paiement enregistré.</p>
+          <p>{t("noPaymentMethodSaved")}</p>
         ) : (
           methods.map((method) => (
             <div key={method.id} className="account-card">
               <div className="account-card-head">
-                <strong>{getBrandLabel(method.brand)}</strong>
-                {method.isDefault && <span className="badge-default">Par défaut</span>}
+                <strong>{getBrandLabel(method.brand, t)}</strong>
+
+                {method.isDefault && (
+                  <span className="badge-default">{t("defaultPaymentMethod")}</span>
+                )}
               </div>
 
               <p>{method.cardName}</p>
               <p>**** **** **** {method.last4}</p>
-              <p>Expire : {method.expiry}</p>
+              <p>
+                {t("expires")} : {method.expiry}
+              </p>
 
               <div className="account-card-actions">
                 <button
@@ -235,7 +247,7 @@ function PaymentMethods() {
                   className="btn btn-secondary"
                   onClick={() => handleEdit(method)}
                 >
-                  Modifier
+                  {t("edit")}
                 </button>
 
                 {!method.isDefault && (
@@ -244,7 +256,7 @@ function PaymentMethods() {
                     className="btn btn-secondary"
                     onClick={() => handleSetDefault(method.id)}
                   >
-                    Définir par défaut
+                    {t("setDefault")}
                   </button>
                 )}
 
@@ -253,7 +265,7 @@ function PaymentMethods() {
                   className="btn btn-secondary"
                   onClick={() => handleDelete(method.id)}
                 >
-                  Supprimer
+                  {t("delete")}
                 </button>
               </div>
             </div>
@@ -268,7 +280,7 @@ function PaymentMethods() {
           <input
             type="text"
             name="cardName"
-            placeholder="Nom sur la carte"
+            placeholder={t("cardName")}
             value={form.cardName}
             onChange={handleChange}
           />
@@ -277,7 +289,7 @@ function PaymentMethods() {
             type="text"
             name="cardNumber"
             placeholder={
-              editingId ? "Ressaisir le numéro de carte" : "Numéro de carte"
+              editingId ? t("reEnterCardNumber") : t("cardNumber")
             }
             value={form.cardNumber}
             onChange={handleChange}
@@ -286,7 +298,7 @@ function PaymentMethods() {
           <input
             type="text"
             name="expiry"
-            placeholder="MM/AA"
+            placeholder={t("cardExpiryPlaceholder")}
             value={form.expiry}
             onChange={handleChange}
           />
@@ -294,7 +306,7 @@ function PaymentMethods() {
           <select name="brand" value={form.brand} onChange={handleChange}>
             {CARD_BRANDS.map((brand) => (
               <option key={brand.value} value={brand.value}>
-                {brand.label}
+                {brand.icon} {t(brand.labelKey)}
               </option>
             ))}
           </select>
@@ -306,7 +318,8 @@ function PaymentMethods() {
               checked={form.isDefault}
               onChange={handleChange}
             />
-            <span>Définir comme carte par défaut</span>
+
+            <span>{t("setAsDefaultCard")}</span>
           </label>
 
           {expiryError && (
@@ -315,7 +328,7 @@ function PaymentMethods() {
 
           <div className="account-form-actions">
             <button className="btn btn-primary" type="submit">
-              {editingId ? "Mettre à jour la carte" : "Ajouter la carte"}
+              {editingId ? t("updateCard") : t("addCardButton")}
             </button>
 
             {editingId && (
@@ -324,7 +337,7 @@ function PaymentMethods() {
                 className="btn btn-secondary"
                 onClick={resetForm}
               >
-                Annuler
+                {t("cancel")}
               </button>
             )}
           </div>

@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useI18n } from "../../context/I18nContext";
 
 function Carousel({ slides = [] }) {
+  const { t, dir } = useI18n();
+
   const activeSlides = slides.filter((slide) => slide.isActive !== false);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex >= activeSlides.length) {
+      setCurrentIndex(0);
+    }
+  }, [activeSlides.length, currentIndex]);
 
   useEffect(() => {
     if (activeSlides.length <= 1) return;
@@ -22,11 +31,8 @@ function Carousel({ slides = [] }) {
       <section className="section">
         <div className="hero">
           <p className="hero-kicker">Althea Shop</p>
-          <h1>Matériel médical professionnel</h1>
-          <p>
-            Découvrez notre sélection de produits pour les professionnels de
-            santé.
-          </p>
+          <h1>{t("homeDefaultHeroTitle")}</h1>
+          <p>{t("homeDefaultHeroSubtitle")}</p>
         </div>
       </section>
     );
@@ -46,7 +52,7 @@ function Carousel({ slides = [] }) {
 
   return (
     <section className="section">
-      <div className="home-carousel">
+      <div className="home-carousel" dir="ltr">
         <div
           className="home-carousel-track"
           style={{
@@ -58,14 +64,15 @@ function Carousel({ slides = [] }) {
               {slide.imageUrl && (
                 <img
                   src={slide.imageUrl}
-                  alt={slide.title}
+                  alt={slide.title || "Althea Shop"}
                   className="home-carousel-image"
                 />
               )}
 
-              <div className="home-carousel-overlay">
+              <div className="home-carousel-overlay" dir={dir}>
                 <p className="hero-kicker">Althea Shop</p>
-                <h1>{slide.title}</h1>
+
+                {slide.title && <h1>{slide.title}</h1>}
 
                 {slide.subtitle && <p>{slide.subtitle}</p>}
 
@@ -85,7 +92,7 @@ function Carousel({ slides = [] }) {
               type="button"
               className="carousel-arrow carousel-arrow-left"
               onClick={goPrevious}
-              aria-label="Slide précédent"
+              aria-label={t("previousSlide")}
             >
               <span>‹</span>
             </button>
@@ -94,7 +101,7 @@ function Carousel({ slides = [] }) {
               type="button"
               className="carousel-arrow carousel-arrow-right"
               onClick={goNext}
-              aria-label="Slide suivant"
+              aria-label={t("nextSlide")}
             >
               <span>›</span>
             </button>
@@ -106,7 +113,7 @@ function Carousel({ slides = [] }) {
                   type="button"
                   className={index === currentIndex ? "active" : ""}
                   onClick={() => setCurrentIndex(index)}
-                  aria-label={`Afficher le slide ${index + 1}`}
+                  aria-label={`${t("showSlide")} ${index + 1}`}
                 />
               ))}
             </div>

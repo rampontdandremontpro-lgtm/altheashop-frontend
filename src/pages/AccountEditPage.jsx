@@ -8,10 +8,12 @@ import AccountSidebar from "../components/account/AccountSidebar";
 import ProfileForm from "../components/account/ProfileForm";
 import AddressList from "../components/account/AddressList";
 import PaymentMethods from "../components/account/PaymentMethods";
+import { useI18n } from "../context/I18nContext";
 
 function AccountEditPage() {
   const navigate = useNavigate();
   const { logout, updateProfile } = useAuth();
+  const { t } = useI18n();
 
   const handleSaveProfile = async (formData) => {
     const updated = await updateProfileApi(formData);
@@ -40,8 +42,8 @@ function AccountEditPage() {
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Modifier mon compte</h1>
-            <p>Gérez vos informations personnelles, adresses et paiements.</p>
+            <h1>{t("editAccountTitle")}</h1>
+            <p>{t("editAccountSubtitle")}</p>
           </div>
         </div>
 

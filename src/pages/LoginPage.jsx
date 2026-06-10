@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useI18n } from "../context/I18nContext";
 
 const EMPTY_FORM = {
   email: "",
@@ -10,15 +11,18 @@ const EMPTY_FORM = {
 function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useI18n();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  
 
   useEffect(() => {
     setForm(EMPTY_FORM);
     setError("");
   }, []);
+  
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -32,7 +36,7 @@ function LoginPage() {
     setError("");
 
     if (!form.email || !form.password) {
-      setError("Merci de remplir votre email et votre mot de passe.");
+      setError(t("loginRequiredFields"));
       return;
     }
 
@@ -47,7 +51,7 @@ function LoginPage() {
       setForm(EMPTY_FORM);
       navigate("/");
     } catch (err) {
-      setError(err.message || "Impossible de se connecter.");
+      setError(err.message || t("loginError"));
     } finally {
       setLoading(false);
     }
@@ -57,7 +61,7 @@ function LoginPage() {
     <div className="page-stack">
       <section className="section auth-section">
         <div className="box auth-box">
-          <h1>Connexion</h1>
+          <h1>{t("loginTitle")}</h1>
 
           {error && <div className="box error-box">{error}</div>}
 
@@ -69,7 +73,7 @@ function LoginPage() {
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder={t("email")}
               value={form.email}
               onChange={handleChange}
               autoComplete="off"
@@ -78,20 +82,20 @@ function LoginPage() {
             <input
               type="password"
               name="password"
-              placeholder="Mot de passe"
+              placeholder={t("password")}
               value={form.password}
               onChange={handleChange}
               autoComplete="new-password"
             />
 
             <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? "Connexion..." : "Se connecter"}
+              {loading ? t("loginLoading") : t("loginSubmit")}
             </button>
           </form>
 
           <div className="auth-links">
-            <Link to="/forgot-password">Mot de passe oublié</Link>
-            <Link to="/register">Créer un compte</Link>
+            <Link to="/forgot-password">{t("forgotPasswordLink")}</Link>
+            <Link to="/register">{t("createAccountLink")}</Link>
           </div>
         </div>
       </section>

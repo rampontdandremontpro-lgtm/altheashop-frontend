@@ -1,5 +1,5 @@
 const checkout = {
-  checkoutTitle: "Checkout",
+  checkoutTitle: "Commande",
   connectedWith: "Connecté avec",
   loadingCheckout: "Chargement du checkout...",
   loginRequired: "Connexion requise",

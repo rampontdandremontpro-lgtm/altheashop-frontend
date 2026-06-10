@@ -76,6 +76,11 @@ const product = {
     "منتجات مشابهة",
   similarProductsDescription:
     "اكتشف منتجات أخرى من نفس الفئة.",
+  categoryTitle: "الفئة",
+categoryProductsLoadError:
+  "تعذر تحميل منتجات هذه الفئة.",
+sortRelevance: "الصلة",
+filter: "تصفية",
 };
 
 export default product;

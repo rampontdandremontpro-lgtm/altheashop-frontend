@@ -76,6 +76,14 @@ const common = {
   termsEvolutionTitle: "התפתחות השירותים",
   termsEvolutionText:
     "הפונקציונליות עשויה להתפתח בהתאם להתקדמות צד הלקוח, צד השרת ודרישות הפרויקט.",
+  notFoundTitle: "העמוד לא נמצא",
+notFoundMessage:
+  "העמוד שאתה מחפש אינו קיים או הועבר.",
+backHome: "חזרה לדף הבית",
+emptyStateTitle: "אין תוצאות",
+emptyStateMessage:
+  "אין פריטים להצגה כרגע.",
+genericError: "אירעה שגיאה. אנא נסה שוב מאוחר יותר.",
 };
 
 export default common;

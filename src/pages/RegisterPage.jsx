@@ -1,27 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
-function normalizePhone(value) {
-  return value.replace(/\D/g, "").slice(0, 10);
-}
-
-function isValidPhone(phone) {
-  return /^\d{10}$/.test(phone);
-}
+import { useI18n } from "../context/I18nContext";
 
 const EMPTY_FORM = {
   firstName: "",
   lastName: "",
   email: "",
-  phone: "",
   password: "",
-  confirmPassword: "",
 };
 
 function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { t } = useI18n();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState("");
@@ -33,17 +25,9 @@ function RegisterPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    let nextValue = value;
-
-    if (name === "phone") {
-      nextValue = normalizePhone(value);
-    }
-
     setForm((prev) => ({
       ...prev,
-      [name]: nextValue,
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -51,25 +35,8 @@ function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.email ||
-      !form.phone ||
-      !form.password ||
-      !form.confirmPassword
-    ) {
-      setError("Merci de remplir tous les champs obligatoires.");
-      return;
-    }
-
-    if (!isValidPhone(form.phone)) {
-      setError("Le numéro de téléphone doit contenir exactement 10 chiffres.");
-      return;
-    }
-
-    if (form.password !== form.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+    if (!form.firstName || !form.lastName || !form.email || !form.password) {
+      setError(t("registerRequiredFields"));
       return;
     }
 
@@ -77,18 +44,16 @@ function RegisterPage() {
       setLoading(true);
 
       await register({
-  firstName: form.firstName,
-  lastName: form.lastName,
-  email: form.email,
-  phone: form.phone,
-  password: form.password,
-  confirmPassword: form.confirmPassword,
-});
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        password: form.password,
+      });
 
       setForm(EMPTY_FORM);
-      navigate("/account");
+      navigate("/");
     } catch (err) {
-      setError(err.message || "Impossible de créer le compte.");
+      setError(err.message || t("registerError"));
     } finally {
       setLoading(false);
     }
@@ -98,7 +63,7 @@ function RegisterPage() {
     <div className="page-stack">
       <section className="section auth-section">
         <div className="box auth-box">
-          <h1>Créer un compte</h1>
+          <h1>{t("registerTitle")}</h1>
 
           {error && <div className="box error-box">{error}</div>}
 
@@ -110,7 +75,7 @@ function RegisterPage() {
             <input
               type="text"
               name="firstName"
-              placeholder="Prénom"
+              placeholder={t("firstName")}
               value={form.firstName}
               onChange={handleChange}
               autoComplete="off"
@@ -119,7 +84,7 @@ function RegisterPage() {
             <input
               type="text"
               name="lastName"
-              placeholder="Nom"
+              placeholder={t("lastName")}
               value={form.lastName}
               onChange={handleChange}
               autoComplete="off"
@@ -128,48 +93,28 @@ function RegisterPage() {
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder={t("email")}
               value={form.email}
               onChange={handleChange}
               autoComplete="off"
             />
 
             <input
-              type="text"
-              name="phone"
-              placeholder="Téléphone"
-              value={form.phone}
-              onChange={handleChange}
-              inputMode="numeric"
-              maxLength={10}
-              autoComplete="off"
-            />
-
-            <input
               type="password"
               name="password"
-              placeholder="Mot de passe"
+              placeholder={t("password")}
               value={form.password}
               onChange={handleChange}
               autoComplete="new-password"
             />
 
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirmer le mot de passe"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              autoComplete="new-password"
-            />
-
             <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? "Création..." : "Créer mon compte"}
+              {loading ? t("registerLoading") : t("registerSubmit")}
             </button>
           </form>
 
           <div className="auth-links">
-            <Link to="/login">J'ai déjà un compte</Link>
+            <Link to="/login">{t("alreadyHaveAccount")}</Link>
           </div>
         </div>
       </section>

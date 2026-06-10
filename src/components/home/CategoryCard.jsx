@@ -1,11 +1,17 @@
 import { Link } from "react-router-dom";
+import { useI18n } from "../../context/I18nContext";
 
 function CategoryCard({ category }) {
+  const { t } = useI18n();
+
   return (
     <Link to={`/categories/${category.slug}`} className="card">
       <div className="card-image-wrapper">
         <img
-          src={category.imageUrl || "https://placehold.co/600x400?text=Categorie"}
+          src={
+            category.imageUrl ||
+            "https://placehold.co/600x400?text=Categorie"
+          }
           alt={category.name}
           className="card-image"
         />
@@ -13,7 +19,7 @@ function CategoryCard({ category }) {
 
       <div className="card-body">
         <h3>{category.name}</h3>
-        <p>{category.description || "Découvrir cette catégorie"}</p>
+        <p>{category.description || t("discoverCategory")}</p>
       </div>
     </Link>
   );

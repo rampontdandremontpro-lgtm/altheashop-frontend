@@ -5,8 +5,11 @@ import ErrorMessage from "../components/common/ErrorMessage";
 import Carousel from "../components/home/Carousel";
 import CategoryCard from "../components/home/CategoryCard";
 import ProductCard from "../components/catalog/ProductCard";
+import { useI18n } from "../context/I18nContext";
 
 function HomePage() {
+  const { t } = useI18n();
+
   const [data, setData] = useState({
     slides: [],
     homeText: "",
@@ -26,16 +29,16 @@ function HomePage() {
         const result = await getPublicHomeData();
         setData(result);
       } catch {
-        setError("Impossible de charger la page d'accueil.");
+        setError(t("homeLoadError"));
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, []);
+  }, [t]);
 
-  if (loading) return <Loader text="Chargement de l'accueil..." />;
+  if (loading) return <Loader text={t("homeLoading")} />;
   if (error) return <ErrorMessage message={error} />;
 
   return (
@@ -44,7 +47,7 @@ function HomePage() {
 
       {data.homeText && (
         <section className="section">
-          <h2>Présentation</h2>
+          <h2>{t("homePresentationTitle")}</h2>
           <div className="box">
             <p>{data.homeText}</p>
           </div>
@@ -52,10 +55,10 @@ function HomePage() {
       )}
 
       <section className="section">
-        <h2>Catégories</h2>
+        <h2>{t("homeCategoriesTitle")}</h2>
 
         {data.categories.length === 0 ? (
-          <div className="box">Aucune catégorie disponible.</div>
+          <div className="box">{t("homeNoCategories")}</div>
         ) : (
           <div className="grid cards-grid">
             {data.categories.map((category) => (
@@ -66,10 +69,10 @@ function HomePage() {
       </section>
 
       <section className="section">
-        <h2>Produits mis en avant</h2>
+        <h2>{t("homeFeaturedTitle")}</h2>
 
         {data.featured.length === 0 ? (
-          <div className="box">Aucun produit mis en avant.</div>
+          <div className="box">{t("homeNoFeaturedProducts")}</div>
         ) : (
           <div className="grid cards-grid">
             {data.featured.map((product) => (

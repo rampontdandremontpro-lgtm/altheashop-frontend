@@ -1,0 +1,37 @@
+const auth = {
+  password: "סיסמה",
+  loginTitle: "התחברות",
+  loginSubmit: "התחבר",
+  loginLoading: "מתחבר...",
+  loginRequiredFields: "נא להזין אימייל וסיסמה.",
+  loginError: "לא ניתן להתחבר.",
+  forgotPasswordLink: "שכחתי סיסמה",
+  createAccountLink: "צור חשבון",
+  registerTitle: "צור חשבון",
+registerSubmit: "הרשמה",
+registerLoading: "נרשם...",
+registerRequiredFields: "נא למלא את כל השדות.",
+registerError: "לא ניתן ליצור חשבון.",
+alreadyHaveAccount: "כבר יש לך חשבון? התחבר",
+forgotPasswordTitle: "שכחתי סיסמה",
+forgotPasswordDescription:
+  "הזן את כתובת האימייל שלך. אם קיים חשבון עם כתובת זו, יישלח אליך קישור לאיפוס הסיסמה.",
+forgotPasswordEmailRequired: "נא להזין את האימייל שלך.",
+forgotPasswordSuccess:
+  "אם קיים חשבון עם כתובת האימייל הזו, נשלח קישור לאיפוס הסיסמה.",
+forgotPasswordError: "לא ניתן לטפל בבקשה.",
+resetPasswordTitle: "איפוס סיסמה",
+resetPasswordDescription:
+  "בחר סיסמה חדשה לחשבון שלך.",
+newPassword: "סיסמה חדשה",
+confirmNewPassword: "אשר סיסמה חדשה",
+resetPasswordSubmit: "אפס סיסמה",
+resetPasswordLoading: "מאפס...",
+resetPasswordMissingToken: "קישור האיפוס אינו תקין או שפג תוקפו.",
+resetPasswordRequiredFields: "נא למלא את שני השדות.",
+resetPasswordMismatch: "הסיסמאות אינן תואמות.",
+resetPasswordSuccess: "הסיסמה שלך אופסה בהצלחה.",
+resetPasswordError: "לא ניתן לאפס את הסיסמה.",
+};
+
+export default auth;

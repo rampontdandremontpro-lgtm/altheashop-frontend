@@ -53,6 +53,11 @@ const product = {
   similarProducts: "מוצרים דומים",
   similarProductsDescription:
     "גלה מוצרים נוספים מאותה קטגוריה.",
+    categoryTitle: "الفئة",
+categoryProductsLoadError:
+  "تعذر تحميل منتجات هذه الفئة.",
+sortRelevance: "الصلة",
+filter: "تصفية",
 };
 
 export default product;

@@ -1,0 +1,37 @@
+const auth = {
+  password: "Mot de passe",
+  loginTitle: "Connexion",
+  loginSubmit: "Se connecter",
+  loginLoading: "Connexion...",
+  loginRequiredFields: "Merci de remplir votre email et votre mot de passe.",
+  loginError: "Impossible de se connecter.",
+  forgotPasswordLink: "Mot de passe oublié",
+  createAccountLink: "Créer un compte",
+  registerTitle: "Créer un compte",
+registerSubmit: "S'inscrire",
+registerLoading: "Inscription...",
+registerRequiredFields: "Merci de remplir tous les champs.",
+registerError: "Impossible de créer le compte.",
+alreadyHaveAccount: "Déjà un compte ? Se connecter",
+forgotPasswordTitle: "Mot de passe oublié",
+forgotPasswordDescription:
+  "Saisissez votre adresse email. Si un compte existe avec cette adresse, vous recevrez un lien pour réinitialiser votre mot de passe.",
+forgotPasswordEmailRequired: "Merci de saisir votre email.",
+forgotPasswordSuccess:
+  "Si un compte existe avec cette adresse email, un lien de réinitialisation a été envoyé.",
+forgotPasswordError: "Impossible de traiter la demande.",
+resetPasswordTitle: "Réinitialiser le mot de passe",
+resetPasswordDescription:
+  "Choisissez un nouveau mot de passe pour votre compte.",
+newPassword: "Nouveau mot de passe",
+confirmNewPassword: "Confirmer le nouveau mot de passe",
+resetPasswordSubmit: "Réinitialiser",
+resetPasswordLoading: "Réinitialisation...",
+resetPasswordMissingToken: "Lien de réinitialisation invalide ou expiré.",
+resetPasswordRequiredFields: "Merci de remplir les deux champs.",
+resetPasswordMismatch: "Les mots de passe ne correspondent pas.",
+resetPasswordSuccess: "Votre mot de passe a bien été réinitialisé.",
+resetPasswordError: "Impossible de réinitialiser le mot de passe.",
+};
+
+export default auth;

@@ -5,6 +5,7 @@ import {
   getAddresses,
   updateAddress,
 } from "../../api/usersApi";
+import { useI18n } from "../../context/I18nContext";
 
 const EMPTY_FORM = {
   firstName: "",
@@ -36,6 +37,8 @@ function isValidPostalCode(postalCode) {
 }
 
 function AddressList() {
+  const { t } = useI18n();
+
   const [addresses, setAddresses] = useState([]);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
@@ -47,7 +50,7 @@ function AddressList() {
       const data = await getAddresses();
       setAddresses(data);
     } catch (err) {
-      setError(err.message || "Impossible de charger les adresses.");
+      setError(err.message || t("addressesLoadError"));
     }
   };
 
@@ -81,6 +84,7 @@ function AddressList() {
 
   const handleEdit = (address) => {
     setEditingId(address.id);
+
     setForm({
       firstName: address.firstName || "",
       lastName: address.lastName || "",
@@ -93,23 +97,34 @@ function AddressList() {
       phone: address.phone || "",
       isDefault: Boolean(address.isDefault),
     });
+
     setError("");
     setSuccess("");
   };
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm(t("addressDeleteConfirm"));
+
+    if (!confirmed) return;
+
     try {
+      setError("");
+      setSuccess("");
+
       await deleteAddress(id);
       await loadAddresses();
-      setSuccess("Adresse supprimée.");
+
+      setSuccess(t("addressDeleted"));
+
       if (editingId === id) resetForm();
     } catch (err) {
-      setError(err.message || "Impossible de supprimer l'adresse.");
+      setError(err.message || t("addressDeleteError"));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
     setSuccess("");
 
@@ -122,48 +137,46 @@ function AddressList() {
       !form.country ||
       !form.phone
     ) {
-      setError("Merci de remplir les champs obligatoires.");
+      setError(t("addressRequiredFields"));
       return;
     }
 
     if (!isValidPostalCode(form.postalCode)) {
-      setError("Le code postal doit contenir exactement 5 chiffres.");
+      setError(t("addressInvalidPostalCode"));
       return;
     }
 
     if (!isValidPhone(form.phone)) {
-      setError(
-        "Le numéro de téléphone doit contenir exactement 10 chiffres."
-      );
+      setError(t("addressInvalidPhone"));
       return;
     }
 
     try {
       if (editingId) {
         await updateAddress(editingId, form);
-        setSuccess("Adresse mise à jour.");
+        setSuccess(t("addressUpdated"));
       } else {
         await createAddress(form);
-        setSuccess("Adresse ajoutée.");
+        setSuccess(t("addressAdded"));
       }
 
       resetForm();
       await loadAddresses();
     } catch (err) {
-      setError(err.message || "Impossible d'enregistrer l'adresse.");
+      setError(err.message || t("addressSaveError"));
     }
   };
 
   return (
     <div className="box">
-      <h2>Adresses</h2>
+      <h2>{t("addressesTitle")}</h2>
 
       {error && <div className="box error-box">{error}</div>}
       {success && <div className="box success-box">{success}</div>}
 
       <div className="account-cards-list">
         {addresses.length === 0 ? (
-          <p>Aucune adresse enregistrée.</p>
+          <p>{t("noAddressSaved")}</p>
         ) : (
           addresses.map((address) => (
             <div key={address.id} className="account-card">
@@ -171,14 +184,19 @@ function AddressList() {
                 <strong>
                   {address.firstName} {address.lastName}
                 </strong>
-                {address.isDefault && <span className="badge-default">Par défaut</span>}
+
+                {address.isDefault && (
+                  <span className="badge-default">{t("defaultAddress")}</span>
+                )}
               </div>
 
               <p>{address.addressLine1}</p>
               {address.addressLine2 && <p>{address.addressLine2}</p>}
+
               <p>
                 {address.postalCode} {address.city}
               </p>
+
               {address.region && <p>{address.region}</p>}
               <p>{address.country}</p>
               {address.phone && <p>{address.phone}</p>}
@@ -189,14 +207,15 @@ function AddressList() {
                   className="btn btn-secondary"
                   onClick={() => handleEdit(address)}
                 >
-                  Modifier
+                  {t("edit")}
                 </button>
+
                 <button
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => handleDelete(address.id)}
                 >
-                  Supprimer
+                  {t("delete")}
                 </button>
               </div>
             </div>
@@ -205,71 +224,79 @@ function AddressList() {
       </div>
 
       <div className="detail-box">
-        <h3>{editingId ? "Modifier l'adresse" : "Ajouter une adresse"}</h3>
+        <h3>{editingId ? t("editAddress") : t("addAddressTitle")}</h3>
 
         <form className="account-form-grid" onSubmit={handleSubmit}>
           <input
             type="text"
             name="firstName"
-            placeholder="Prénom"
+            placeholder={t("firstName")}
             value={form.firstName}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="lastName"
-            placeholder="Nom"
+            placeholder={t("lastName")}
             value={form.lastName}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="addressLine1"
-            placeholder="Adresse 1"
+            placeholder={t("addressLine1")}
             value={form.addressLine1}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="addressLine2"
-            placeholder="Adresse 2"
+            placeholder={t("addressLine2")}
             value={form.addressLine2}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="city"
-            placeholder="Ville"
+            placeholder={t("city")}
             value={form.city}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="region"
-            placeholder="Région"
+            placeholder={t("region")}
             value={form.region}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="postalCode"
-            placeholder="Code postal"
+            placeholder={t("postalCode")}
             value={form.postalCode}
             onChange={handleChange}
             inputMode="numeric"
             maxLength={5}
           />
+
           <input
             type="text"
             name="country"
-            placeholder="Pays"
+            placeholder={t("country")}
             value={form.country}
             onChange={handleChange}
           />
+
           <input
             type="text"
             name="phone"
-            placeholder="Téléphone"
+            placeholder={t("phone")}
             value={form.phone}
             onChange={handleChange}
             inputMode="numeric"
@@ -283,12 +310,13 @@ function AddressList() {
               checked={form.isDefault}
               onChange={handleChange}
             />
-            <span>Définir comme adresse par défaut</span>
+
+            <span>{t("setAsDefaultAddress")}</span>
           </label>
 
           <div className="account-form-actions">
             <button className="btn btn-primary" type="submit">
-              {editingId ? "Mettre à jour" : "Ajouter"}
+              {editingId ? t("update") : t("add")}
             </button>
 
             {editingId && (
@@ -297,7 +325,7 @@ function AddressList() {
                 className="btn btn-secondary"
                 onClick={resetForm}
               >
-                Annuler
+                {t("cancel")}
               </button>
             )}
           </div>

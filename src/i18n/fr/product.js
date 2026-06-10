@@ -53,6 +53,11 @@ const product = {
   similarProducts: "Produits similaires",
   similarProductsDescription:
     "Découvrez d’autres produits de la même catégorie.",
+  categoryTitle: "Catégorie",
+categoryProductsLoadError:
+  "Impossible de charger les produits de cette catégorie.",
+sortRelevance: "Pertinence",
+filter: "Filtrer",
 };
 
 export default product;

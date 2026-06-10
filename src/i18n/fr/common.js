@@ -76,6 +76,14 @@ const common = {
   termsEvolutionTitle: "Évolution des services",
   termsEvolutionText:
     "Les fonctionnalités peuvent évoluer selon l’avancement du frontend, du backend et du cahier des charges.",
+  notFoundTitle: "Page introuvable",
+notFoundMessage:
+  "La page que vous recherchez n'existe pas ou a été déplacée.",
+backHome: "Retour à l'accueil",
+emptyStateTitle: "Aucun résultat",
+emptyStateMessage:
+  "Aucun élément à afficher pour le moment.",
+  genericError: "Une erreur est survenue. Veuillez réessayer plus tard.",
 };
 
 export default common;

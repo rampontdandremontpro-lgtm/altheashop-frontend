@@ -1,3 +1,5 @@
+import { useI18n } from "../../context/I18nContext";
+
 function ProductFilters({
   search,
   setSearch,
@@ -8,22 +10,24 @@ function ProductFilters({
   onSubmit,
   onReset,
 }) {
+  const { t } = useI18n();
+
   return (
     <form className="filters" onSubmit={onSubmit}>
       <input
         type="text"
-        placeholder="Rechercher un produit..."
+        placeholder={t("searchPlaceholder")}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
       <select value={sort} onChange={(e) => setSort(e.target.value)}>
-        <option value="relevance">Pertinence</option>
-        <option value="priority">Priorité</option>
-        <option value="price_asc">Prix croissant</option>
-        <option value="price_desc">Prix décroissant</option>
-        <option value="name_asc">Nom A-Z</option>
-        <option value="name_desc">Nom Z-A</option>
+        <option value="relevance">{t("sortRelevance")}</option>
+        <option value="priority">{t("sortPriority")}</option>
+        <option value="price_asc">{t("sortPriceAsc")}</option>
+        <option value="price_desc">{t("sortPriceDesc")}</option>
+        <option value="name_asc">{t("sortNameAsc")}</option>
+        <option value="name_desc">{t("sortNameDesc")}</option>
       </select>
 
       <label className="checkbox-inline">
@@ -32,15 +36,15 @@ function ProductFilters({
           checked={inStock}
           onChange={(e) => setInStock(e.target.checked)}
         />
-        En stock
+        {t("inStock")}
       </label>
 
       <button type="submit" className="btn btn-primary">
-        Filtrer
+        {t("filter")}
       </button>
 
       <button type="button" className="btn btn-secondary" onClick={onReset}>
-        Réinitialiser
+        {t("resetFilters")}
       </button>
     </form>
   );

@@ -1,0 +1,123 @@
+const account = {
+  accountTitle: "Mon compte",
+  accountWelcome: "Bienvenue",
+  personalInformation: "Informations personnelles",
+  phone: "Téléphone",
+  edit: "Modifier",
+  customerArea: "Espace client",
+  myProfile: "Mon profil",
+  myOrders: "Mes commandes",
+  editAccountTitle: "Modifier mon compte",
+editAccountSubtitle:
+  "Gérez vos informations personnelles, adresses et paiements.",
+profileRequiredFields:
+  "Le prénom, le nom, l'email et le téléphone sont obligatoires.",
+profileInvalidPhone:
+  "Le numéro de téléphone doit contenir exactement 10 chiffres.",
+profileCurrentPasswordRequired:
+  "Pour modifier votre email, merci de renseigner votre mot de passe actuel.",
+profileUpdateSuccess: "Informations personnelles mises à jour.",
+profileUpdateError: "Impossible de mettre à jour le profil.",
+currentPasswordRequiredForEmail:
+  "Mot de passe actuel obligatoire pour modifier l'email",
+emailChangeSecurityHelp:
+  "Pour votre sécurité, le mot de passe actuel est demandé lorsque vous changez votre email.",
+saving: "Enregistrement...",
+saveChanges: "Enregistrer les modifications",
+cancel: "Annuler",
+deleting: "Suppression...",
+deleteAccount: "Supprimer le compte",
+deleteAccountFirstConfirm:
+  "Êtes-vous sûre de vouloir supprimer votre compte ? Cette action est irréversible.",
+deleteAccountSecondConfirm:
+  "Dernière confirmation : votre compte sera désactivé définitivement.",
+deleteAccountError: "Impossible de supprimer le compte.",
+currentPassword: "Mot de passe actuel",
+changePasswordTitle: "Modifier le mot de passe",
+passwordRequiredFields:
+  "Merci de remplir tous les champs du mot de passe.",
+passwordTooShort:
+  "Le nouveau mot de passe doit contenir au moins 6 caractères.",
+passwordMismatch: "Les nouveaux mots de passe ne correspondent pas.",
+passwordUpdateSuccess: "Mot de passe modifié avec succès.",
+passwordUpdateError: "Impossible de modifier le mot de passe.",
+passwordChanging: "Modification...",
+changePassword: "Modifier le mot de passe",
+addressesTitle: "Adresses",
+noAddressSaved: "Aucune adresse enregistrée.",
+defaultAddress: "Par défaut",
+editAddress: "Modifier l'adresse",
+addAddressTitle: "Ajouter une adresse",
+add: "Ajouter",
+update: "Mettre à jour",
+delete: "Supprimer",
+addressesLoadError: "Impossible de charger les adresses.",
+addressAdded: "Adresse ajoutée.",
+addressUpdated: "Adresse mise à jour.",
+addressDeleted: "Adresse supprimée.",
+addressSaveError: "Impossible d'enregistrer l'adresse.",
+addressDeleteError: "Impossible de supprimer l'adresse.",
+addressDeleteConfirm: "Voulez-vous vraiment supprimer cette adresse ?",
+addressLine1: "Adresse 1",
+addressLine2: "Adresse 2",
+city: "Ville",
+region: "Région",
+postalCode: "Code postal",
+country: "Pays",
+setAsDefaultAddress: "Définir comme adresse par défaut",
+addressRequiredFields: "Merci de remplir les champs obligatoires.",
+addressInvalidPostalCode:
+  "Le code postal doit contenir exactement 5 chiffres.",
+addressInvalidPhone:
+  "Le numéro de téléphone doit contenir exactement 10 chiffres.",
+paymentMethodsTitle: "Moyens de paiement",
+noPaymentMethodSaved: "Aucun moyen de paiement enregistré.",
+defaultPaymentMethod: "Par défaut",
+editCard: "Modifier une carte",
+addCard: "Ajouter une carte",
+cardName: "Nom sur la carte",
+cardNumber: "Numéro de carte",
+reEnterCardNumber: "Ressaisir le numéro de carte",
+cardExpiryPlaceholder: "MM/AA",
+setAsDefaultCard: "Définir comme carte par défaut",
+addCardButton: "Ajouter la carte",
+updateCard: "Mettre à jour la carte",
+setDefault: "Définir par défaut",
+expires: "Expire",
+cardBrandDefault: "Carte",
+cardBrandCb: "Carte bancaire",
+cardBrandVisa: "Visa",
+cardBrandMastercard: "Mastercard",
+cardBrandAmex: "American Express",
+paymentMethodsLoadError: "Impossible de charger les moyens de paiement.",
+paymentRequiredFields: "Merci de remplir les champs obligatoires.",
+cardNumberRequiredForEdit:
+  "Merci de saisir à nouveau le numéro de carte pour la modification.",
+cardNumberRequired: "Merci de saisir le numéro de carte.",
+cardExpiryInvalid: "La date d'expiration est invalide ou la carte est expirée.",
+paymentMethodUpdated: "Moyen de paiement mis à jour.",
+paymentMethodAdded: "Moyen de paiement ajouté.",
+paymentMethodDeleted: "Moyen de paiement supprimé.",
+paymentDefaultUpdated: "Méthode par défaut mise à jour.",
+paymentMethodSaveError: "Impossible d'enregistrer le moyen de paiement.",
+paymentMethodDeleteError: "Impossible de supprimer le moyen de paiement.",
+paymentDefaultUpdateError:
+  "Impossible de mettre à jour la méthode par défaut.",
+paymentDeleteConfirm:
+  "Voulez-vous vraiment supprimer ce moyen de paiement ?",
+settingsTitle: "Paramètres",
+settingsSubtitle:
+  "Gérez vos préférences de langue, de sécurité et de notifications.",
+languageSettingsTitle: "Langue",
+languageSettingsDescription:
+  "Choisissez la langue d'affichage de l'interface.",
+chooseLanguage: "Langue de l'interface",
+securitySettingsTitle: "Sécurité",
+securitySettingsDescription:
+  "La sécurité du compte est gérée depuis les informations personnelles et le changement de mot de passe.",
+notificationSettingsTitle: "Notifications",
+notificationSettingsDescription:
+  "Les préférences de notification pourront être configurées dans une prochaine évolution.",
+};
+
+export default account;

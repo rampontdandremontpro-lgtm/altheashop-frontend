@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { changePassword } from "../../api/usersApi";
+import { useI18n } from "../../context/I18nContext";
 
 function normalizePhone(value) {
   return value.replace(/\D/g, "").slice(0, 10);
@@ -12,6 +13,7 @@ function isValidPhone(phone) {
 
 function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
   const { user } = useAuth();
+  const { t } = useI18n();
 
   const [form, setForm] = useState({
     firstName: user?.firstName || "",
@@ -67,19 +69,17 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
     setError("");
 
     if (!form.firstName || !form.lastName || !form.email || !form.phone) {
-      setError("Le prénom, le nom, l'email et le téléphone sont obligatoires.");
+      setError(t("profileRequiredFields"));
       return;
     }
 
     if (!isValidPhone(form.phone)) {
-      setError("Le numéro de téléphone doit contenir exactement 10 chiffres.");
+      setError(t("profileInvalidPhone"));
       return;
     }
 
     if (emailChanged && !form.currentPassword) {
-      setError(
-        "Pour modifier votre email, merci de renseigner votre mot de passe actuel."
-      );
+      setError(t("profileCurrentPasswordRequired"));
       return;
     }
 
@@ -88,7 +88,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
 
       await onSave(form);
 
-      setSuccess("Informations personnelles mises à jour.");
+      setSuccess(t("profileUpdateSuccess"));
       setForm((prev) => ({
         ...prev,
         currentPassword: "",
@@ -97,7 +97,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de mettre à jour le profil."
+          t("profileUpdateError")
       );
     } finally {
       setLoading(false);
@@ -114,17 +114,17 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
       !passwordForm.newPassword ||
       !passwordForm.confirmPassword
     ) {
-      setPasswordError("Merci de remplir tous les champs du mot de passe.");
+      setPasswordError(t("passwordRequiredFields"));
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      setPasswordError("Le nouveau mot de passe doit contenir au moins 6 caractères.");
+      setPasswordError(t("passwordTooShort"));
       return;
     }
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("Les nouveaux mots de passe ne correspondent pas.");
+      setPasswordError(t("passwordMismatch"));
       return;
     }
 
@@ -133,7 +133,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
 
       await changePassword(passwordForm);
 
-      setPasswordSuccess("Mot de passe modifié avec succès.");
+      setPasswordSuccess(t("passwordUpdateSuccess"));
       setPasswordForm({
         currentPassword: "",
         newPassword: "",
@@ -143,7 +143,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
       setPasswordError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de modifier le mot de passe."
+          t("passwordUpdateError")
       );
     } finally {
       setPasswordLoading(false);
@@ -151,15 +151,11 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
   };
 
   const handleDelete = async () => {
-    const firstConfirm = window.confirm(
-      "Êtes-vous sûre de vouloir supprimer votre compte ? Cette action est irréversible."
-    );
+    const firstConfirm = window.confirm(t("deleteAccountFirstConfirm"));
 
     if (!firstConfirm) return;
 
-    const secondConfirm = window.confirm(
-      "Dernière confirmation : votre compte sera désactivé définitivement."
-    );
+    const secondConfirm = window.confirm(t("deleteAccountSecondConfirm"));
 
     if (!secondConfirm) return;
 
@@ -170,7 +166,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible de supprimer le compte."
+          t("deleteAccountError")
       );
     } finally {
       setDeleting(false);
@@ -180,7 +176,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
   return (
     <>
       <div className="box">
-        <h2>Informations personnelles</h2>
+        <h2>{t("personalInformation")}</h2>
 
         {error && <div className="box error-box">{error}</div>}
         {success && <div className="box success-box">{success}</div>}
@@ -189,7 +185,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="text"
             name="firstName"
-            placeholder="Prénom"
+            placeholder={t("firstName")}
             value={form.firstName}
             onChange={handleChange}
           />
@@ -197,7 +193,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="text"
             name="lastName"
-            placeholder="Nom"
+            placeholder={t("lastName")}
             value={form.lastName}
             onChange={handleChange}
           />
@@ -205,7 +201,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder={t("email")}
             value={form.email}
             onChange={handleChange}
           />
@@ -213,7 +209,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="text"
             name="phone"
-            placeholder="Téléphone"
+            placeholder={t("phone")}
             value={form.phone}
             onChange={handleChange}
             inputMode="numeric"
@@ -225,22 +221,19 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
               <input
                 type="password"
                 name="currentPassword"
-                placeholder="Mot de passe actuel obligatoire pour modifier l'email"
+                placeholder={t("currentPasswordRequiredForEmail")}
                 value={form.currentPassword}
                 onChange={handleChange}
                 autoComplete="current-password"
               />
 
-              <p className="form-help-text">
-                Pour votre sécurité, le mot de passe actuel est demandé lorsque
-                vous changez votre email.
-              </p>
+              <p className="form-help-text">{t("emailChangeSecurityHelp")}</p>
             </div>
           )}
 
           <div className="account-form-actions">
             <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+              {loading ? t("saving") : t("saveChanges")}
             </button>
 
             <button
@@ -248,7 +241,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
               type="button"
               onClick={onCancel}
             >
-              Annuler
+              {t("cancel")}
             </button>
 
             <button
@@ -257,14 +250,14 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
               onClick={handleDelete}
               disabled={deleting}
             >
-              {deleting ? "Suppression..." : "Supprimer le compte"}
+              {deleting ? t("deleting") : t("deleteAccount")}
             </button>
           </div>
         </form>
       </div>
 
       <div className="box">
-        <h2>Modifier le mot de passe</h2>
+        <h2>{t("changePasswordTitle")}</h2>
 
         {passwordError && <div className="box error-box">{passwordError}</div>}
         {passwordSuccess && (
@@ -275,7 +268,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="password"
             name="currentPassword"
-            placeholder="Mot de passe actuel"
+            placeholder={t("currentPassword")}
             value={passwordForm.currentPassword}
             onChange={handlePasswordChange}
             autoComplete="current-password"
@@ -284,7 +277,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="password"
             name="newPassword"
-            placeholder="Nouveau mot de passe"
+            placeholder={t("newPassword")}
             value={passwordForm.newPassword}
             onChange={handlePasswordChange}
             autoComplete="new-password"
@@ -293,7 +286,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
           <input
             type="password"
             name="confirmPassword"
-            placeholder="Confirmer le nouveau mot de passe"
+            placeholder={t("confirmNewPassword")}
             value={passwordForm.confirmPassword}
             onChange={handlePasswordChange}
             autoComplete="new-password"
@@ -305,7 +298,7 @@ function ProfileForm({ onSave, onCancel, onDeleteAccount }) {
               type="submit"
               disabled={passwordLoading}
             >
-              {passwordLoading ? "Modification..." : "Modifier le mot de passe"}
+              {passwordLoading ? t("passwordChanging") : t("changePassword")}
             </button>
           </div>
         </form>

@@ -76,6 +76,14 @@ const common = {
   termsEvolutionTitle: "Service Evolution",
   termsEvolutionText:
     "Features may evolve according to frontend, backend and project requirements.",
+  notFoundTitle: "Page not found",
+notFoundMessage:
+  "The page you are looking for does not exist or has been moved.",
+backHome: "Back to home",
+emptyStateTitle: "No results",
+emptyStateMessage:
+  "No items to display at the moment.",
+  genericError: "An error occurred. Please try again later.",
 };
 
 export default common;

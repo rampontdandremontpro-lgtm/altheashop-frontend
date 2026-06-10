@@ -1,17 +1,21 @@
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import AccountSidebar from "../components/account/AccountSidebar";
+import { useI18n } from "../context/I18nContext";
 
 function AccountPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
 
   return (
     <div className="page-stack">
       <section className="section">
         <div className="page-heading">
           <div>
-            <h1>Mon compte</h1>
-            <p>Bienvenue {user?.firstName}.</p>
+            <h1>{t("accountTitle")}</h1>
+            <p>
+              {t("accountWelcome")} {user?.firstName}.
+            </p>
           </div>
         </div>
 
@@ -20,33 +24,33 @@ function AccountPage() {
 
           <div>
             <div className="box">
-              <h2>Informations personnelles</h2>
+              <h2>{t("personalInformation")}</h2>
 
               <div className="account-summary-list">
                 <div className="account-summary-row">
-                  <span>Prénom</span>
+                  <span>{t("firstName")}</span>
                   <strong>{user?.firstName || "-"}</strong>
                 </div>
 
                 <div className="account-summary-row">
-                  <span>Nom</span>
+                  <span>{t("lastName")}</span>
                   <strong>{user?.lastName || "-"}</strong>
                 </div>
 
                 <div className="account-summary-row">
-                  <span>Email</span>
+                  <span>{t("email")}</span>
                   <strong>{user?.email || "-"}</strong>
                 </div>
 
                 <div className="account-summary-row">
-                  <span>Téléphone</span>
+                  <span>{t("phone")}</span>
                   <strong>{user?.phone || "-"}</strong>
                 </div>
               </div>
 
               <div className="detail-box">
                 <Link to="/account/edit" className="btn btn-primary">
-                  Modifier
+                  {t("edit")}
                 </Link>
               </div>
             </div>

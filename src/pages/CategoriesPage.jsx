@@ -6,8 +6,10 @@ import ErrorMessage from "../components/common/ErrorMessage";
 import Pagination from "../components/common/Pagination";
 import ProductCard from "../components/catalog/ProductCard";
 import ProductFilters from "../components/catalog/ProductFilters";
+import { useI18n } from "../context/I18nContext";
 
 function CategoriesPage() {
+  const { t } = useI18n();
   const { slug } = useParams();
 
   const [productsData, setProductsData] = useState({
@@ -44,15 +46,15 @@ function CategoriesPage() {
 
         const data = await getProducts(params);
         setProductsData(data);
-      } catch (err) {
-        setError("Impossible de charger les produits de cette catégorie.");
+      } catch {
+        setError(t("categoryProductsLoadError"));
       } finally {
         setLoading(false);
       }
     }
 
     fetchProducts();
-  }, [slug, page, search, sort, inStock]);
+  }, [slug, page, search, sort, inStock, t]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,13 +68,15 @@ function CategoriesPage() {
     setPage(1);
   };
 
-  if (loading) return <Loader text="Chargement des produits..." />;
+  if (loading) return <Loader text={t("loadingCatalog")} />;
   if (error) return <ErrorMessage message={error} />;
 
   return (
     <div className="page-stack">
       <section className="section">
-        <h1>Catégorie : {slug}</h1>
+        <h1>
+          {t("categoryTitle")} : {slug}
+        </h1>
 
         <ProductFilters
           search={search}
@@ -88,7 +92,7 @@ function CategoriesPage() {
 
       <section className="section">
         {productsData.items.length === 0 ? (
-          <div className="box">Aucun produit trouvé.</div>
+          <div className="box">{t("noProductsFound")}</div>
         ) : (
           <div className="grid cards-grid">
             {productsData.items.map((product) => (
