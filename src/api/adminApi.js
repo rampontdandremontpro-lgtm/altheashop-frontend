@@ -62,8 +62,11 @@ function normalizePayload(payload) {
   };
 }
 
-export async function getAdminStats() {
-  const response = await api.get("/admin/stats");
+export async function getAdminStats(period = "7d") {
+  const response = await api.get("/admin/stats", {
+    params: { period },
+  });
+
   return response.data;
 }
 
