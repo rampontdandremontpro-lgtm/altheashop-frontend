@@ -30,9 +30,13 @@ export async function deleteContactMessage(id) {
   return true;
 }
 
-export async function sendChatbotMessage(message) {
+export async function sendChatbotMessage(
+  message,
+  language = "fr"
+) {
   const response = await api.post("/chatbot/message", {
     message,
+    language,
   });
 
   return response.data;
