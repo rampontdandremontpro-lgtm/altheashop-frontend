@@ -1,0 +1,58 @@
+const product = {
+  catalogTitle: "Catalogue",
+  catalogResultsFor: "Résultats pour",
+  productsFound: "produit(s) trouvé(s)",
+  loadCatalogError: "Impossible de charger les produits.",
+  loadingCatalog: "Chargement des produits...",
+
+  searchPageTitle: "Recherche",
+  searchResultsFor: "Résultats pour",
+  loadSearchError: "Impossible de charger les résultats de recherche.",
+  loadingSearchResults: "Chargement des résultats...",
+
+  matchAuto: "Priorité automatique",
+  matchContains: "Contient",
+  matchStartsWith: "Commence par",
+  matchExact: "Correspondance exacte",
+  matchOneCharDiff: "Un caractère différent",
+
+  allCategories: "Toutes les catégories",
+  sortPriority: "Priorité",
+  sortNewest: "Nouveautés",
+  sortOldest: "Plus anciens",
+  sortPriceAsc: "Prix croissant",
+  sortPriceDesc: "Prix décroissant",
+  sortNameAsc: "Nom A-Z",
+  sortNameDesc: "Nom Z-A",
+  sortStockDesc: "Stock décroissant",
+  sortStockAsc: "Stock croissant",
+  allAvailabilities: "Toutes disponibilités",
+  inStock: "En stock",
+  outOfStock: "Rupture de stock",
+  minPricePlaceholder: "Prix min (centimes)",
+  maxPricePlaceholder: "Prix max (centimes)",
+  resetFilters: "Réinitialiser",
+  noProductsFound: "Aucun produit trouvé",
+  noProductsFoundMessage:
+    "Essaie de modifier les filtres ou de faire une nouvelle recherche depuis la barre du haut.",
+  viewProduct: "Voir le produit",
+
+  loadingProduct: "Chargement du produit...",
+  loadProductError: "Impossible de charger le produit.",
+  productNotFound: "Produit introuvable.",
+  previousImage: "Image précédente",
+  nextImage: "Image suivante",
+  showImage: "Afficher l'image",
+  productAddedTitle: "Article ajouté",
+  productAddedSuffix: "a bien été ajouté à votre panier.",
+  addToCart: "Ajouter au panier",
+  description: "Description",
+  technicalSpecs: "Caractéristiques techniques",
+  noDescriptionAvailable: "Aucune description disponible.",
+  noTechnicalSpecsAvailable: "Aucune caractéristique technique disponible.",
+  similarProducts: "Produits similaires",
+  similarProductsDescription:
+    "Découvrez d’autres produits de la même catégorie.",
+};
+
+export default product;

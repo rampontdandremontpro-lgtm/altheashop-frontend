@@ -609,3 +609,30 @@
   border: 1px solid var(--border);
   background: #f8fafc;
 }
+
+.admin-gallery-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.admin-gallery-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font: inherit;
+}
+
+.admin-gallery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-gallery-actions .btn {
+  flex: 1;
+  min-width: 110px;
+}

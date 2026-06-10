@@ -6,11 +6,26 @@ import {
   getAdminProductById,
   getAdminProductImages,
   updateAdminProduct,
+  updateAdminProductGalleryImage,
   uploadAdminProductGalleryImage,
   uploadAdminProductImage,
 } from "../../api/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
+
+function sortImages(images) {
+  return [...images].sort(
+    (a, b) => Number(a.displayOrder ?? 0) - Number(b.displayOrder ?? 0)
+  );
+}
+
+function normalizeUrl(url) {
+  return String(url || "").trim();
+}
+
+function isSameImage(urlA, urlB) {
+  return normalizeUrl(urlA) === normalizeUrl(urlB);
+}
 
 function AdminProductEditPage() {
   const { id } = useParams();
@@ -18,6 +33,7 @@ function AdminProductEditPage() {
 
   const [product, setProduct] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [galleryForms, setGalleryForms] = useState({});
   const [loadingPage, setLoadingPage] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -29,11 +45,32 @@ function AdminProductEditPage() {
   async function loadProduct() {
     const data = await getAdminProductById(id);
     setProduct(data);
+    return data;
   }
 
-  async function loadGalleryImages() {
+  async function loadGalleryImages(productData) {
     const images = await getAdminProductImages(id);
-    setGalleryImages(images);
+    const mainImageUrl = productData?.imageUrl || "";
+
+    const filteredImages = images.filter(
+      (image) =>
+        !isSameImage(image.url, mainImageUrl) &&
+        !isSameImage(image.imageUrl, mainImageUrl)
+    );
+
+    const sortedImages = sortImages(filteredImages);
+    setGalleryImages(sortedImages);
+
+    const forms = {};
+
+    sortedImages.forEach((image, index) => {
+      forms[image.id] = {
+  altText: image.altText || "",
+  displayOrder: Number(image.displayOrder ?? index + 1),
+};
+    });
+
+    setGalleryForms(forms);
   }
 
   async function loadPageData() {
@@ -41,7 +78,8 @@ function AdminProductEditPage() {
       setLoadingPage(true);
       setError("");
 
-      await Promise.all([loadProduct(), loadGalleryImages()]);
+      const productData = await loadProduct();
+      await loadGalleryImages(productData);
     } catch (err) {
       setError(err.message || "Impossible de charger le produit.");
     } finally {
@@ -53,16 +91,43 @@ function AdminProductEditPage() {
     loadPageData();
   }, [id]);
 
+  const handleGalleryFormChange = (imageId, field, value) => {
+    setGalleryForms((prev) => ({
+      ...prev,
+      [imageId]: {
+        ...prev[imageId],
+        [field]: value,
+      },
+    }));
+  };
+
   const handleSave = async (formData) => {
     try {
       setSaving(true);
       setError("");
       setSuccess("");
 
-      await updateAdminProduct(id, formData);
+      await Promise.all(
+        galleryImages.map((image) =>
+          updateAdminProductGalleryImage(id, image.id, {
+            altText: galleryForms[image.id]?.altText || "",
+            displayOrder: Number(galleryForms[image.id]?.displayOrder || 1),
+          })
+        )
+      );
+
+      await updateAdminProduct(id, {
+        ...formData,
+        imageUrl: product.imageUrl || formData.imageUrl || "",
+      });
+
       navigate("/admin/products");
     } catch (err) {
-      setError(err.message || "Impossible de modifier le produit.");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible d'enregistrer les modifications."
+      );
     } finally {
       setSaving(false);
     }
@@ -83,15 +148,17 @@ function AdminProductEditPage() {
       setError("");
       setSuccess("");
 
-      await uploadAdminProductImage(id, file);
-      setSuccess("Image principale envoyée avec succès.");
+      const updatedProduct = await uploadAdminProductImage(id, file);
 
-      await Promise.all([loadProduct(), loadGalleryImages()]);
+      setProduct(updatedProduct);
+      await loadGalleryImages(updatedProduct);
+
+      setSuccess("Image principale modifiée avec succès.");
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Impossible d'envoyer l'image."
+          "Impossible de modifier l'image principale."
       );
     } finally {
       setUploading(false);
@@ -115,9 +182,11 @@ function AdminProductEditPage() {
       setSuccess("");
 
       await uploadAdminProductGalleryImage(id, file);
-      setSuccess("Image ajoutée à la galerie avec succès.");
 
-      await Promise.all([loadProduct(), loadGalleryImages()]);
+      const productData = await loadProduct();
+      await loadGalleryImages(productData);
+
+      setSuccess("Image secondaire ajoutée à la galerie.");
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -132,7 +201,7 @@ function AdminProductEditPage() {
 
   const handleDeleteGalleryImage = async (imageId) => {
     const confirmed = window.confirm(
-      "Voulez-vous vraiment supprimer cette image de la galerie ?"
+      "Voulez-vous vraiment supprimer cette image secondaire ?"
     );
 
     if (!confirmed) return;
@@ -143,9 +212,11 @@ function AdminProductEditPage() {
       setSuccess("");
 
       await deleteAdminProductGalleryImage(id, imageId);
-      setSuccess("Image supprimée de la galerie.");
 
-      await Promise.all([loadProduct(), loadGalleryImages()]);
+      const productData = await loadProduct();
+      await loadGalleryImages(productData);
+
+      setSuccess("Image secondaire supprimée.");
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -180,6 +251,11 @@ function AdminProductEditPage() {
         <div className="box admin-upload-box">
           <h2>Image principale du produit</h2>
 
+          <p className="form-help-text">
+            Cette image est utilisée dans le catalogue, la recherche, le panier
+            et comme première image de la fiche produit.
+          </p>
+
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
@@ -206,12 +282,12 @@ function AdminProductEditPage() {
           <h2>Galerie du produit</h2>
 
           <p className="form-help-text">
-            Les images ajoutées ici apparaissent dans la galerie sur la fiche
-            produit côté client.
+            La galerie contient uniquement les images secondaires affichées après
+            l’image principale sur la fiche produit. L’ordre commence à 1.
           </p>
 
           <label className="btn btn-secondary admin-file-label">
-            {uploadingGallery ? "Ajout en cours..." : "Ajouter une image"}
+            {uploadingGallery ? "Ajout en cours..." : "Ajouter une image secondaire"}
             <input
               type="file"
               accept="image/*"
@@ -222,32 +298,60 @@ function AdminProductEditPage() {
           </label>
 
           {galleryImages.length === 0 ? (
-            <p>Aucune image dans la galerie.</p>
+            <p>Aucune image secondaire dans la galerie.</p>
           ) : (
             <div className="admin-product-gallery">
               {galleryImages.map((image) => (
                 <div key={image.id} className="admin-product-gallery-item">
                   <img
                     src={image.url || image.imageUrl}
-                    alt={image.altText || product.name}
+                    alt={galleryForms[image.id]?.altText || product.name}
                     className="admin-product-gallery-image"
                   />
 
-                  <div className="admin-product-gallery-info">
-                    <strong>{image.altText || product.name}</strong>
-                    <span>Ordre : {image.displayOrder ?? 0}</span>
-                  </div>
+                  <label className="admin-gallery-field">
+                    Texte alternatif
+                    <input
+                      type="text"
+                      value={galleryForms[image.id]?.altText || ""}
+                      onChange={(e) =>
+                        handleGalleryFormChange(
+                          image.id,
+                          "altText",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </label>
 
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => handleDeleteGalleryImage(image.id)}
-                    disabled={deletingImageId === image.id}
-                  >
-                    {deletingImageId === image.id
-                      ? "Suppression..."
-                      : "Supprimer"}
-                  </button>
+                  <label className="admin-gallery-field">
+                    Position dans la galerie
+                    <input
+                      type="number"
+                      min="1"
+                      value={galleryForms[image.id]?.displayOrder ?? 1}
+                      onChange={(e) =>
+                        handleGalleryFormChange(
+                          image.id,
+                          "displayOrder",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </label>
+
+                  <div className="admin-gallery-actions">
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => handleDeleteGalleryImage(image.id)}
+                      disabled={deletingImageId === image.id}
+                    >
+                      {deletingImageId === image.id
+                        ? "Suppression..."
+                        : "Supprimer l’image secondaire"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

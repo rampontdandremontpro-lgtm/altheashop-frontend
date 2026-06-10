@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { forgotPassword } from "../api/authApi";
+import { useI18n } from "../context/I18nContext";
 
 function ForgotPasswordPage() {
+  const { t } = useI18n();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -13,17 +16,26 @@ function ForgotPasswordPage() {
     setSuccess("");
 
     if (!email) {
-      setError("Merci de saisir votre email.");
+      setError(t("forgotPasswordEmailRequired"));
       return;
     }
 
     try {
       setLoading(true);
+
       const result = await forgotPassword(email);
-      setSuccess(result.message);
+
+      setSuccess(
+        result.message || t("forgotPasswordSuccess")
+      );
+
       setEmail("");
     } catch (err) {
-      setError(err.message || "Impossible de traiter la demande.");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("forgotPasswordError")
+      );
     } finally {
       setLoading(false);
     }
@@ -33,11 +45,9 @@ function ForgotPasswordPage() {
     <div className="page-stack">
       <section className="section auth-section">
         <div className="box auth-box">
-          <h1>Mot de passe oublié</h1>
-          <p>
-            Cette page est prête. Quand le backend sera disponible, elle enverra
-            une vraie demande de réinitialisation.
-          </p>
+          <h1>{t("forgotPasswordTitle")}</h1>
+
+          <p>{t("forgotPasswordDescription")}</p>
 
           {error && <div className="box error-box">{error}</div>}
           {success && <div className="box success-box">{success}</div>}
@@ -45,13 +55,13 @@ function ForgotPasswordPage() {
           <form className="auth-form" onSubmit={handleSubmit}>
             <input
               type="email"
-              placeholder="Votre email"
+              placeholder={t("email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
 
             <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? "Envoi..." : "Envoyer"}
+              {loading ? t("sending") : t("send")}
             </button>
           </form>
         </div>

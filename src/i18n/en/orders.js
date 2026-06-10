@@ -1,0 +1,46 @@
+const orders = {
+  ordersHistory: "Order History",
+  ordersCount: "order(s)",
+  loadingOrders: "Loading orders...",
+  loadOrdersError: "Unable to load orders.",
+  downloadInvoiceError: "Unable to download invoice.",
+  ordersSearchPlaceholder:
+    "Search by reference, product, date...",
+  allYears: "All Years",
+  noOrdersTitle: "No Orders",
+  noOrdersMessage:
+    "No orders match your search.",
+  orderReference: "Order Reference",
+  status: "Status",
+  orderPlacedOn: "Order placed on",
+  products: "Products",
+  product: "Product",
+  noProductAvailable: "No product available.",
+  quantity: "Quantity",
+  viewDetails: "View Details",
+  downloading: "Downloading...",
+  invoicePdf: "Invoice PDF",
+
+  statusPending: "Pending",
+  statusConfirmed: "Confirmed",
+  statusPaid: "Paid",
+  statusProcessing: "Processing",
+  statusShipped: "Shipped",
+  statusDelivered: "Delivered",
+  statusCancelled: "Cancelled",
+
+  loadingOrderDetail: "Loading order...",
+  loadOrderDetailError: "Unable to load order.",
+  orderNotFound: "Order not found.",
+  order: "Order",
+  backToOrders: "Back to Orders",
+  shippingAddress: "Shipping Address",
+  addressUnavailable: "Address unavailable.",
+  payment: "Payment",
+  notProvided: "Not provided",
+  orderedProducts: "Ordered Products",
+  noOrderedProducts: "No products in this order.",
+  downloadInvoicePdf: "Download Invoice PDF",
+};
+
+export default orders;

@@ -1,0 +1,58 @@
+const product = {
+  catalogTitle: "קטלוג",
+  catalogResultsFor: "תוצאות עבור",
+  productsFound: "מוצר(ים) נמצאו",
+  loadCatalogError: "לא ניתן לטעון מוצרים.",
+  loadingCatalog: "טוען מוצרים...",
+
+  searchPageTitle: "חיפוש",
+  searchResultsFor: "תוצאות עבור",
+  loadSearchError: "לא ניתן לטעון תוצאות חיפוש.",
+  loadingSearchResults: "טוען תוצאות...",
+
+  matchAuto: "עדיפות אוטומטית",
+  matchContains: "מכיל",
+  matchStartsWith: "מתחיל ב",
+  matchExact: "התאמה מדויקת",
+  matchOneCharDiff: "הבדל של תו אחד",
+
+  allCategories: "כל הקטגוריות",
+  sortPriority: "עדיפות",
+  sortNewest: "החדשים ביותר",
+  sortOldest: "הישנים ביותר",
+  sortPriceAsc: "מחיר עולה",
+  sortPriceDesc: "מחיר יורד",
+  sortNameAsc: "שם א-ת",
+  sortNameDesc: "שם ת-א",
+  sortStockDesc: "מלאי יורד",
+  sortStockAsc: "מלאי עולה",
+  allAvailabilities: "כל הזמינויות",
+  inStock: "במלאי",
+  outOfStock: "אזל מהמלאי",
+  minPricePlaceholder: "מחיר מינימלי",
+  maxPricePlaceholder: "מחיר מקסימלי",
+  resetFilters: "אפס מסננים",
+  noProductsFound: "לא נמצאו מוצרים",
+  noProductsFoundMessage:
+    "נסה לשנות את המסננים או לבצע חיפוש חדש.",
+  viewProduct: "צפה במוצר",
+
+  loadingProduct: "טוען מוצר...",
+  loadProductError: "לא ניתן לטעון את המוצר.",
+  productNotFound: "המוצר לא נמצא.",
+  previousImage: "תמונה קודמת",
+  nextImage: "תמונה הבאה",
+  showImage: "הצג תמונה",
+  productAddedTitle: "המוצר נוסף",
+  productAddedSuffix: "נוסף בהצלחה לעגלה שלך.",
+  addToCart: "הוסף לעגלה",
+  description: "תיאור",
+  technicalSpecs: "מפרט טכני",
+  noDescriptionAvailable: "אין תיאור זמין.",
+  noTechnicalSpecsAvailable: "אין מפרט טכני זמין.",
+  similarProducts: "מוצרים דומים",
+  similarProductsDescription:
+    "גלה מוצרים נוספים מאותה קטגוריה.",
+};
+
+export default product;

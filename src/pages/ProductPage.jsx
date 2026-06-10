@@ -23,7 +23,11 @@ function getProductImages(product) {
   }
 
   if (Array.isArray(product?.images)) {
-    product.images.forEach((image) => {
+    const sortedImages = [...product.images].sort(
+      (a, b) => Number(a.displayOrder ?? 0) - Number(b.displayOrder ?? 0)
+    );
+
+    sortedImages.forEach((image) => {
       const url = image?.url || image?.imageUrl;
 
       if (isValidImageUrl(url) && !images.includes(url.trim())) {
