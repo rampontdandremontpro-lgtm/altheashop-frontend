@@ -53,6 +53,9 @@ function normalizeProduct(product) {
       normalizedImages[0]?.imageUrl ||
       "",
     images: normalizedImages,
+    translations: Array.isArray(product.translations)
+  ? product.translations
+  : [],
     createdAt: product.createdAt || null,
     updatedAt: product.updatedAt || null,
   };

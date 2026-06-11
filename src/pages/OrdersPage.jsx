@@ -12,6 +12,7 @@ import { formatPrice } from "../utils/formatPrice";
 import AccountSidebar from "../components/account/AccountSidebar";
 import { useI18n } from "../context/I18nContext";
 import { useCart } from "../context/CartContext";
+import { getTranslatedProduct } from "../utils/productTranslations";
 
 const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Image";
 
@@ -19,8 +20,23 @@ function getOrderYear(order) {
   return new Date(order.createdAt).getFullYear();
 }
 
-function getItemName(item, t) {
-  return item.name || item.product?.name || t("product");
+function getOrderItemProduct(item) {
+  return {
+    ...item.product,
+    ...item,
+    translations: item.product?.translations || item.translations || [],
+    name: item.product?.name || item.name,
+    shortDescription: item.product?.shortDescription || item.shortDescription,
+    description: item.product?.description || item.description,
+    techSpecs: item.product?.techSpecs || item.techSpecs,
+  };
+}
+
+function getItemName(item, t, language) {
+  const product = getOrderItemProduct(item);
+  const translatedProduct = getTranslatedProduct(product, language);
+
+  return translatedProduct?.name || item.name || item.product?.name || t("product");
 }
 
 function getItemImage(item) {
@@ -33,13 +49,13 @@ function getItemImage(item) {
   );
 }
 
-function orderMatchesSearch(order, search) {
+function orderMatchesSearch(order, search, language) {
   const query = search.trim().toLowerCase();
 
   if (!query) return true;
 
   const productNames = (order.items || [])
-    .map((item) => item.name || item.product?.name || "")
+    .map((item) => getItemName(item, () => "", language))
     .join(" ")
     .toLowerCase();
 
@@ -52,7 +68,7 @@ function orderMatchesSearch(order, search) {
 
 function OrdersPage() {
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { loadCart } = useCart();
 
   const [orders, setOrders] = useState([]);
@@ -106,9 +122,9 @@ function OrdersPage() {
           ? true
           : getOrderYear(order) === Number(selectedYear)
       )
-      .filter((order) => orderMatchesSearch(order, search))
+      .filter((order) => orderMatchesSearch(order, search, language))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [orders, selectedYear, search]);
+  }, [orders, selectedYear, search, language]);
 
   const ordersByYear = useMemo(() => {
     return filteredOrders.reduce((acc, order) => {
@@ -153,9 +169,7 @@ function OrdersPage() {
       navigate("/cart");
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          err.message ||
-          t("reorderError")
+        err.response?.data?.message || err.message || t("reorderError")
       );
     } finally {
       setReorderLoadingId(null);
@@ -254,31 +268,35 @@ function OrdersPage() {
                             <p>{t("noProductAvailable")}</p>
                           ) : (
                             <div className="order-products-list">
-                              {order.items.map((item) => (
-                                <div
-                                  key={`${order.id}-${item.id}`}
-                                  className="order-product-row"
-                                >
-                                  <img
-                                    src={getItemImage(item)}
-                                    alt={getItemName(item, t)}
-                                    className="order-product-image"
-                                    onError={(e) => {
-                                      e.currentTarget.src = FALLBACK_IMAGE;
-                                    }}
-                                  />
+                              {order.items.map((item) => {
+                                const itemName = getItemName(item, t, language);
 
-                                  <div>
-                                    <strong>{getItemName(item, t)}</strong>
-                                    <p>
-                                      {t("quantity")} : {item.quantity} —{" "}
-                                      {formatPrice(
-                                        item.priceCents * item.quantity
-                                      )}
-                                    </p>
+                                return (
+                                  <div
+                                    key={`${order.id}-${item.id}`}
+                                    className="order-product-row"
+                                  >
+                                    <img
+                                      src={getItemImage(item)}
+                                      alt={itemName}
+                                      className="order-product-image"
+                                      onError={(e) => {
+                                        e.currentTarget.src = FALLBACK_IMAGE;
+                                      }}
+                                    />
+
+                                    <div>
+                                      <strong>{itemName}</strong>
+                                      <p>
+                                        {t("quantity")} : {item.quantity} —{" "}
+                                        {formatPrice(
+                                          item.priceCents * item.quantity
+                                        )}
+                                      </p>
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           )}
                         </div>

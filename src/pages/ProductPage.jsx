@@ -7,6 +7,7 @@ import { formatPrice } from "../utils/formatPrice";
 import { useCart } from "../context/CartContext";
 import SimilarProducts from "../components/catalog/SimilarProducts";
 import { useI18n } from "../context/I18nContext";
+import { getTranslatedProduct } from "../utils/productTranslations";
 
 const FALLBACK_IMAGE =
   "https://via.placeholder.com/600x400?text=Image+indisponible";
@@ -40,7 +41,7 @@ function getProductImages(product) {
 }
 
 function ProductPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const params = useParams();
   const identifier = params.slug || params.id;
   const { addToCart, cartError } = useCart();
@@ -98,7 +99,8 @@ function ProductPage() {
 
     if (!success) return;
 
-    setCartSuccess(product.name);
+    const translatedProduct = getTranslatedProduct(product, language);
+    setCartSuccess(translatedProduct.name);
 
     window.setTimeout(() => {
       setCartSuccess("");
@@ -110,6 +112,7 @@ function ProductPage() {
   if (!product) return <ErrorMessage message={t("productNotFound")} />;
 
   const currentImage = productImages[currentImageIndex];
+  const translatedProduct = getTranslatedProduct(product, language);
 
   return (
     <div className="page-stack">
@@ -119,7 +122,7 @@ function ProductPage() {
             <div className="product-gallery-main">
               <img
                 src={currentImage}
-                alt={product.name}
+                alt={translatedProduct.name}
                 className="product-main-image"
                 onError={(e) => {
                   e.currentTarget.src = FALLBACK_IMAGE;
@@ -165,7 +168,7 @@ function ProductPage() {
                   >
                     <img
                       src={image}
-                      alt={`${product.name} ${index + 1}`}
+                      alt={`${translatedProduct.name} ${index + 1}`}
                       className="thumb-image"
                       onError={(e) => {
                         e.currentTarget.src = FALLBACK_IMAGE;
@@ -180,7 +183,7 @@ function ProductPage() {
           <div className="box">
             <p className="product-category">{product.category?.name}</p>
 
-            <h1>{product.name}</h1>
+            <h1>{translatedProduct.name}</h1>
 
             <p className="product-price">{formatPrice(product.priceCents)}</p>
 
@@ -190,7 +193,7 @@ function ProductPage() {
                 : t("outOfStock")}
             </p>
 
-            <p>{product.shortDescription}</p>
+            <p>{translatedProduct.shortDescription}</p>
 
             {cartSuccess && (
               <div className="cart-success-message">
@@ -214,15 +217,19 @@ function ProductPage() {
             <hr />
 
             <h2>{t("description")}</h2>
-            <p>{product.description || t("noDescriptionAvailable")}</p>
+            <p>
+              {translatedProduct.description || t("noDescriptionAvailable")}
+            </p>
 
             <hr />
 
             <h2>{t("technicalSpecs")}</h2>
             <p>
-              {typeof product.techSpecs === "string"
-                ? product.techSpecs || t("noTechnicalSpecsAvailable")
-                : product.techSpecs?.content || t("noTechnicalSpecsAvailable")}
+              {typeof translatedProduct.techSpecs === "string"
+                ? translatedProduct.techSpecs ||
+                  t("noTechnicalSpecsAvailable")
+                : translatedProduct.techSpecs?.content ||
+                  t("noTechnicalSpecsAvailable")}
             </p>
           </div>
         </div>

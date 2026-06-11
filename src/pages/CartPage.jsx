@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useI18n } from "../context/I18nContext";
 import { formatPrice } from "../utils/formatPrice";
+import { getTranslatedProduct } from "../utils/productTranslations";
 import CartSummary from "../components/cart/CartSummary";
 import EmptyState from "../components/common/EmptyState";
 
 function CartPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   const {
     cartItems,
@@ -38,68 +39,76 @@ function CartPage() {
         ) : (
           <div className="cart-layout">
             <div className="cart-list">
-              {cartItems.map((item) => (
-                <div className="cart-item box" key={item.id}>
-                  <img
-                    src={
-                      item.imageUrl ||
-                      "https://placehold.co/120x120?text=Produit"
-                    }
-                    alt={item.name}
-                    className="cart-item-image"
-                  />
+              {cartItems.map((item) => {
+                const translatedItem = getTranslatedProduct(item, language);
 
-                  <div className="cart-item-content">
-                    <div className="cart-item-top">
-                      <div>
-                        <h3>{item.name}</h3>
-                        <p className="cart-item-price">
-                          {formatPrice(item.priceCents)}
-                        </p>
+                return (
+                  <div className="cart-item box" key={item.id}>
+                    <img
+                      src={
+                        item.imageUrl ||
+                        "https://placehold.co/120x120?text=Produit"
+                      }
+                      alt={translatedItem.name}
+                      className="cart-item-image"
+                    />
+
+                    <div className="cart-item-content">
+                      <div className="cart-item-top">
+                        <div>
+                          <h3>{translatedItem.name}</h3>
+
+                          <p className="cart-item-price">
+                            {formatPrice(item.priceCents)}
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="link-danger"
+                          onClick={() => removeFromCart(item.id)}
+                        >
+                          {t("remove")}
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        className="link-danger"
-                        onClick={() => removeFromCart(item.id)}
+                      <div className="qty-controls">
+                        <button
+                          type="button"
+                          onClick={() => decreaseQty(item.id)}
+                          aria-label={t("decreaseQuantity")}
+                        >
+                          -
+                        </button>
+
+                        <span>{item.quantity}</span>
+
+                        <button
+                          type="button"
+                          onClick={() => increaseQty(item.id)}
+                          aria-label={t("increaseQuantity")}
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <p className="cart-line-total">
+                        {t("subtotal")} :{" "}
+                        <strong>
+                          {formatPrice(item.priceCents * item.quantity)}
+                        </strong>
+                      </p>
+
+                      <Link
+                        to={`/product/${item.slug}`}
+                        className="cart-back-link"
                       >
-                        {t("remove")}
-                      </button>
+                        {t("viewProductAgain")}
+                      </Link>
                     </div>
-
-                    <div className="qty-controls">
-                      <button
-                        type="button"
-                        onClick={() => decreaseQty(item.id)}
-                        aria-label="Diminuer la quantité"
-                      >
-                        -
-                      </button>
-
-                      <span>{item.quantity}</span>
-
-                      <button
-                        type="button"
-                        onClick={() => increaseQty(item.id)}
-                        aria-label="Augmenter la quantité"
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    <p className="cart-line-total">
-                      {t("subtotal")} :{" "}
-                      <strong>
-                        {formatPrice(item.priceCents * item.quantity)}
-                      </strong>
-                    </p>
-
-                    <Link to={`/product/${item.slug}`} className="cart-back-link">
-                      {t("viewProductAgain")}
-                    </Link>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <CartSummary

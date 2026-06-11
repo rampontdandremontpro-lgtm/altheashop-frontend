@@ -8,8 +8,22 @@ import Pagination from "../components/common/Pagination";
 import ProductCard from "../components/catalog/ProductCard";
 import { useI18n } from "../context/I18nContext";
 
+function getTranslatedCategoryName(category, language) {
+  const shortLanguage = (language || "fr").split("-")[0].toLowerCase();
+
+  if (shortLanguage === "fr") {
+    return category.name;
+  }
+
+  const translation = category.translations?.find(
+    (item) => item.language === shortLanguage
+  );
+
+  return translation?.name || category.name;
+}
+
 function SearchPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialQuery = searchParams.get("q") || "";
@@ -180,7 +194,7 @@ function SearchPage() {
             <option value="">{t("allCategories")}</option>
             {categoryOptions.map((category) => (
               <option key={category.id} value={category.slug}>
-                {category.name}
+                {getTranslatedCategoryName(category, language)}
               </option>
             ))}
           </select>
