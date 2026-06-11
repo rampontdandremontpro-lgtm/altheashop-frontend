@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_BASE_URL = "http://10.111.0.85:3001/api";
+export const API_BASE_URL = "http://172.20.10.13:3001/api";
 export const ASSET_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
 
 export function resolveImageUrl(url) {

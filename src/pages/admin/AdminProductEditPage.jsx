@@ -4,7 +4,6 @@ import ProductAdminForm from "../../components/admin/ProductAdminForm";
 import {
   deleteAdminProductGalleryImage,
   getAdminProductById,
-  getAdminProductImages,
   updateAdminProduct,
   updateAdminProductGalleryImage,
   uploadAdminProductGalleryImage,
@@ -48,8 +47,11 @@ function AdminProductEditPage() {
     return data;
   }
 
-  async function loadGalleryImages(productData) {
-    const images = await getAdminProductImages(id);
+  function loadGalleryImages(productData) {
+    const images = Array.isArray(productData?.images)
+      ? productData.images
+      : [];
+
     const mainImageUrl = productData?.imageUrl || "";
 
     const filteredImages = images.filter(
@@ -59,18 +61,25 @@ function AdminProductEditPage() {
     );
 
     const sortedImages = sortImages(filteredImages);
+
     setGalleryImages(sortedImages);
 
     const forms = {};
 
     sortedImages.forEach((image, index) => {
       forms[image.id] = {
-  altText: image.altText || "",
-  displayOrder: Number(image.displayOrder ?? index + 1),
-};
+        altText: image.altText || "",
+        displayOrder: Number(image.displayOrder ?? index + 1),
+      };
     });
 
     setGalleryForms(forms);
+  }
+
+  async function refreshProductAndGallery() {
+    const productData = await loadProduct();
+    loadGalleryImages(productData);
+    return productData;
   }
 
   async function loadPageData() {
@@ -78,10 +87,13 @@ function AdminProductEditPage() {
       setLoadingPage(true);
       setError("");
 
-      const productData = await loadProduct();
-      await loadGalleryImages(productData);
+      await refreshProductAndGallery();
     } catch (err) {
-      setError(err.message || "Impossible de charger le produit.");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible de charger le produit."
+      );
     } finally {
       setLoadingPage(false);
     }
@@ -151,7 +163,7 @@ function AdminProductEditPage() {
       const updatedProduct = await uploadAdminProductImage(id, file);
 
       setProduct(updatedProduct);
-      await loadGalleryImages(updatedProduct);
+      loadGalleryImages(updatedProduct);
 
       setSuccess("Image principale modifiée avec succès.");
     } catch (err) {
@@ -182,9 +194,7 @@ function AdminProductEditPage() {
       setSuccess("");
 
       await uploadAdminProductGalleryImage(id, file);
-
-      const productData = await loadProduct();
-      await loadGalleryImages(productData);
+      await refreshProductAndGallery();
 
       setSuccess("Image secondaire ajoutée à la galerie.");
     } catch (err) {
@@ -212,9 +222,7 @@ function AdminProductEditPage() {
       setSuccess("");
 
       await deleteAdminProductGalleryImage(id, imageId);
-
-      const productData = await loadProduct();
-      await loadGalleryImages(productData);
+      await refreshProductAndGallery();
 
       setSuccess("Image secondaire supprimée.");
     } catch (err) {
@@ -287,7 +295,9 @@ function AdminProductEditPage() {
           </p>
 
           <label className="btn btn-secondary admin-file-label">
-            {uploadingGallery ? "Ajout en cours..." : "Ajouter une image secondaire"}
+            {uploadingGallery
+              ? "Ajout en cours..."
+              : "Ajouter une image secondaire"}
             <input
               type="file"
               accept="image/*"
