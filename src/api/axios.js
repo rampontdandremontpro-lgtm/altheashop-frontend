@@ -24,7 +24,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("althea_token");
+  const token =
+    localStorage.getItem("althea_token") ||
+    sessionStorage.getItem("althea_token");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
