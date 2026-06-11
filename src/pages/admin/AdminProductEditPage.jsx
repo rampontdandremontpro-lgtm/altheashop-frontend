@@ -9,6 +9,7 @@ import {
   uploadAdminProductGalleryImage,
   uploadAdminProductImage,
 } from "../../api/adminApi";
+import { resolveImageUrl } from "../../api/axios";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 
@@ -16,14 +17,6 @@ function sortImages(images) {
   return [...images].sort(
     (a, b) => Number(a.displayOrder ?? 0) - Number(b.displayOrder ?? 0)
   );
-}
-
-function normalizeUrl(url) {
-  return String(url || "").trim();
-}
-
-function isSameImage(urlA, urlB) {
-  return normalizeUrl(urlA) === normalizeUrl(urlB);
 }
 
 function AdminProductEditPage() {
@@ -48,17 +41,14 @@ function AdminProductEditPage() {
   }
 
   function loadGalleryImages(productData) {
-    const images = Array.isArray(productData?.images)
-      ? productData.images
-      : [];
-
+    const images = Array.isArray(productData?.images) ? productData.images : [];
     const mainImageUrl = productData?.imageUrl || "";
 
-    const filteredImages = images.filter(
-      (image) =>
-        !isSameImage(image.url, mainImageUrl) &&
-        !isSameImage(image.imageUrl, mainImageUrl)
-    );
+    const filteredImages = images.filter((image) => {
+      const imageUrl = image.url || image.imageUrl || "";
+
+      return imageUrl !== mainImageUrl;
+    });
 
     const sortedImages = sortImages(filteredImages);
 
@@ -86,6 +76,7 @@ function AdminProductEditPage() {
     try {
       setLoadingPage(true);
       setError("");
+      setSuccess("");
 
       await refreshProductAndGallery();
     } catch (err) {
@@ -130,7 +121,6 @@ function AdminProductEditPage() {
 
       await updateAdminProduct(id, {
         ...formData,
-        imageUrl: product.imageUrl || formData.imageUrl || "",
       });
 
       navigate("/admin/products");
@@ -160,10 +150,8 @@ function AdminProductEditPage() {
       setError("");
       setSuccess("");
 
-      const updatedProduct = await uploadAdminProductImage(id, file);
-
-      setProduct(updatedProduct);
-      loadGalleryImages(updatedProduct);
+      await uploadAdminProductImage(id, file);
+      await refreshProductAndGallery();
 
       setSuccess("Image principale modifiée avec succès.");
     } catch (err) {
@@ -236,8 +224,13 @@ function AdminProductEditPage() {
     }
   };
 
-  if (loadingPage) return <Loader text="Chargement du produit..." />;
-  if (error && !product) return <ErrorMessage message={error} />;
+  if (loadingPage) {
+    return <Loader text="Chargement du produit..." />;
+  }
+
+  if (error && !product) {
+    return <ErrorMessage message={error} />;
+  }
 
   return (
     <div className="page-stack">
@@ -264,9 +257,9 @@ function AdminProductEditPage() {
             et comme première image de la fiche produit.
           </p>
 
-          {product.imageUrl ? (
+          {product?.imageUrl ? (
             <img
-              src={product.imageUrl}
+              src={resolveImageUrl(product.imageUrl)}
               alt={product.name}
               className="admin-product-preview-image"
             />
@@ -314,7 +307,7 @@ function AdminProductEditPage() {
               {galleryImages.map((image) => (
                 <div key={image.id} className="admin-product-gallery-item">
                   <img
-                    src={image.url || image.imageUrl}
+                    src={resolveImageUrl(image.url || image.imageUrl)}
                     alt={galleryForms[image.id]?.altText || product.name}
                     className="admin-product-gallery-image"
                   />

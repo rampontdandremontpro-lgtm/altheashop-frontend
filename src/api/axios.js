@@ -7,12 +7,20 @@ export function resolveImageUrl(url) {
   if (!url) return "";
 
   if (
-    url.startsWith("http://") ||
-    url.startsWith("https://") ||
     url.startsWith("data:") ||
     url.startsWith("blob:")
   ) {
     return url;
+  }
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    try {
+      const parsedUrl = new URL(url);
+
+      return `${ASSET_BASE_URL}${parsedUrl.pathname}`;
+    } catch {
+      return url;
+    }
   }
 
   return `${ASSET_BASE_URL}${url.startsWith("/") ? url : `/${url}`}`;

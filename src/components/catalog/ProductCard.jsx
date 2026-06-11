@@ -3,32 +3,37 @@ import { useState } from "react";
 import { formatPrice } from "../../utils/formatPrice";
 import { useI18n } from "../../context/I18nContext";
 import { getTranslatedProduct } from "../../utils/productTranslations";
-
-const FALLBACK_IMAGE =
-  "https://via.placeholder.com/400x400?text=Image+indisponible";
+import { resolveImageUrl } from "../../api/axios";
 
 function ProductCard({ product }) {
   const { t, language } = useI18n();
 
   const translatedProduct = getTranslatedProduct(product, language);
 
-  const [imageSrc, setImageSrc] = useState(
+  const initialImage =
     translatedProduct.imageUrl ||
-      translatedProduct.images?.[0]?.url ||
-      FALLBACK_IMAGE
-  );
+    translatedProduct.images?.[0]?.url ||
+    translatedProduct.images?.[0]?.imageUrl ||
+    "";
+
+  const [imageSrc, setImageSrc] = useState(resolveImageUrl(initialImage));
+  const [imageError, setImageError] = useState(false);
 
   return (
     <article className="product-card box">
-      <Link
-        to={`/product/${translatedProduct.slug || translatedProduct.id}`}
-      >
-        <img
-          src={imageSrc}
-          alt={translatedProduct.name}
-          className="product-card-image"
-          onError={() => setImageSrc(FALLBACK_IMAGE)}
-        />
+      <Link to={`/product/${translatedProduct.slug || translatedProduct.id}`}>
+        {imageSrc && !imageError ? (
+          <img
+            src={imageSrc}
+            alt={translatedProduct.name}
+            className="product-card-image"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="image-placeholder product-card-image">
+            Image indisponible
+          </div>
+        )}
       </Link>
 
       <div className="product-card-content">

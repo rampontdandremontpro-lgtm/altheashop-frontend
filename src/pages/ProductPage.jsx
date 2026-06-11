@@ -8,9 +8,7 @@ import { useCart } from "../context/CartContext";
 import SimilarProducts from "../components/catalog/SimilarProducts";
 import { useI18n } from "../context/I18nContext";
 import { getTranslatedProduct } from "../utils/productTranslations";
-
-const FALLBACK_IMAGE =
-  "https://via.placeholder.com/600x400?text=Image+indisponible";
+import { resolveImageUrl } from "../api/axios";
 
 function isValidImageUrl(url) {
   return typeof url === "string" && url.trim().length > 0;
@@ -20,7 +18,7 @@ function getProductImages(product) {
   const images = [];
 
   if (isValidImageUrl(product?.imageUrl)) {
-    images.push(product.imageUrl.trim());
+    images.push(resolveImageUrl(product.imageUrl.trim()));
   }
 
   if (Array.isArray(product?.images)) {
@@ -31,13 +29,17 @@ function getProductImages(product) {
     sortedImages.forEach((image) => {
       const url = image?.url || image?.imageUrl;
 
-      if (isValidImageUrl(url) && !images.includes(url.trim())) {
-        images.push(url.trim());
+      if (isValidImageUrl(url)) {
+        const resolvedUrl = resolveImageUrl(url.trim());
+
+        if (!images.includes(resolvedUrl)) {
+          images.push(resolvedUrl);
+        }
       }
     });
   }
 
-  return images.length > 0 ? images : [FALLBACK_IMAGE];
+  return images;
 }
 
 function ProductPage() {
@@ -47,8 +49,10 @@ function ProductPage() {
   const { addToCart, cartError } = useCart();
 
   const [product, setProduct] = useState(null);
-  const [productImages, setProductImages] = useState([FALLBACK_IMAGE]);
+  const [productImages, setProductImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const [thumbErrors, setThumbErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cartSuccess, setCartSuccess] = useState("");
@@ -59,6 +63,8 @@ function ProductPage() {
         setLoading(true);
         setError("");
         setCartSuccess("");
+        setImageError(false);
+        setThumbErrors({});
 
         const data = await getProductById(identifier);
         const images = getProductImages(data);
@@ -83,12 +89,14 @@ function ProductPage() {
   }, [identifier, t]);
 
   const handlePreviousImage = () => {
+    setImageError(false);
     setCurrentImageIndex((prev) =>
       prev === 0 ? productImages.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
+    setImageError(false);
     setCurrentImageIndex((prev) =>
       prev === productImages.length - 1 ? 0 : prev + 1
     );
@@ -120,14 +128,18 @@ function ProductPage() {
         <div className="product-detail">
           <div className="box product-gallery">
             <div className="product-gallery-main">
-              <img
-                src={currentImage}
-                alt={translatedProduct.name}
-                className="product-main-image"
-                onError={(e) => {
-                  e.currentTarget.src = FALLBACK_IMAGE;
-                }}
-              />
+              {currentImage && !imageError ? (
+                <img
+                  src={currentImage}
+                  alt={translatedProduct.name}
+                  className="product-main-image"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="image-placeholder product-main-image">
+                  Image indisponible
+                </div>
+              )}
 
               {productImages.length > 1 && (
                 <>
@@ -163,17 +175,29 @@ function ProductPage() {
                         ? "thumb-button active"
                         : "thumb-button"
                     }
-                    onClick={() => setCurrentImageIndex(index)}
+                    onClick={() => {
+                      setImageError(false);
+                      setCurrentImageIndex(index);
+                    }}
                     aria-label={`${t("showImage")} ${index + 1}`}
                   >
-                    <img
-                      src={image}
-                      alt={`${translatedProduct.name} ${index + 1}`}
-                      className="thumb-image"
-                      onError={(e) => {
-                        e.currentTarget.src = FALLBACK_IMAGE;
-                      }}
-                    />
+                    {!thumbErrors[index] ? (
+                      <img
+                        src={image}
+                        alt={`${translatedProduct.name} ${index + 1}`}
+                        className="thumb-image"
+                        onError={() =>
+                          setThumbErrors((prev) => ({
+                            ...prev,
+                            [index]: true,
+                          }))
+                        }
+                      />
+                    ) : (
+                      <div className="image-placeholder thumb-image">
+                        Image indisponible
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>

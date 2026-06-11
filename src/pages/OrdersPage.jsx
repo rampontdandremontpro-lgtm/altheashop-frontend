@@ -13,8 +13,7 @@ import AccountSidebar from "../components/account/AccountSidebar";
 import { useI18n } from "../context/I18nContext";
 import { useCart } from "../context/CartContext";
 import { getTranslatedProduct } from "../utils/productTranslations";
-
-const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Image";
+import { resolveImageUrl } from "../api/axios";
 
 function getOrderYear(order) {
   return new Date(order.createdAt).getFullYear();
@@ -36,7 +35,12 @@ function getItemName(item, t, language) {
   const product = getOrderItemProduct(item);
   const translatedProduct = getTranslatedProduct(product, language);
 
-  return translatedProduct?.name || item.name || item.product?.name || t("product");
+  return (
+    translatedProduct?.name ||
+    item.name ||
+    item.product?.name ||
+    t("product")
+  );
 }
 
 function getItemImage(item) {
@@ -45,7 +49,7 @@ function getItemImage(item) {
     item.product?.imageUrl ||
     item.product?.images?.[0]?.url ||
     item.product?.images?.[0]?.imageUrl ||
-    FALLBACK_IMAGE
+    ""
   );
 }
 
@@ -77,6 +81,7 @@ function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [invoiceLoadingId, setInvoiceLoadingId] = useState(null);
   const [reorderLoadingId, setReorderLoadingId] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
   const [error, setError] = useState("");
 
   const statusLabels = {
@@ -270,20 +275,32 @@ function OrdersPage() {
                             <div className="order-products-list">
                               {order.items.map((item) => {
                                 const itemName = getItemName(item, t, language);
+                                const rawImage = getItemImage(item);
+                                const imageUrl = resolveImageUrl(rawImage);
+                                const imageKey = `${order.id}-${item.id}`;
 
                                 return (
                                   <div
-                                    key={`${order.id}-${item.id}`}
+                                    key={imageKey}
                                     className="order-product-row"
                                   >
-                                    <img
-                                      src={getItemImage(item)}
-                                      alt={itemName}
-                                      className="order-product-image"
-                                      onError={(e) => {
-                                        e.currentTarget.src = FALLBACK_IMAGE;
-                                      }}
-                                    />
+                                    {imageUrl && !imageErrors[imageKey] ? (
+                                      <img
+                                        src={imageUrl}
+                                        alt={itemName}
+                                        className="order-product-image"
+                                        onError={() =>
+                                          setImageErrors((prev) => ({
+                                            ...prev,
+                                            [imageKey]: true,
+                                          }))
+                                        }
+                                      />
+                                    ) : (
+                                      <div className="image-placeholder order-product-image">
+                                        Image indisponible
+                                      </div>
+                                    )}
 
                                     <div>
                                       <strong>{itemName}</strong>
