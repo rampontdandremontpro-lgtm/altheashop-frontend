@@ -62,6 +62,7 @@ twoFactorError: "לא ניתן לאמת את הקוד.",
 invalidTwoFactorCode: "הקוד שהוזן שגוי.",
 twoFactorCodeExpired: "פג תוקף הקוד. נא להתחבר שוב.",
 backToLogin: "חזרה להתחברות",
+rememberMe: "זכור אותי",
 };
 
 export default auth;

@@ -63,6 +63,7 @@ twoFactorError: "تعذر التحقق من الرمز.",
 invalidTwoFactorCode: "الرمز الذي تم إدخاله غير صحيح.",
 twoFactorCodeExpired: "انتهت صلاحية الرمز. يرجى تسجيل الدخول مرة أخرى.",
 backToLogin: "العودة إلى تسجيل الدخول",
+rememberMe: "تذكرني",
 };
 
 export default auth;

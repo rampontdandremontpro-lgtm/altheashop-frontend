@@ -61,6 +61,7 @@ twoFactorError: "Impossible de vérifier le code.",
 invalidTwoFactorCode: "Le code saisi est incorrect.",
 twoFactorCodeExpired: "Le code a expiré. Veuillez vous reconnecter.",
 backToLogin: "Retour à la connexion",
+rememberMe: "Se souvenir de moi",
 };
 
 export default auth;

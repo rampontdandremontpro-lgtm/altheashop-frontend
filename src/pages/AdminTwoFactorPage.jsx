@@ -11,6 +11,7 @@ function AdminTwoFactorPage() {
 
   const email = location.state?.email || "";
   const redirectTo = location.state?.from || "/admin";
+  const rememberMe = Boolean(location.state?.rememberMe);
 
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -54,6 +55,7 @@ function AdminTwoFactorPage() {
       await verifyTwoFactor({
         email,
         code,
+        rememberMe,
       });
 
       navigate(redirectTo, { replace: true });

@@ -61,6 +61,7 @@ twoFactorError: "Unable to verify the code.",
 invalidTwoFactorCode: "The code entered is incorrect.",
 twoFactorCodeExpired: "The code has expired. Please log in again.",
 backToLogin: "Back to login",
+rememberMe: "Remember me",
 };
 
 export default auth;

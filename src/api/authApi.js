@@ -3,40 +3,54 @@ import api from "./axios";
 const TOKEN_KEY = "althea_token";
 const USER_KEY = "althea_user";
 
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
+function getStorage(rememberMe = true) {
+  return rememberMe ? localStorage : sessionStorage;
 }
 
-export function setToken(token) {
-  localStorage.setItem(TOKEN_KEY, token);
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token, rememberMe = true) {
+  const storage = getStorage(rememberMe);
+  const otherStorage = rememberMe ? sessionStorage : localStorage;
+
+  storage.setItem(TOKEN_KEY, token);
+  otherStorage.removeItem(TOKEN_KEY);
 }
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
 }
 
-function saveUser(user) {
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+function saveUser(user, rememberMe = true) {
+  const storage = getStorage(rememberMe);
+  const otherStorage = rememberMe ? sessionStorage : localStorage;
+
+  storage.setItem(USER_KEY, JSON.stringify(user));
+  otherStorage.removeItem(USER_KEY);
 }
 
 function clearUser() {
   localStorage.removeItem(USER_KEY);
+  sessionStorage.removeItem(USER_KEY);
 }
 
 export function getStoredUser() {
-  const raw = localStorage.getItem(USER_KEY);
+  const raw = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY);
   return raw ? JSON.parse(raw) : null;
 }
 
-function saveAuthResponse(data) {
+function saveAuthResponse(data, rememberMe = true) {
   const token = data.accessToken || data.token;
 
   if (token) {
-    setToken(token);
+    setToken(token, rememberMe);
   }
 
   if (data.user) {
-    saveUser(data.user);
+    saveUser(data.user, rememberMe);
   }
 
   return data.user;
@@ -59,6 +73,7 @@ export async function login(payload) {
   const response = await api.post("/auth/login", {
     email: payload.email,
     password: payload.password,
+    rememberMe: Boolean(payload.rememberMe),
   });
 
   if (response.data?.requiresTwoFactor) {
@@ -66,10 +81,11 @@ export async function login(payload) {
       requiresTwoFactor: true,
       email: response.data.email,
       message: response.data.message,
+      rememberMe: Boolean(payload.rememberMe),
     };
   }
 
-  const user = saveAuthResponse(response.data);
+  const user = saveAuthResponse(response.data, Boolean(payload.rememberMe));
 
   return {
     requiresTwoFactor: false,
@@ -83,7 +99,7 @@ export async function verifyTwoFactor(payload) {
     code: payload.code,
   });
 
-  const user = saveAuthResponse(response.data);
+  const user = saveAuthResponse(response.data, Boolean(payload.rememberMe));
 
   return user;
 }
@@ -104,7 +120,9 @@ export async function getMe() {
   const response = await api.get("/auth/me");
   const user = response.data.user || response.data;
 
-  saveUser(user);
+  const rememberMe = Boolean(localStorage.getItem(TOKEN_KEY));
+  saveUser(user, rememberMe);
+
   return user;
 }
 
@@ -137,7 +155,9 @@ export async function updateProfile(payload) {
   });
 
   const user = response.data.user || response.data;
-  saveUser(user);
+  const rememberMe = Boolean(localStorage.getItem(TOKEN_KEY));
+
+  saveUser(user, rememberMe);
 
   return user;
 }

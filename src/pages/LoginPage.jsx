@@ -6,6 +6,7 @@ import { useI18n } from "../context/I18nContext";
 const EMPTY_FORM = {
   email: "",
   password: "",
+  rememberMe: false,
 };
 
 function LoginPage() {
@@ -26,9 +27,11 @@ function LoginPage() {
   }, []);
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -59,6 +62,7 @@ function LoginPage() {
       const result = await login({
         email: form.email,
         password: form.password,
+        rememberMe: form.rememberMe,
       });
 
       if (result?.requiresTwoFactor) {
@@ -66,8 +70,10 @@ function LoginPage() {
           state: {
             email: result.email || form.email,
             from: redirectTo,
+            rememberMe: result.rememberMe,
           },
         });
+
         return;
       }
 
@@ -111,6 +117,17 @@ function LoginPage() {
               onChange={handleChange}
               autoComplete="new-password"
             />
+
+            <label className="default-toggle">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                checked={form.rememberMe}
+                onChange={handleChange}
+              />
+
+              <span>{t("rememberMe")}</span>
+            </label>
 
             <button className="btn btn-primary" type="submit" disabled={loading}>
               {loading ? t("loginLoading") : t("loginSubmit")}
