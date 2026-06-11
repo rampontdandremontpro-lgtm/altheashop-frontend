@@ -19,7 +19,13 @@ function formatDate(value) {
 }
 
 function isEscalationResolved(item) {
-  return Boolean(item.isResolved || item.resolvedAt || item.status === "resolved");
+  return Boolean(
+    item.isResolved ||
+      item.resolvedAt ||
+      item.status === "resolved" ||
+      item.supportStatus === "resolved" ||
+      item.supportResolvedAt
+  );
 }
 
 function AdminChatbotEscalationsPage() {
@@ -74,17 +80,20 @@ function AdminChatbotEscalationsPage() {
       await resolveAdminChatbotEscalation(id);
 
       setEscalations((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                isResolved: true,
-                resolvedAt: item.resolvedAt || new Date().toISOString(),
-                status: "resolved",
-              }
-            : item
-        )
-      );
+  prev.map((item) =>
+    item.id === id
+      ? {
+          ...item,
+          isResolved: true,
+          resolvedAt: item.resolvedAt || new Date().toISOString(),
+          status: "resolved",
+          supportStatus: "resolved",
+          supportResolvedAt:
+            item.supportResolvedAt || new Date().toISOString(),
+        }
+      : item
+  )
+);
 
       setSuccess("La demande a bien été marquée comme traitée.");
     } catch (err) {
@@ -156,7 +165,7 @@ function AdminChatbotEscalationsPage() {
                         {item.userFullName || `Utilisateur #${item.userId}`}
                       </td>
                       <td>{item.userEmail || "-"}</td>
-                      <td>{item.subject || "Support client"}</td>
+                      <td>{item.supportSubject || item.subject || "Support client"}</td>
                       <td>{item.message || "-"}</td>
                       <td>
                         <span
