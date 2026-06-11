@@ -22,6 +22,15 @@ const contact = {
   writeMessage: "Écrire un message...",
   chatbotGuestReply:
   "Je peux vous aider, mais pour accéder à l'historique complet du chatbot, connectez-vous à votre compte. Vous pouvez aussi nous contacter via le formulaire.",
+  chatbotEscalate: "Parler à un conseiller",
+chatbotEscalating: "Transmission en cours...",
+chatbotEscalationSuccess:
+  "Votre demande a été transmise à notre équipe. Nous vous répondrons rapidement.",
+chatbotEscalationError:
+  "Impossible de transmettre votre demande.",
+chatbotEscalationSubject: "Support client",
+chatbotEscalationDefaultMessage:
+  "Le client souhaite être mis en relation avec un conseiller.",
 };
 
 export default contact;

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  escalateChatbot,
   getChatbotMessages,
   sendChatbotMessage,
 } from "../../api/contactApi";
@@ -10,7 +11,6 @@ const SUPPORTED_LANGUAGES = ["fr", "en", "ar", "he"];
 
 function getSafeLanguage(language) {
   const shortLanguage = (language || "fr").split("-")[0].toLowerCase();
-
   return SUPPORTED_LANGUAGES.includes(shortLanguage) ? shortLanguage : "fr";
 }
 
@@ -66,6 +66,7 @@ function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [sending, setSending] = useState(false);
+  const [escalating, setEscalating] = useState(false);
   const [error, setError] = useState("");
 
   async function reloadHistory() {
@@ -99,7 +100,7 @@ function ChatbotWidget() {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages, sending]);
+  }, [messages, sending, escalating]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -170,6 +171,42 @@ function ChatbotWidget() {
     }
   };
 
+  const handleEscalate = async () => {
+    try {
+      setEscalating(true);
+      setError("");
+
+      const lastUserMessage =
+        [...messages]
+          .reverse()
+          .find((message) => message.role === "user")?.text ||
+        t("chatbotEscalationDefaultMessage");
+
+      await escalateChatbot({
+        message: lastUserMessage,
+        subject: t("chatbotEscalationSubject"),
+        language: currentLanguage,
+      });
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `escalation-${Date.now()}`,
+          role: "bot",
+          text: t("chatbotEscalationSuccess"),
+        },
+      ]);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("chatbotEscalationError")
+      );
+    } finally {
+      setEscalating(false);
+    }
+  };
+
   return (
     <div className="box chatbot-box">
       <div className="chatbot-header">
@@ -205,6 +242,12 @@ function ChatbotWidget() {
           </div>
         )}
 
+        {escalating && (
+          <div className="chat-message bot">
+            <span>{t("chatbotEscalating")}</span>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -221,6 +264,17 @@ function ChatbotWidget() {
           {sending ? t("sending") : t("send")}
         </button>
       </form>
+
+      <div className="chatbot-escalation">
+        <button
+          type="button"
+          className="btn btn-secondary full-width"
+          onClick={handleEscalate}
+          disabled={escalating}
+        >
+          {escalating ? t("chatbotEscalating") : t("chatbotEscalate")}
+        </button>
+      </div>
     </div>
   );
 }

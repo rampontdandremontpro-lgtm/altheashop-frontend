@@ -21,6 +21,15 @@ const contact = {
   writeMessage: "כתוב הודעה...",
   chatbotGuestReply:
   "אני יכול לעזור לך, אך כדי לגשת להיסטוריית הצ'אט המלאה יש להתחבר לחשבון. ניתן גם ליצור איתנו קשר באמצעות הטופס.",
+  chatbotEscalate: "דבר עם נציג",
+chatbotEscalating: "שולח את הבקשה...",
+chatbotEscalationSuccess:
+  "הבקשה שלך הועברה לצוות שלנו. נחזור אליך בהקדם.",
+chatbotEscalationError:
+  "לא ניתן לשלוח את הבקשה.",
+chatbotEscalationSubject: "תמיכת לקוחות",
+chatbotEscalationDefaultMessage:
+  "הלקוח מעוניין לדבר עם נציג.",
 };
 
 export default contact;

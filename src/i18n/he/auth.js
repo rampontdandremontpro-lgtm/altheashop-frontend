@@ -51,6 +51,17 @@ invalidEmailToken:
   "קישור האישור אינו תקין.",
 emailTokenExpired:
   "פג תוקף קישור האישור. נא לבקש קישור חדש.",
+twoFactorTitle: "אימות מנהל",
+twoFactorDescription:
+  "קוד אבטחה בן 6 ספרות נשלח לכתובת האימייל של המנהל.",
+twoFactorCodePlaceholder: "קוד בן 6 ספרות",
+twoFactorCodeRequired: "נא להזין את הקוד בן 6 הספרות.",
+twoFactorLoading: "מאמת...",
+twoFactorSubmit: "אמת קוד",
+twoFactorError: "לא ניתן לאמת את הקוד.",
+invalidTwoFactorCode: "הקוד שהוזן שגוי.",
+twoFactorCodeExpired: "פג תוקף הקוד. נא להתחבר שוב.",
+backToLogin: "חזרה להתחברות",
 };
 
 export default auth;

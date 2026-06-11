@@ -5,6 +5,7 @@ import {
   logout as logoutApi,
   register as registerApi,
   updateProfile as updateProfileApi,
+  verifyTwoFactor as verifyTwoFactorApi,
 } from "../api/authApi";
 
 const AuthContext = createContext(null);
@@ -29,15 +30,26 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (payload) => {
-    const loggedUser = await loginApi(payload);
+    const result = await loginApi(payload);
+
+    if (result?.requiresTwoFactor) {
+      return result;
+    }
+
+    setUser(result.user);
+    return result;
+  };
+
+  const verifyTwoFactor = async (payload) => {
+    const loggedUser = await verifyTwoFactorApi(payload);
     setUser(loggedUser);
     return loggedUser;
   };
 
   const register = async (payload) => {
-  const result = await registerApi(payload);
-  return result;
-};
+    const result = await registerApi(payload);
+    return result;
+  };
 
   const logout = async () => {
     await logoutApi();
@@ -57,6 +69,7 @@ export function AuthProvider({ children }) {
       isAdmin: user?.role === "admin",
       authLoading,
       login,
+      verifyTwoFactor,
       register,
       logout,
       updateProfile,

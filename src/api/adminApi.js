@@ -312,3 +312,24 @@ export async function getAdminChatbotMessages(page = 1, limit = 20) {
     totalPages: data.totalPages ?? 1,
   };
 }
+
+export async function getAdminChatbotEscalations(page = 1, limit = 20) {
+  const response = await api.get("/admin/chatbot/escalations", {
+    params: { page, limit },
+  });
+
+  const data = response.data || {};
+
+  return {
+    items: Array.isArray(data.items) ? data.items : [],
+    page: data.page ?? page,
+    limit: data.limit ?? limit,
+    total: data.total ?? 0,
+    totalPages: data.totalPages ?? 1,
+  };
+}
+
+export async function resolveAdminChatbotEscalation(id) {
+  const response = await api.patch(`/admin/chatbot/escalations/${id}/resolve`);
+  return response.data;
+}

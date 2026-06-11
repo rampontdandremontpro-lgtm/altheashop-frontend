@@ -41,6 +41,8 @@ const orders = {
   orderedProducts: "Ordered Products",
   noOrderedProducts: "No products in this order.",
   downloadInvoicePdf: "Download Invoice PDF",
+  reorder: "Order again",
+reorderError: "Unable to reorder this order.",
 };
 
 export default orders;

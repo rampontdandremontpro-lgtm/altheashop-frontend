@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useI18n } from "../context/I18nContext";
 
@@ -10,25 +10,38 @@ const EMPTY_FORM = {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const { t } = useI18n();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
+  const redirectTo = location.state?.from?.pathname || "/";
 
   useEffect(() => {
     setForm(EMPTY_FORM);
     setError("");
   }, []);
-  
 
   const handleChange = (e) => {
     setForm((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const getLoginErrorMessage = (backendMessage) => {
+    if (backendMessage === "EMAIL_NOT_CONFIRMED") {
+      return t("emailNotConfirmed");
+    }
+
+    if (backendMessage === "INVALID_CREDENTIALS") {
+      return t("invalidCredentials");
+    }
+
+    return t("loginError");
   };
 
   const handleSubmit = async (e) => {
@@ -43,24 +56,27 @@ function LoginPage() {
     try {
       setLoading(true);
 
-      await login({
+      const result = await login({
         email: form.email,
         password: form.password,
       });
 
-      setForm(EMPTY_FORM);
-      navigate("/");
-    } catch (err) {
-  const backendMessage = err.response?.data?.message;
+      if (result?.requiresTwoFactor) {
+        navigate("/admin-2fa", {
+          state: {
+            email: result.email || form.email,
+            from: redirectTo,
+          },
+        });
+        return;
+      }
 
-  if (backendMessage === "EMAIL_NOT_CONFIRMED") {
-    setError(t("emailNotConfirmed"));
-  } else if (backendMessage === "INVALID_CREDENTIALS") {
-    setError(t("invalidCredentials"));
-  } else {
-    setError(t("loginError"));
-  }
-}finally {
+      setForm(EMPTY_FORM);
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      const backendMessage = err.response?.data?.message;
+      setError(getLoginErrorMessage(backendMessage));
+    } finally {
       setLoading(false);
     }
   };

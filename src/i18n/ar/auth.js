@@ -52,6 +52,17 @@ invalidEmailToken:
   "رابط التأكيد غير صالح.",
 emailTokenExpired:
   "انتهت صلاحية رابط التأكيد. يرجى طلب رابط جديد.",
+twoFactorTitle: "التحقق من المسؤول",
+twoFactorDescription:
+  "تم إرسال رمز أمان مكوّن من 6 أرقام إلى بريد المسؤول الإلكتروني.",
+twoFactorCodePlaceholder: "رمز من 6 أرقام",
+twoFactorCodeRequired: "يرجى إدخال الرمز المكون من 6 أرقام.",
+twoFactorLoading: "جارٍ التحقق...",
+twoFactorSubmit: "تأكيد الرمز",
+twoFactorError: "تعذر التحقق من الرمز.",
+invalidTwoFactorCode: "الرمز الذي تم إدخاله غير صحيح.",
+twoFactorCodeExpired: "انتهت صلاحية الرمز. يرجى تسجيل الدخول مرة أخرى.",
+backToLogin: "العودة إلى تسجيل الدخول",
 };
 
 export default auth;

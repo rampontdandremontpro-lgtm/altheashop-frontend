@@ -29,6 +29,15 @@ const contact = {
   writeMessage: "Write a message...",
   chatbotGuestReply:
   "I can help you, but to access the full chatbot history, please log in to your account. You can also contact us using the form.",
+  chatbotEscalate: "Talk to an advisor",
+chatbotEscalating: "Sending request...",
+chatbotEscalationSuccess:
+  "Your request has been forwarded to our team.",
+chatbotEscalationError:
+  "Unable to forward your request.",
+chatbotEscalationSubject: "Customer support",
+chatbotEscalationDefaultMessage:
+  "The customer would like to speak with an advisor.",
 };
 
 export default contact;

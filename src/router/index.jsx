@@ -41,6 +41,8 @@ import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import AdminUserEditPage from "../pages/admin/AdminUserEditPage";
 import AdminChatbotMessagesPage from "../pages/admin/AdminChatbotMessagesPage";
 import VerifyEmailPage from "../pages/VerifyEmailPage";
+import AdminTwoFactorPage from "../pages/AdminTwoFactorPage";
+import AdminChatbotEscalationsPage from "../pages/admin/AdminChatbotEscalationsPage";
 
 function AppRouter() {
   return (
@@ -63,6 +65,7 @@ function AppRouter() {
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="verify-email" element={<VerifyEmailPage />} />
+        <Route path="admin-2fa" element={<AdminTwoFactorPage />} />
         <Route path="account" element={<PrivateRoute><AccountPage /></PrivateRoute>} />
         <Route path="account/edit" element={<PrivateRoute> <AccountEditPage /></PrivateRoute>} />
         <Route path="orders" element={<PrivateRoute><OrdersPage /></PrivateRoute> } />
@@ -83,6 +86,7 @@ function AppRouter() {
         <Route path="admin/orders/:id" element={<AdminRoute><AdminOrderDetailPage /></AdminRoute>} />
         <Route path="admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
         <Route path="admin/users/:id/edit" element={<AdminRoute><AdminUserEditPage /></AdminRoute>} />
+        <Route path="admin/chatbot/escalations" element={<AdminRoute><AdminChatbotEscalationsPage /></AdminRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

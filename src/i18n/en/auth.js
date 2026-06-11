@@ -50,6 +50,17 @@ invalidEmailToken:
   "The confirmation link is invalid.",
 emailTokenExpired:
   "The confirmation link has expired. Please request a new link.",
+twoFactorTitle: "Administrator verification",
+twoFactorDescription:
+  "A 6-digit security code has been sent to the administrator email address.",
+twoFactorCodePlaceholder: "6-digit code",
+twoFactorCodeRequired: "Please enter the 6-digit code.",
+twoFactorLoading: "Verifying...",
+twoFactorSubmit: "Verify code",
+twoFactorError: "Unable to verify the code.",
+invalidTwoFactorCode: "The code entered is incorrect.",
+twoFactorCodeExpired: "The code has expired. Please log in again.",
+backToLogin: "Back to login",
 };
 
 export default auth;

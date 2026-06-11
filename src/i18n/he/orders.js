@@ -39,6 +39,8 @@ const orders = {
   orderedProducts: "מוצרים שהוזמנו",
   noOrderedProducts: "אין מוצרים בהזמנה זו.",
   downloadInvoicePdf: "הורד חשבונית PDF",
+  reorder: "הזמן שוב",
+reorderError: "לא ניתן לבצע הזמנה חוזרת.",
 };
 
 export default orders;

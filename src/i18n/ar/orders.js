@@ -66,6 +66,8 @@ const orders = {
     "لا توجد منتجات في هذا الطلب.",
   downloadInvoicePdf:
     "تحميل الفاتورة PDF",
+  reorder: "الطلب مرة أخرى",
+reorderError: "تعذر إعادة هذه الطلبية.",
 };
 
 export default orders;

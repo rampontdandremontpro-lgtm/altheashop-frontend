@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { downloadOrderInvoice, getOrders } from "../api/ordersApi";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  downloadOrderInvoice,
+  getOrders,
+  reorder,
+} from "../api/ordersApi";
 import Loader from "../components/common/Loader";
 import ErrorMessage from "../components/common/ErrorMessage";
 import EmptyState from "../components/common/EmptyState";
 import { formatPrice } from "../utils/formatPrice";
 import AccountSidebar from "../components/account/AccountSidebar";
 import { useI18n } from "../context/I18nContext";
+import { useCart } from "../context/CartContext";
 
 const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Image";
 
@@ -46,13 +51,16 @@ function orderMatchesSearch(order, search) {
 }
 
 function OrdersPage() {
+  const navigate = useNavigate();
   const { t } = useI18n();
+  const { loadCart } = useCart();
 
   const [orders, setOrders] = useState([]);
   const [selectedYear, setSelectedYear] = useState("all");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [invoiceLoadingId, setInvoiceLoadingId] = useState(null);
+  const [reorderLoadingId, setReorderLoadingId] = useState(null);
   const [error, setError] = useState("");
 
   const statusLabels = {
@@ -120,6 +128,8 @@ function OrdersPage() {
   const handleDownloadInvoice = async (order) => {
     try {
       setInvoiceLoadingId(order.id);
+      setError("");
+
       await downloadOrderInvoice(order.id, order.reference);
     } catch (err) {
       setError(
@@ -129,6 +139,26 @@ function OrdersPage() {
       );
     } finally {
       setInvoiceLoadingId(null);
+    }
+  };
+
+  const handleReorder = async (order) => {
+    try {
+      setReorderLoadingId(order.id);
+      setError("");
+
+      await reorder(order.id);
+      await loadCart();
+
+      navigate("/cart");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          t("reorderError")
+      );
+    } finally {
+      setReorderLoadingId(null);
     }
   };
 
@@ -195,7 +225,9 @@ function OrdersPage() {
 
                             <p className="order-status-line">
                               {t("status")} :
-                              <span className={`status-badge status-${order.status}`}>
+                              <span
+                                className={`status-badge status-${order.status}`}
+                              >
                                 {statusLabels[order.status] || order.status}
                               </span>
                             </p>
@@ -268,6 +300,17 @@ function OrdersPage() {
                             {invoiceLoadingId === order.id
                               ? t("downloading")
                               : t("invoicePdf")}
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => handleReorder(order)}
+                            disabled={reorderLoadingId === order.id}
+                          >
+                            {reorderLoadingId === order.id
+                              ? t("reorderLoading")
+                              : t("reorder")}
                           </button>
                         </div>
                       </article>

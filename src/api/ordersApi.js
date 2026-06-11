@@ -35,3 +35,8 @@ export async function downloadOrderInvoice(id, reference = "facture") {
   link.remove();
   window.URL.revokeObjectURL(blobUrl);
 }
+
+export async function reorder(orderId) {
+  const response = await api.post(`/orders/${orderId}/reorder`);
+  return response.data;
+}

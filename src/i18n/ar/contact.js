@@ -31,6 +31,15 @@ const contact = {
     "اكتب رسالة...",
     chatbotGuestReply:
   "يمكنني مساعدتك، ولكن للوصول إلى سجل المحادثة الكامل يرجى تسجيل الدخول إلى حسابك. يمكنك أيضًا التواصل معنا عبر النموذج.",
+  chatbotEscalate: "التحدث إلى مستشار",
+chatbotEscalating: "جارٍ إرسال الطلب...",
+chatbotEscalationSuccess:
+  "تم إرسال طلبك إلى فريقنا. سنرد عليك في أقرب وقت ممكن.",
+chatbotEscalationError:
+  "تعذر إرسال طلبك.",
+chatbotEscalationSubject: "دعم العملاء",
+chatbotEscalationDefaultMessage:
+  "يرغب العميل في التواصل مع مستشار.",
 };
 
 export default contact;

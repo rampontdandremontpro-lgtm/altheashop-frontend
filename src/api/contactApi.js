@@ -46,3 +46,13 @@ export async function getChatbotMessages() {
   const response = await api.get("/chatbot/messages");
   return Array.isArray(response.data) ? response.data : [];
 }
+
+export async function escalateChatbot(payload) {
+  const response = await api.post("/chatbot/escalate", {
+    message: payload.message,
+    subject: payload.subject,
+    language: payload.language,
+  });
+
+  return response.data;
+}

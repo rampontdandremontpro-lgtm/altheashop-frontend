@@ -54,13 +54,38 @@ export async function register(payload) {
 
   return response.data;
 }
+
 export async function login(payload) {
   const response = await api.post("/auth/login", {
     email: payload.email,
     password: payload.password,
   });
 
-  return saveAuthResponse(response.data);
+  if (response.data?.requiresTwoFactor) {
+    return {
+      requiresTwoFactor: true,
+      email: response.data.email,
+      message: response.data.message,
+    };
+  }
+
+  const user = saveAuthResponse(response.data);
+
+  return {
+    requiresTwoFactor: false,
+    user,
+  };
+}
+
+export async function verifyTwoFactor(payload) {
+  const response = await api.post("/auth/verify-2fa", {
+    email: payload.email,
+    code: payload.code,
+  });
+
+  const user = saveAuthResponse(response.data);
+
+  return user;
 }
 
 export async function logout() {

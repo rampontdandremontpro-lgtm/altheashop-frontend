@@ -39,6 +39,8 @@ const orders = {
   orderedProducts: "Produits commandés",
   noOrderedProducts: "Aucun produit dans cette commande.",
   downloadInvoicePdf: "Télécharger la facture PDF",
+  reorder: "Commander à nouveau",
+reorderError: "Impossible de renouveler cette commande.",
 };
 
 export default orders;

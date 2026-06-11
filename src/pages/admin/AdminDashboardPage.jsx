@@ -118,6 +118,10 @@ function AdminDashboardPage() {
               Gérer les utilisateurs
             </Link>
 
+            <Link to="/admin/chatbot/escalations" className="btn btn-secondary">
+  Demandes chatbot
+</Link>
+
             <Link to="/admin/contact" className="btn btn-secondary">
               Messages contact
             </Link>

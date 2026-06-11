@@ -50,6 +50,17 @@ invalidEmailToken:
   "Le lien de confirmation est invalide.",
 emailTokenExpired:
   "Le lien de confirmation a expiré. Veuillez demander un nouveau lien.",
+twoFactorTitle: "Vérification administrateur",
+twoFactorDescription:
+  "Un code de sécurité à 6 chiffres a été envoyé à l'adresse email administrateur.",
+twoFactorCodePlaceholder: "Code à 6 chiffres",
+twoFactorCodeRequired: "Merci de saisir le code à 6 chiffres.",
+twoFactorLoading: "Vérification...",
+twoFactorSubmit: "Valider le code",
+twoFactorError: "Impossible de vérifier le code.",
+invalidTwoFactorCode: "Le code saisi est incorrect.",
+twoFactorCodeExpired: "Le code a expiré. Veuillez vous reconnecter.",
+backToLogin: "Retour à la connexion",
 };
 
 export default auth;
