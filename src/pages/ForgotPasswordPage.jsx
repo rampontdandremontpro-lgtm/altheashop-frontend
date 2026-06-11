@@ -49,12 +49,14 @@ useEffect(() => {
       setSuccess(t("forgotPasswordSuccess"));
       setEmail("");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          t("forgotPasswordError")
-      );
-    } finally {
+  const backendMessage = err.response?.data?.message;
+
+  if (backendMessage === "EMAIL_NOT_FOUND") {
+    setError(t("emailNotFound"));
+  } else {
+    setError(t("forgotPasswordError"));
+  }
+}finally {
       setLoading(false);
     }
   };

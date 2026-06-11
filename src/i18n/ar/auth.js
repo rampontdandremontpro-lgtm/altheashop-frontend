@@ -42,6 +42,16 @@ verifyEmailSuccess:
 verifyEmailError: "رابط التأكيد غير صالح أو منتهي الصلاحية.",
 verifyEmailMissingToken: "رابط التأكيد غير مكتمل.",
 goToLogin: "الذهاب إلى تسجيل الدخول",
+invalidCredentials:
+  "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+emailNotConfirmed:
+  "لم يتم تأكيد بريدك الإلكتروني بعد. يرجى التحقق من بريدك.",
+emailNotFound:
+  "لا يوجد حساب مرتبط بهذا البريد الإلكتروني.",
+invalidEmailToken:
+  "رابط التأكيد غير صالح.",
+emailTokenExpired:
+  "انتهت صلاحية رابط التأكيد. يرجى طلب رابط جديد.",
 };
 
 export default auth;

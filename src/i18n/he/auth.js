@@ -41,6 +41,16 @@ verifyEmailSuccess:
 verifyEmailError: "קישור האישור אינו תקין או שפג תוקפו.",
 verifyEmailMissingToken: "קישור האישור חסר.",
 goToLogin: "עבור להתחברות",
+invalidCredentials:
+  "כתובת האימייל או הסיסמה שגויים.",
+emailNotConfirmed:
+  "כתובת האימייל שלך עדיין לא אושרה. נא לבדוק את תיבת הדואר.",
+emailNotFound:
+  "לא נמצא חשבון המשויך לכתובת אימייל זו.",
+invalidEmailToken:
+  "קישור האישור אינו תקין.",
+emailTokenExpired:
+  "פג תוקף קישור האישור. נא לבקש קישור חדש.",
 };
 
 export default auth;

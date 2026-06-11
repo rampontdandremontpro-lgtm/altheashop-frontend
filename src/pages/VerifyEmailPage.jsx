@@ -28,12 +28,16 @@ function VerifyEmailPage() {
         await verifyEmail(token);
         setSuccess(t("verifyEmailSuccess"));
       } catch (err) {
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            t("verifyEmailError")
-        );
-      } finally {
+  const backendMessage = err.response?.data?.message;
+
+  if (backendMessage === "INVALID_EMAIL_TOKEN") {
+    setError(t("invalidEmailToken"));
+  } else if (backendMessage === "EMAIL_TOKEN_EXPIRED") {
+    setError(t("emailTokenExpired"));
+  } else {
+    setError(t("verifyEmailError"));
+  }
+} finally {
         setLoading(false);
       }
     }

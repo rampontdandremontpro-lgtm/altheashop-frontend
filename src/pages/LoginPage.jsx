@@ -51,8 +51,16 @@ function LoginPage() {
       setForm(EMPTY_FORM);
       navigate("/");
     } catch (err) {
-      setError(err.message || t("loginError"));
-    } finally {
+  const backendMessage = err.response?.data?.message;
+
+  if (backendMessage === "EMAIL_NOT_CONFIRMED") {
+    setError(t("emailNotConfirmed"));
+  } else if (backendMessage === "INVALID_CREDENTIALS") {
+    setError(t("invalidCredentials"));
+  } else {
+    setError(t("loginError"));
+  }
+}finally {
       setLoading(false);
     }
   };

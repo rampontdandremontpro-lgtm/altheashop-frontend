@@ -41,6 +41,15 @@ verifyEmailSuccess:
 verifyEmailError: "Invalid or expired confirmation link.",
 verifyEmailMissingToken: "Incomplete confirmation link.",
 goToLogin: "Go to login",
+invalidCredentials: "Incorrect email address or password.",
+emailNotConfirmed:
+  "Your email address has not been confirmed yet. Please check your inbox.",
+emailNotFound:
+  "No account is associated with this email address.",
+invalidEmailToken:
+  "The confirmation link is invalid.",
+emailTokenExpired:
+  "The confirmation link has expired. Please request a new link.",
 };
 
 export default auth;
