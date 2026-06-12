@@ -7,9 +7,11 @@ import EmptyState from "../components/common/EmptyState";
 import Pagination from "../components/common/Pagination";
 import ProductCard from "../components/catalog/ProductCard";
 import { useI18n } from "../context/I18nContext";
+import { getTranslatedCategory } from "../utils/categoryTranslations";
+
 
 function CatalogPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialQuery = searchParams.get("q") || "";
@@ -141,7 +143,13 @@ function CatalogPage() {
     setPage(1);
   };
 
-  const categoryOptions = useMemo(() => categories || [], [categories]);
+  const categoryOptions = useMemo(
+    () =>
+      (categories || []).map((category) =>
+        getTranslatedCategory(category, language)
+      ),
+    [categories, language]
+  );
 
   return (
     <div className="page-stack">

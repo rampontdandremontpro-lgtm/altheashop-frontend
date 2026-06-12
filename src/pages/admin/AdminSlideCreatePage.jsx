@@ -1,19 +1,42 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SlideAdminForm from "../../components/admin/SlideAdminForm";
-import { createAdminSlide } from "../../api/homeApi";
+import { createAdminSlide, uploadAdminSlideImage } from "../../api/homeApi";
 
 function AdminSlideCreatePage() {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const [error, setError] = useState("");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Merci de choisir un fichier image.");
+      return;
+    }
+
+    setSelectedImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setError("");
+  };
 
   const handleCreate = async (formData) => {
     try {
       setLoading(true);
       setError("");
 
-      await createAdminSlide(formData);
+      const createdSlide = await createAdminSlide(formData);
+
+      if (selectedImage) {
+        await uploadAdminSlideImage(createdSlide.id, selectedImage);
+      }
+
       navigate("/admin/home");
     } catch (err) {
       setError(
@@ -41,6 +64,31 @@ function AdminSlideCreatePage() {
         </div>
 
         {error && <div className="box error-box">{error}</div>}
+
+        <div className="box admin-upload-box">
+          <h2>Image du slide</h2>
+
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="Aperçu du slide"
+              className="admin-product-preview-image"
+            />
+          ) : (
+            <p>Aucune image sélectionnée.</p>
+          )}
+
+          <label className="btn btn-secondary admin-file-label">
+            Choisir une image
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              disabled={loading}
+              hidden
+            />
+          </label>
+        </div>
 
         <SlideAdminForm
           onSubmit={handleCreate}

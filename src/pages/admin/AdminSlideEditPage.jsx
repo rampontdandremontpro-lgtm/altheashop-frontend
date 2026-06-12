@@ -1,7 +1,11 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SlideAdminForm from "../../components/admin/SlideAdminForm";
-import { getAdminSlides, updateAdminSlide } from "../../api/homeApi";
+import {
+  getAdminSlides,
+  updateAdminSlide,
+  uploadAdminSlideImage,
+} from "../../api/homeApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 
@@ -12,22 +16,28 @@ function AdminSlideEditPage() {
   const [slide, setSlide] = useState(null);
   const [loadingPage, setLoadingPage] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  async function loadSlide() {
+    const slides = await getAdminSlides();
+    const foundSlide = slides.find((item) => Number(item.id) === Number(id));
+
+    if (!foundSlide) {
+      throw new Error("Slide introuvable.");
+    }
+
+    setSlide(foundSlide);
+    return foundSlide;
+  }
 
   useEffect(() => {
-    async function loadSlide() {
+    async function loadPage() {
       try {
         setLoadingPage(true);
         setError("");
-
-        const slides = await getAdminSlides();
-        const foundSlide = slides.find((item) => Number(item.id) === Number(id));
-
-        if (!foundSlide) {
-          throw new Error("Slide introuvable.");
-        }
-
-        setSlide(foundSlide);
+        await loadSlide();
       } catch (err) {
         setError(
           err.response?.data?.message ||
@@ -39,13 +49,14 @@ function AdminSlideEditPage() {
       }
     }
 
-    loadSlide();
+    loadPage();
   }, [id]);
 
   const handleSave = async (formData) => {
     try {
       setSaving(true);
       setError("");
+      setSuccess("");
 
       await updateAdminSlide(id, formData);
       navigate("/admin/home");
@@ -57,6 +68,37 @@ function AdminSlideEditPage() {
       );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Merci de choisir un fichier image.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setError("");
+      setSuccess("");
+
+      const updatedSlide = await uploadAdminSlideImage(id, file);
+      setSlide(updatedSlide);
+
+      setSuccess("Image du slide modifiée avec succès.");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Impossible de modifier l'image du slide."
+      );
+    } finally {
+      setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -78,6 +120,32 @@ function AdminSlideEditPage() {
         </div>
 
         {error && <div className="box error-box">{error}</div>}
+        {success && <div className="box success-box">{success}</div>}
+
+        <div className="box admin-upload-box">
+          <h2>Image du slide</h2>
+
+          {slide?.imageUrl ? (
+            <img
+              src={slide.imageUrl}
+              alt={slide.title}
+              className="admin-product-preview-image"
+            />
+          ) : (
+            <p>Aucune image pour ce slide.</p>
+          )}
+
+          <label className="btn btn-secondary admin-file-label">
+            {uploading ? "Envoi en cours..." : "Changer l’image du slide"}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              disabled={uploading}
+              hidden
+            />
+          </label>
+        </div>
 
         <SlideAdminForm
           initialValues={slide}

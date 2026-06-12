@@ -181,14 +181,6 @@ function ProductAdminForm({
           min="0"
         />
 
-        <input
-          type="text"
-          name="imageUrl"
-          placeholder="URL image principale"
-          value={form.imageUrl}
-          onChange={handleChange}
-        />
-
         <textarea
           name="shortDescription"
           placeholder="Description courte"

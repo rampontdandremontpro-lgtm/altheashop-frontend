@@ -50,10 +50,9 @@ function SlideAdminForm({
     e.preventDefault();
     setError("");
 
-    if (!form.title || !form.imageUrl) {
-      setError("Le titre et l'URL de l'image sont obligatoires.");
-      return;
-    }
+    if (!form.title) {
+  setError("Le titre est obligatoire.");
+}
 
     await onSubmit(form);
   };
@@ -78,14 +77,6 @@ function SlideAdminForm({
           name="subtitle"
           placeholder="Sous-titre"
           value={form.subtitle}
-          onChange={handleChange}
-        />
-
-        <input
-          type="text"
-          name="imageUrl"
-          placeholder="URL de l'image"
-          value={form.imageUrl}
           onChange={handleChange}
         />
 

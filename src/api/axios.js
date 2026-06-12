@@ -1,15 +1,14 @@
 import axios from "axios";
 
-export const API_BASE_URL = "http://172.20.10.13:3001/api";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+
 export const ASSET_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
 
 export function resolveImageUrl(url) {
   if (!url) return "";
 
-  if (
-    url.startsWith("data:") ||
-    url.startsWith("blob:")
-  ) {
+  if (url.startsWith("data:") || url.startsWith("blob:")) {
     return url;
   }
 

@@ -1,12 +1,34 @@
 import api, { resolveImageUrl } from "./axios";
 
+function normalizeImage(image) {
+  if (!image) return null;
+
+  const url = resolveImageUrl(image.url || image.imageUrl || "");
+
+  return {
+    ...image,
+    url,
+    imageUrl: url,
+    altText: image.altText || image.alt || "",
+    displayOrder: Number(image.displayOrder ?? 0),
+  };
+}
+
+function normalizeTranslations(translations) {
+  return Array.isArray(translations) ? translations : [];
+}
+
 function normalizeProduct(product) {
-  const firstImageUrl = resolveImageUrl(
-  product.imageUrl ||
-    product.images?.[0]?.url ||
-    product.images?.[0]?.imageUrl ||
-    ""
-);
+  if (!product) return null;
+
+  const normalizedImages = Array.isArray(product.images)
+    ? product.images.map(normalizeImage).filter(Boolean)
+    : [];
+
+  const imageUrl =
+    resolveImageUrl(product.imageUrl || "") ||
+    normalizedImages[0]?.url ||
+    "";
 
   return {
     id: product.id,
@@ -27,21 +49,17 @@ function normalizeProduct(product) {
     categoryId: product.categoryId ?? product.category?.id ?? "",
     categoryName: product.category?.name || "",
     category: product.category || null,
-    imageUrl: firstImageUrl,
-    images: Array.isArray(product.images)
-  ? product.images.map((image) => ({
-      ...image,
-      url: resolveImageUrl(image.url || image.imageUrl || ""),
-      imageUrl: resolveImageUrl(image.url || image.imageUrl || ""),
-    }))
-  : [],
+    imageUrl,
+    images: normalizedImages,
+    translations: normalizeTranslations(product.translations),
   };
 }
 
 function normalizeCategory(category) {
   return {
     ...category,
-    imageUrl: resolveImageUrl(category.imageUrl || ""),
+    imageUrl: resolveImageUrl(category?.imageUrl || ""),
+    translations: normalizeTranslations(category?.translations),
   };
 }
 
@@ -92,6 +110,52 @@ export async function getAdminCategories() {
     : [];
 }
 
+export async function createAdminCategory(payload) {
+  const response = await api.post("/admin/categories", {
+    name: payload.name,
+    slug: payload.slug,
+    description: payload.description || "",
+    displayOrder: Number(payload.displayOrder || 0),
+    isActive: Boolean(payload.isActive),
+  });
+
+  return normalizeCategory(response.data);
+}
+
+export async function updateAdminCategory(id, payload) {
+  const response = await api.patch(`/admin/categories/${id}`, {
+    name: payload.name,
+    slug: payload.slug,
+    description: payload.description || "",
+    displayOrder: Number(payload.displayOrder || 0),
+    isActive: Boolean(payload.isActive),
+  });
+
+  return normalizeCategory(response.data);
+}
+
+export async function deleteAdminCategory(id) {
+  await api.delete(`/admin/categories/${id}`);
+  return true;
+}
+
+export async function uploadAdminCategoryImage(categoryId, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post(
+    `/admin/categories/${categoryId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return normalizeCategory(response.data);
+}
+
 export async function getAdminProducts() {
   const response = await api.get("/admin/products");
   const data = response.data;
@@ -130,43 +194,83 @@ export async function uploadAdminProductImage(productId, file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await api.post(`/admin/products/${productId}/image`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await api.post(
+    `/admin/products/${productId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
   return normalizeProduct(response.data);
 }
 
-export async function createAdminCategory(payload) {
-  const response = await api.post("/admin/categories", {
-    name: payload.name,
-    slug: payload.slug,
-    description: payload.description || "",
-    imageUrl: payload.imageUrl || "",
-    displayOrder: Number(payload.displayOrder || 0),
-    isActive: Boolean(payload.isActive),
-  });
+export async function getAdminProductImages(productId) {
+  const response = await api.get(`/admin/products/${productId}/images`);
 
-  return normalizeCategory(response.data);
+  return Array.isArray(response.data)
+    ? response.data.map(normalizeImage).filter(Boolean)
+    : [];
 }
 
-export async function updateAdminCategory(id, payload) {
-  const response = await api.patch(`/admin/categories/${id}`, {
-    name: payload.name,
-    slug: payload.slug,
-    description: payload.description || "",
-    imageUrl: payload.imageUrl || "",
-    displayOrder: Number(payload.displayOrder || 0),
-    isActive: Boolean(payload.isActive),
-  });
+export async function uploadAdminProductGalleryImage(productId, file) {
+  const formData = new FormData();
+  formData.append("file", file);
 
-  return normalizeCategory(response.data);
+  const response = await api.post(
+    `/admin/products/${productId}/images`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return normalizeImage(response.data);
 }
 
-export async function deleteAdminCategory(id) {
-  await api.delete(`/admin/categories/${id}`);
+export async function updateAdminProductGalleryImage(productId, imageId, payload) {
+  const response = await api.patch(
+    `/admin/products/${productId}/images/${imageId}`,
+    {
+      altText: payload.altText || "",
+      displayOrder: Number(payload.displayOrder || 0),
+    }
+  );
+
+  return normalizeImage(response.data);
+}
+
+export async function deleteAdminProductGalleryImage(productId, imageId) {
+  await api.delete(`/admin/products/${productId}/images/${imageId}`);
+  return true;
+}
+
+export async function getAdminProductTranslations(productId) {
+  const response = await api.get(`/admin/products/${productId}/translations`);
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function saveAdminProductTranslation(productId, payload) {
+  const response = await api.post(
+    `/admin/products/${productId}/translations`,
+    {
+      language: payload.language,
+      name: payload.name || "",
+      shortDescription: payload.shortDescription || "",
+      description: payload.description || "",
+      techSpecs: payload.techSpecs || {},
+    }
+  );
+
+  return response.data;
+}
+
+export async function deleteAdminProductTranslation(productId, language) {
+  await api.delete(`/admin/products/${productId}/translations/${language}`);
   return true;
 }
 
@@ -213,84 +317,6 @@ export async function updateAdminUser(id, payload) {
 
 export async function deleteAdminUser(id) {
   await api.delete(`/admin/users/${id}`);
-  return true;
-}
-
-export async function uploadAdminCategoryImage(categoryId, file) {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await api.post(
-    `/admin/categories/${categoryId}/image`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-
-  return {
-    ...response.data,
-    imageUrl: resolveImageUrl(response.data.imageUrl || ""),
-  };
-}
-
-export async function getAdminProductImages(productId) {
-  const response = await api.get(`/admin/products/${productId}/images`);
-
-  return Array.isArray(response.data)
-    ? response.data.map((image) => ({
-        ...image,
-        url: resolveImageUrl(image.url || image.imageUrl || ""),
-        imageUrl: resolveImageUrl(image.url || image.imageUrl || ""),
-      }))
-    : [];
-}
-
-export async function uploadAdminProductGalleryImage(productId, file) {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await api.post(
-    `/admin/products/${productId}/images`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-
-  return {
-    ...response.data,
-    url: resolveImageUrl(response.data.url || response.data.imageUrl || ""),
-    imageUrl: resolveImageUrl(response.data.url || response.data.imageUrl || ""),
-  };
-}
-
-export async function updateAdminProductGalleryImage(
-  productId,
-  imageId,
-  payload
-) {
-  const response = await api.patch(
-    `/admin/products/${productId}/images/${imageId}`,
-    {
-      altText: payload.altText || "",
-      displayOrder: Number(payload.displayOrder || 0),
-    }
-  );
-
-  return {
-    ...response.data,
-    url: resolveImageUrl(response.data.url || response.data.imageUrl || ""),
-    imageUrl: resolveImageUrl(response.data.url || response.data.imageUrl || ""),
-  };
-}
-
-export async function deleteAdminProductGalleryImage(productId, imageId) {
-  await api.delete(`/admin/products/${productId}/images/${imageId}`);
   return true;
 }
 

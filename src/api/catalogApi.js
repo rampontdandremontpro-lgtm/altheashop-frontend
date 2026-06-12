@@ -3,7 +3,9 @@ import api, { resolveImageUrl } from "./axios";
 function normalizeImage(image) {
   if (!image) return null;
 
-  const url = resolveImageUrl(image.url || image.imageUrl || "");
+  const rawUrl = image.url || image.imageUrl || "";
+  const url = resolveImageUrl(rawUrl);
+
   return {
     id: image.id,
     url,
@@ -13,17 +15,32 @@ function normalizeImage(image) {
   };
 }
 
+function normalizeTranslations(translations) {
+  return Array.isArray(translations) ? translations : [];
+}
+
 function normalizeCategory(category) {
   if (!category) return null;
 
   return {
     id: category.id,
-    name: category.name,
-    slug: category.slug,
+    name: category.name || "",
+    slug: category.slug || "",
     description: category.description || "",
     imageUrl: resolveImageUrl(category.imageUrl || ""),
     displayOrder: category.displayOrder ?? 0,
+    translations: normalizeTranslations(category.translations),
   };
+}
+
+function normalizeTechSpecs(techSpecs) {
+  if (!techSpecs) return "";
+
+  if (typeof techSpecs === "string") {
+    return techSpecs;
+  }
+
+  return techSpecs.content || "";
 }
 
 function normalizeProduct(product) {
@@ -33,29 +50,30 @@ function normalizeProduct(product) {
     ? product.images.map(normalizeImage).filter(Boolean)
     : [];
 
+  const mainImageUrl =
+    resolveImageUrl(product.imageUrl || "") ||
+    normalizedImages[0]?.url ||
+    normalizedImages[0]?.imageUrl ||
+    "";
+
   return {
     id: product.id,
     sku: product.sku || "",
-    name: product.name,
-    slug: product.slug,
+    name: product.name || "",
+    slug: product.slug || "",
     shortDescription: product.shortDescription || "",
     description: product.description || "",
-    techSpecs: product.techSpecs || "",
+    techSpecs: normalizeTechSpecs(product.techSpecs),
     priceCents: product.priceCents ?? 0,
     stock: product.stock ?? 0,
     priority: product.priority ?? 0,
     isActive: Boolean(product.isActive),
+    isFeatured: Boolean(product.isFeatured),
     categoryId: product.categoryId ?? product.category?.id ?? null,
     category: normalizeCategory(product.category),
-    imageUrl:
-      resolveImageUrl(product.imageUrl || "") ||
-      normalizedImages[0]?.url ||
-      normalizedImages[0]?.imageUrl ||
-      "",
+    imageUrl: mainImageUrl,
     images: normalizedImages,
-    translations: Array.isArray(product.translations)
-  ? product.translations
-  : [],
+    translations: normalizeTranslations(product.translations),
     createdAt: product.createdAt || null,
     updatedAt: product.updatedAt || null,
   };
@@ -108,12 +126,20 @@ export async function getProducts(params = {}) {
   const cleanParams = {};
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== "" && value !== null && value !== undefined && value !== false) {
+    if (
+      value !== "" &&
+      value !== null &&
+      value !== undefined &&
+      value !== false
+    ) {
       cleanParams[key] = value;
     }
   });
 
-  const response = await api.get("/catalog/products", { params: cleanParams });
+  const response = await api.get("/catalog/products", {
+    params: cleanParams,
+  });
+
   const data = response.data;
 
   return {

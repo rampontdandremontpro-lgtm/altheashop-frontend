@@ -81,6 +81,7 @@ function AppRouter() {
         <Route path="admin/categories/new" element={<AdminRoute><AdminCategoryCreatePage /></AdminRoute>} />
         <Route path="admin/categories/:id/edit" element={<AdminRoute><AdminCategoryEditPage /></AdminRoute>} />
         <Route path="admin/chatbot" element={<AdminRoute><AdminChatbotMessagesPage /></AdminRoute>}/>
+        <Route path="admin/contact" element={<AdminRoute><AdminContactMessagesPage /></AdminRoute>}s/>
         <Route path="admin/categories" element={<AdminRoute><AdminCategoriesPage /></AdminRoute>} />
         <Route path="admin/orders" element={<AdminRoute><AdminOrdersPage /></AdminRoute>} />
         <Route path="admin/orders/:id" element={<AdminRoute><AdminOrderDetailPage /></AdminRoute>} />

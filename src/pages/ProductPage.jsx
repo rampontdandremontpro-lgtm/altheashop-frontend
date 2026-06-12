@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 import SimilarProducts from "../components/catalog/SimilarProducts";
 import { useI18n } from "../context/I18nContext";
 import { getTranslatedProduct } from "../utils/productTranslations";
+import { getTranslatedCategory } from "../utils/categoryTranslations";
 import { resolveImageUrl } from "../api/axios";
 
 function isValidImageUrl(url) {
@@ -120,7 +121,16 @@ function ProductPage() {
   if (!product) return <ErrorMessage message={t("productNotFound")} />;
 
   const currentImage = productImages[currentImageIndex];
-  const translatedProduct = getTranslatedProduct(product, language);
+
+const translatedProduct = getTranslatedProduct(
+  product,
+  language
+);
+
+const translatedCategory = getTranslatedCategory(
+  product.category,
+  language
+);
 
   return (
     <div className="page-stack">
@@ -205,7 +215,9 @@ function ProductPage() {
           </div>
 
           <div className="box">
-            <p className="product-category">{product.category?.name}</p>
+            <p className="product-category">
+  {translatedCategory?.name || product.category?.name}
+</p>
 
             <h1>{translatedProduct.name}</h1>
 

@@ -105,14 +105,6 @@ function CategoryAdminForm({
           min="0"
         />
 
-        <input
-          type="text"
-          name="imageUrl"
-          placeholder="URL image"
-          value={form.imageUrl}
-          onChange={handleChange}
-        />
-
         <textarea
           name="description"
           placeholder="Description"

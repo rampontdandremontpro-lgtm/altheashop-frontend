@@ -14,11 +14,19 @@ const CartContext = createContext(null);
 const LOCAL_STORAGE_KEY = "althea_cart";
 
 function hasToken() {
-  return Boolean(localStorage.getItem("althea_token"));
+  return Boolean(
+    localStorage.getItem("althea_token") ||
+      sessionStorage.getItem("althea_token")
+  );
 }
 
 function normalizeImage(product) {
-  return resolveImageUrl(product?.imageUrl || product?.images?.[0]?.url || "");
+  return resolveImageUrl(
+    product?.imageUrl ||
+      product?.images?.[0]?.url ||
+      product?.images?.[0]?.imageUrl ||
+      ""
+  );
 }
 
 function normalizeCartResponse(data) {
@@ -33,6 +41,9 @@ function normalizeCartResponse(data) {
     priceCents: item.product?.priceCents || 0,
     stock: item.product?.stock || 0,
     imageUrl: normalizeImage(item.product),
+    translations: Array.isArray(item.product?.translations)
+      ? item.product.translations
+      : [],
     quantity: item.quantity,
   }));
 }
@@ -129,6 +140,9 @@ export function CartProvider({ children }) {
           priceCents: product.priceCents,
           stock: product.stock,
           imageUrl: normalizeImage(product),
+          translations: Array.isArray(product.translations)
+            ? product.translations
+            : [],
           quantity: 1,
         },
       ];

@@ -44,11 +44,11 @@ export async function getPublicHomeData() {
     slides: Array.isArray(data?.slides) ? data.slides.map(normalizeSlide) : [],
     homeText: data?.homeText || "",
     categories: Array.isArray(data?.categories)
-  ? data.categories.map(normalizeCategory)
-  : [],
-featured: Array.isArray(data?.featured)
-  ? data.featured.map(normalizeProduct)
-  : [],
+      ? data.categories.map(normalizeCategory)
+      : [],
+    featured: Array.isArray(data?.featured)
+      ? data.featured.map(normalizeProduct)
+      : [],
   };
 }
 
@@ -74,7 +74,6 @@ export async function createAdminSlide(payload) {
   const response = await api.post("/admin/slides", {
     title: payload.title,
     subtitle: payload.subtitle || "",
-    imageUrl: payload.imageUrl,
     ctaLabel: payload.ctaLabel || "",
     ctaUrl: payload.ctaUrl || "",
     displayOrder: Number(payload.displayOrder || 0),
@@ -88,11 +87,23 @@ export async function updateAdminSlide(id, payload) {
   const response = await api.patch(`/admin/slides/${id}`, {
     title: payload.title,
     subtitle: payload.subtitle || "",
-    imageUrl: payload.imageUrl,
     ctaLabel: payload.ctaLabel || "",
     ctaUrl: payload.ctaUrl || "",
     displayOrder: Number(payload.displayOrder || 0),
     isActive: Boolean(payload.isActive),
+  });
+
+  return normalizeSlide(response.data);
+}
+
+export async function uploadAdminSlideImage(slideId, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post(`/admin/slides/${slideId}/image`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 
   return normalizeSlide(response.data);
