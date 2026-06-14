@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   addCartItem,
   clearCartApi,
@@ -57,8 +64,14 @@ function saveLocalCart(items) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
 }
 
+function clearLocalCart() {
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
+}
+
 export function CartProvider({ children }) {
   const { user, isAuthenticated, authLoading } = useAuth();
+
+  const mergedUserIdRef = useRef(null);
 
   const [cartItems, setCartItems] = useState(() =>
     hasToken() ? [] : getLocalCart()
@@ -86,12 +99,51 @@ export function CartProvider({ children }) {
     }
   };
 
+  const mergeLocalCartIntoAccount = async () => {
+    const localCart = getLocalCart();
+
+    if (!hasToken() || localCart.length === 0) {
+      await loadCart();
+      return;
+    }
+
+    try {
+      setCartLoading(true);
+      setCartError("");
+
+      for (const item of localCart) {
+        const productId = item.productId || item.id;
+        const quantity = Number(item.quantity || 1);
+
+        for (let i = 0; i < quantity; i += 1) {
+          await addCartItem(productId, 1);
+        }
+      }
+
+      clearLocalCart();
+
+      const data = await getCart();
+      setCartItems(normalizeCartResponse(data));
+    } catch {
+      setCartError("Impossible de synchroniser le panier visiteur.");
+      await loadCart();
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (authLoading) return;
 
-    if (isAuthenticated) {
-      loadCart();
+    if (isAuthenticated && user?.id) {
+      if (mergedUserIdRef.current !== user.id) {
+        mergedUserIdRef.current = user.id;
+        mergeLocalCartIntoAccount();
+      } else {
+        loadCart();
+      }
     } else {
+      mergedUserIdRef.current = null;
       setCartItems(getLocalCart());
     }
   }, [authLoading, isAuthenticated, user?.id]);
@@ -248,7 +300,7 @@ export function CartProvider({ children }) {
     }
 
     setCartItems([]);
-    saveLocalCart([]);
+    clearLocalCart();
   };
 
   const totalItems = useMemo(() => {

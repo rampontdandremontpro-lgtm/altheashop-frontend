@@ -84,11 +84,14 @@ function CheckoutForm({ addresses, cartItems, totalPriceCents, clearCart }) {
         paymentMethod: "card",
       });
 
-      await clearCart();
-
       navigate(
-        `/checkout/success?reference=${order.reference}&total=${order.totalPriceCents}`
+        `/checkout/success?reference=${order.reference}&total=${order.totalPriceCents}`,
+        { replace: true }
       );
+
+      window.setTimeout(() => {
+        clearCart();
+      }, 0);
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || t("orderConfirmError")
